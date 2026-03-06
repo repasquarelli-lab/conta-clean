@@ -1,14 +1,19 @@
-// Update this page (the content is just a fallback if you fail to update the page)
+import { AppProvider, useApp } from '@/contexts/AppContext';
+import Landing from '@/components/Landing';
+import Auth from '@/components/Auth';
+import AppShell from '@/components/AppShell';
 
-const Index = () => {
-  return (
-    <div className="flex min-h-screen items-center justify-center bg-background">
-      <div className="text-center">
-        <h1 className="mb-4 text-4xl font-bold">Welcome to Your Blank App</h1>
-        <p className="text-xl text-muted-foreground">Start building your amazing project here!</p>
-      </div>
-    </div>
-  );
-};
+function ScreenRouter() {
+  const { screen } = useApp();
+  if (screen === 'landing') return <Landing />;
+  if (screen === 'auth') return <Auth />;
+  return <AppShell />;
+}
+
+const Index = () => (
+  <AppProvider>
+    <ScreenRouter />
+  </AppProvider>
+);
 
 export default Index;
