@@ -3,6 +3,7 @@ import { currency, monthMetrics, paidCount, upcomingBills, dueTodayBills, overdu
 import BillItem from '../BillItem';
 import { PieChart, Pie, Cell, ResponsiveContainer, Tooltip, BarChart, Bar, XAxis, YAxis, CartesianGrid } from 'recharts';
 import MonthNavigator from '../MonthNavigator';
+import MarketTicker from '../MarketTicker';
 
 const CHART_COLORS = [
   'hsl(190, 90%, 50%)',
@@ -56,6 +57,11 @@ export default function DashboardView() {
 
   return (
     <div>
+      {/* Market Ticker */}
+      <div className="mb-4">
+        <MarketTicker />
+      </div>
+
       {/* Month Navigator */}
       <div className="mb-4 flex justify-center sm:justify-start">
         <MonthNavigator month={currentMonth} onChange={setCurrentMonth} />
