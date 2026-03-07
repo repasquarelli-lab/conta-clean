@@ -161,13 +161,23 @@ export default function AppShell() {
           </div>
         </div>
 
-        <div className="animate-fade-in">
-          {currentView === 'dashboard' && <DashboardView />}
-          {currentView === 'lancamentos' && <LancamentosView />}
-          {currentView === 'fixas' && <FixasView />}
-          {currentView === 'agenda' && <AgendaView />}
-          {currentView === 'resumo' && <ResumoView />}
-          {currentView === 'config' && <ConfigView />}
+        <div className="overflow-hidden">
+          <AnimatePresence mode="wait" initial={false}>
+            <motion.div
+              key={currentView}
+              initial={{ opacity: 0, x: direction * 60 }}
+              animate={{ opacity: 1, x: 0 }}
+              exit={{ opacity: 0, x: direction * -60 }}
+              transition={{ duration: 0.25, ease: 'easeInOut' }}
+            >
+              {currentView === 'dashboard' && <DashboardView />}
+              {currentView === 'lancamentos' && <LancamentosView />}
+              {currentView === 'fixas' && <FixasView />}
+              {currentView === 'agenda' && <AgendaView />}
+              {currentView === 'resumo' && <ResumoView />}
+              {currentView === 'config' && <ConfigView />}
+            </motion.div>
+          </AnimatePresence>
         </div>
       </main>
 
