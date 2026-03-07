@@ -1,7 +1,7 @@
 import { useApp } from '@/contexts/AppContext';
-import { monthMetrics, paidCount, topCategory, currency, budgetProgress, getMonthEntries } from '@/lib/store';
+import { monthMetrics, paidCount, topCategory, currency, budgetProgress, getMonthEntries, AppState } from '@/lib/store';
 import MonthNavigator from '../MonthNavigator';
-import { Lightbulb, TrendingUp, TrendingDown, AlertTriangle, CheckCircle, Target, ShieldCheck } from 'lucide-react';
+import { Lightbulb, TrendingUp, TrendingDown, AlertTriangle, CheckCircle, Target, ShieldCheck, ArrowUpRight, ArrowDownRight, Minus } from 'lucide-react';
 
 function generateTips(state: any, month: string) {
   const m = monthMetrics(state, month);
