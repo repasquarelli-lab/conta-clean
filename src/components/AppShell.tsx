@@ -89,7 +89,7 @@ export default function AppShell() {
   return (
     <div className="min-h-screen flex flex-col lg:grid lg:grid-cols-[280px_1fr]">
       {/* Mobile Header */}
-      <header className="lg:hidden flex items-center justify-between px-4 py-3 border-b border-border sticky top-0 z-40" style={{ background: 'hsla(222,55%,8%,0.96)', backdropFilter: 'blur(12px)' }}>
+      <header className="lg:hidden flex items-center justify-between px-4 py-3 border-b border-border sticky top-0 z-40 bg-background/95 backdrop-blur-xl">
         <div className="flex items-center gap-3">
           <div className="w-9 h-9 rounded-xl grid place-items-center brand-gradient font-black tracking-wide text-primary-foreground text-xs">CC</div>
           <div>
