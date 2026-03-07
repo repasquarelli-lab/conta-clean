@@ -28,6 +28,7 @@ const BOTTOM_TABS = VIEWS.filter(v => v.id !== 'config');
 
 export default function AppShell() {
   const { state, currentView, setCurrentView, setScreen, reloadDemo } = useApp();
+  const { theme, toggleTheme } = useTheme();
   const meta = VIEWS.find(v => v.id === currentView)!;
   const [sidebarOpen, setSidebarOpen] = useState(false);
   const prevViewRef = useRef(currentView);
