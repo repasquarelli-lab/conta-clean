@@ -193,3 +193,14 @@ export function paidCount(state: AppState, month: string) {
   const exps = getMonthEntries(state, month).filter(e => e.type === 'expense');
   return { paid: exps.filter(e => e.paid).length, total: exps.length };
 }
+
+export function budgetProgress(state: AppState, month: string) {
+  const goals = state.budgetGoals || [];
+  const entries = getMonthEntries(state, month).filter(e => e.type === 'expense');
+  return goals.map(g => {
+    const spent = entries.filter(e => e.category === g.category).reduce((a, b) => a + Number(b.value || 0), 0);
+    const pct = g.limit > 0 ? Math.round((spent / g.limit) * 100) : 0;
+    return { ...g, spent, pct };
+  });
+}
+}
