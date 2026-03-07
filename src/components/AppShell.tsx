@@ -97,9 +97,14 @@ export default function AppShell() {
             <p className="text-[10px] text-muted-foreground">{state.userName ? `Olá, ${state.userName}` : 'Seu mês'}</p>
           </div>
         </div>
-        <button onClick={() => setSidebarOpen(!sidebarOpen)} className="w-10 h-10 rounded-xl grid place-items-center bg-card border border-border cursor-pointer">
-          {sidebarOpen ? <X className="w-5 h-5" /> : <Menu className="w-5 h-5" />}
-        </button>
+        <div className="flex items-center gap-2">
+          <button onClick={toggleTheme} className="w-10 h-10 rounded-xl grid place-items-center bg-card border border-border cursor-pointer" title={theme === 'dark' ? 'Modo claro' : 'Modo escuro'}>
+            {theme === 'dark' ? <Sun className="w-4.5 h-4.5" /> : <Moon className="w-4.5 h-4.5" />}
+          </button>
+          <button onClick={() => setSidebarOpen(!sidebarOpen)} className="w-10 h-10 rounded-xl grid place-items-center bg-card border border-border cursor-pointer">
+            {sidebarOpen ? <X className="w-5 h-5" /> : <Menu className="w-5 h-5" />}
+          </button>
+        </div>
       </header>
 
       {/* Mobile Slide-down Menu */}
