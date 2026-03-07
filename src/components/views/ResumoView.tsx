@@ -1,5 +1,6 @@
 import { useApp } from '@/contexts/AppContext';
 import { monthMetrics, paidCount, topCategory, currency } from '@/lib/store';
+import MonthNavigator from '../MonthNavigator';
 
 export default function ResumoView() {
   const { state, currentMonth, setCurrentMonth } = useApp();
@@ -27,7 +28,7 @@ export default function ResumoView() {
             <h3 className="font-bold">Leitura simples do mês</h3>
             <p className="text-muted-foreground text-sm">Resumo em linguagem humana</p>
           </div>
-          <input type="month" value={currentMonth} onChange={e => setCurrentMonth(e.target.value)} className="px-3 py-2 rounded-[14px] border border-border bg-input text-foreground text-sm outline-none" />
+          <MonthNavigator month={currentMonth} onChange={setCurrentMonth} />
         </div>
         <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
           {insights.map((text, i) => (

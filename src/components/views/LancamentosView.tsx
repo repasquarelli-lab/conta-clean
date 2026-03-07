@@ -1,6 +1,7 @@
 import { useState } from 'react';
 import { useApp } from '@/contexts/AppContext';
 import { getMonthEntries, currency, formatDate, todayISO, uid, categories, incomeCategories } from '@/lib/store';
+import MonthNavigator from '../MonthNavigator';
 
 export default function LancamentosView() {
   const { state, updateState, currentMonth, setCurrentMonth } = useApp();
@@ -55,7 +56,7 @@ export default function LancamentosView() {
             <h3 className="font-bold">Novo lançamento</h3>
             <p className="text-muted-foreground text-sm">Cadastre uma entrada ou saída em poucos campos</p>
           </div>
-          <input type="month" value={currentMonth} onChange={e => setCurrentMonth(e.target.value)} className="px-3 py-2 rounded-[14px] border border-border bg-input text-foreground text-sm outline-none" />
+          <MonthNavigator month={currentMonth} onChange={setCurrentMonth} />
         </div>
 
         <div className="flex gap-2 mb-4">
