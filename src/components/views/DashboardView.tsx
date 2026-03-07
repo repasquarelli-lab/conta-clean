@@ -1,5 +1,5 @@
 import { useApp } from '@/contexts/AppContext';
-import { currency, monthMetrics, paidCount, upcomingBills, dueTodayBills, overdueBills, topCategory, getMonthEntries, ensureMonthFixedBills, AppState } from '@/lib/store';
+import { currency, monthMetrics, paidCount, upcomingBills, dueTodayBills, overdueBills, topCategory, getMonthEntries, ensureMonthFixedBills, AppState, budgetProgress } from '@/lib/store';
 import BillItem from '../BillItem';
 import { PieChart, Pie, Cell, ResponsiveContainer, Tooltip, BarChart, Bar, XAxis, YAxis, CartesianGrid, AreaChart, Area, Legend } from 'recharts';
 import MonthNavigator from '../MonthNavigator';
@@ -210,6 +210,49 @@ export default function DashboardView() {
           </ResponsiveContainer>
         </div>
       </div>
+
+      {/* Budget Goals */}
+      {(state.budgetGoals?.length ?? 0) > 0 && (
+        <div className="glass-panel p-4 mt-4">
+          <div className="mb-3">
+            <h3 className="font-bold">Metas de orçamento</h3>
+            <p className="text-muted-foreground text-sm">Acompanhe seus limites por categoria</p>
+          </div>
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3">
+            {budgetProgress(state, currentMonth).map(g => {
+              const overBudget = g.pct > 100;
+              const nearLimit = g.pct >= 80 && g.pct <= 100;
+              return (
+                <div key={g.category} className="p-3.5 rounded-2xl bg-accent border border-border">
+                  <div className="flex justify-between items-center mb-1.5">
+                    <span className="text-sm font-semibold">{g.category}</span>
+                    <span className={`text-xs font-bold ${overBudget ? 'text-red-400' : nearLimit ? 'text-yellow-400' : 'text-emerald-400'}`}>
+                      {g.pct}%
+                    </span>
+                  </div>
+                  <div className="progress-bar mb-1.5">
+                    <div
+                      className="h-full rounded-full transition-all"
+                      style={{
+                        width: `${Math.min(g.pct, 100)}%`,
+                        background: overBudget
+                          ? 'hsl(0, 72%, 51%)'
+                          : nearLimit
+                          ? 'hsl(38, 92%, 50%)'
+                          : 'hsl(142, 71%, 45%)',
+                      }}
+                    />
+                  </div>
+                  <div className="flex justify-between text-[11px] text-muted-foreground">
+                    <span>{currency(g.spent)} gasto</span>
+                    <span>de {currency(g.limit)}</span>
+                  </div>
+                </div>
+              );
+            })}
+          </div>
+        </div>
+      )}
 
       {/* Two columns */}
       <div className="grid grid-cols-1 lg:grid-cols-[1.12fr_0.88fr] gap-4 mt-4">
