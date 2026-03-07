@@ -57,6 +57,11 @@ export default function DashboardView() {
 
   return (
     <div>
+      {/* Market Ticker */}
+      <div className="mb-4">
+        <MarketTicker />
+      </div>
+
       {/* Month Navigator */}
       <div className="mb-4 flex justify-center sm:justify-start">
         <MonthNavigator month={currentMonth} onChange={setCurrentMonth} />
