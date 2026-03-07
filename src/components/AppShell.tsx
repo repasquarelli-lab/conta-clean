@@ -1,7 +1,10 @@
-import { useState } from 'react';
+import { useState, useRef } from 'react';
 import { useApp, View } from '@/contexts/AppContext';
 import { saveState } from '@/lib/store';
 import { LayoutDashboard, ArrowLeftRight, Pin, CalendarClock, FileText, Settings, Menu, X, Home } from 'lucide-react';
+import { AnimatePresence, motion } from 'framer-motion';
+
+const VIEW_ORDER: View[] = ['dashboard', 'lancamentos', 'fixas', 'agenda', 'resumo', 'config'];
 import DashboardView from './views/DashboardView';
 import LancamentosView from './views/LancamentosView';
 import FixasView from './views/FixasView';
@@ -25,6 +28,9 @@ export default function AppShell() {
   const { state, currentView, setCurrentView, setScreen, reloadDemo } = useApp();
   const meta = VIEWS.find(v => v.id === currentView)!;
   const [sidebarOpen, setSidebarOpen] = useState(false);
+  const prevViewRef = useRef(currentView);
+  const direction = VIEW_ORDER.indexOf(currentView) >= VIEW_ORDER.indexOf(prevViewRef.current) ? 1 : -1;
+  prevViewRef.current = currentView;
 
   function exportBackup() {
     const blob = new Blob([JSON.stringify(state, null, 2)], { type: 'application/json' });
@@ -155,13 +161,23 @@ export default function AppShell() {
           </div>
         </div>
 
-        <div className="animate-fade-in">
-          {currentView === 'dashboard' && <DashboardView />}
-          {currentView === 'lancamentos' && <LancamentosView />}
-          {currentView === 'fixas' && <FixasView />}
-          {currentView === 'agenda' && <AgendaView />}
-          {currentView === 'resumo' && <ResumoView />}
-          {currentView === 'config' && <ConfigView />}
+        <div className="overflow-hidden">
+          <AnimatePresence mode="wait" initial={false}>
+            <motion.div
+              key={currentView}
+              initial={{ opacity: 0, x: direction * 60 }}
+              animate={{ opacity: 1, x: 0 }}
+              exit={{ opacity: 0, x: direction * -60 }}
+              transition={{ duration: 0.25, ease: 'easeInOut' }}
+            >
+              {currentView === 'dashboard' && <DashboardView />}
+              {currentView === 'lancamentos' && <LancamentosView />}
+              {currentView === 'fixas' && <FixasView />}
+              {currentView === 'agenda' && <AgendaView />}
+              {currentView === 'resumo' && <ResumoView />}
+              {currentView === 'config' && <ConfigView />}
+            </motion.div>
+          </AnimatePresence>
         </div>
       </main>
 
