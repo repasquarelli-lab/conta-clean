@@ -177,6 +177,8 @@ export default function ResumoView() {
   const m = monthMetrics(state, currentMonth);
   const counts = paidCount(state, currentMonth);
   const tips = generateTips(state, currentMonth);
+  const comparison = getCategoryComparison(state, currentMonth);
+  const prevMonthStr = getPrevMonth(currentMonth);
 
   return (
     <div>
