@@ -136,6 +136,41 @@ function generateTips(state: any, month: string) {
   return tips;
 }
 
+function getPrevMonth(month: string): string {
+  const [y, m] = month.split('-').map(Number);
+  const d = new Date(y, m - 2, 1);
+  return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}`;
+}
+
+function getCategoryComparison(state: AppState, month: string) {
+  const prev = getPrevMonth(month);
+  const curEntries = getMonthEntries(state, month).filter(e => e.type === 'expense');
+  const prevEntries = getMonthEntries(state, prev).filter(e => e.type === 'expense');
+
+  const curMap: Record<string, number> = {};
+  const prevMap: Record<string, number> = {};
+  curEntries.forEach(e => { curMap[e.category] = (curMap[e.category] || 0) + Number(e.value || 0); });
+  prevEntries.forEach(e => { prevMap[e.category] = (prevMap[e.category] || 0) + Number(e.value || 0); });
+
+  const allCats = new Set([...Object.keys(curMap), ...Object.keys(prevMap)]);
+  return Array.from(allCats)
+    .map(cat => {
+      const cur = curMap[cat] || 0;
+      const prv = prevMap[cat] || 0;
+      const diff = cur - prv;
+      const pct = prv > 0 ? Math.round(((cur - prv) / prv) * 100) : cur > 0 ? 100 : 0;
+      return { category: cat, current: cur, previous: prv, diff, pct };
+    })
+    .filter(c => c.current > 0 || c.previous > 0)
+    .sort((a, b) => Math.abs(b.diff) - Math.abs(a.diff));
+}
+
+const MONTH_LABELS = ['Jan', 'Fev', 'Mar', 'Abr', 'Mai', 'Jun', 'Jul', 'Ago', 'Set', 'Out', 'Nov', 'Dez'];
+function monthLabel(month: string) {
+  const [y, m] = month.split('-').map(Number);
+  return `${MONTH_LABELS[m - 1]}/${String(y).slice(2)}`;
+}
+
 export default function ResumoView() {
   const { state, currentMonth, setCurrentMonth } = useApp();
 
