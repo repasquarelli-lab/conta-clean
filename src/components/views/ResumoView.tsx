@@ -207,6 +207,56 @@ export default function ResumoView() {
         </div>
       </div>
 
+      {/* Month comparison */}
+      {comparison.length > 0 && (
+        <div className="glass-panel p-4 mb-4">
+          <div className="mb-3">
+            <h3 className="font-bold">Comparação com mês anterior</h3>
+            <p className="text-muted-foreground text-sm">
+              {monthLabel(currentMonth)} vs {monthLabel(prevMonthStr)} — por categoria
+            </p>
+          </div>
+          <div className="flex flex-col gap-2">
+            {comparison.map(c => {
+              const increased = c.diff > 0;
+              const decreased = c.diff < 0;
+              const isNew = c.previous === 0 && c.current > 0;
+              const removed = c.previous > 0 && c.current === 0;
+              return (
+                <div key={c.category} className="flex items-center gap-3 p-3 rounded-xl bg-accent border border-border">
+                  <div className="flex-1 min-w-0">
+                    <div className="flex items-center gap-2">
+                      <span className="text-sm font-semibold truncate">{c.category}</span>
+                      {isNew && <span className="text-[10px] font-bold px-1.5 py-0.5 rounded-full bg-primary/20 text-primary">NOVO</span>}
+                      {removed && <span className="text-[10px] font-bold px-1.5 py-0.5 rounded-full bg-muted text-muted-foreground">ZEROU</span>}
+                    </div>
+                    <div className="flex gap-3 text-xs text-muted-foreground mt-0.5">
+                      <span>Anterior: {currency(c.previous)}</span>
+                      <span>Atual: {currency(c.current)}</span>
+                    </div>
+                  </div>
+                  <div className={`flex items-center gap-1 text-sm font-bold shrink-0 ${
+                    increased ? 'text-red-400' : decreased ? 'text-emerald-400' : 'text-muted-foreground'
+                  }`}>
+                    {increased ? <ArrowUpRight className="w-4 h-4" /> : decreased ? <ArrowDownRight className="w-4 h-4" /> : <Minus className="w-4 h-4" />}
+                    {c.diff !== 0 ? (
+                      <span>{increased ? '+' : ''}{currency(c.diff)}</span>
+                    ) : (
+                      <span>igual</span>
+                    )}
+                  </div>
+                  {c.pct !== 0 && !isNew && !removed && (
+                    <span className={`text-[11px] font-semibold shrink-0 ${increased ? 'text-red-400' : 'text-emerald-400'}`}>
+                      {c.pct > 0 ? '+' : ''}{c.pct}%
+                    </span>
+                  )}
+                </div>
+              );
+            })}
+          </div>
+        </div>
+      )}
+
       {/* Quick numbers */}
       <div className="glass-panel p-4">
         <h3 className="font-bold mb-1">Distribuição rápida</h3>
