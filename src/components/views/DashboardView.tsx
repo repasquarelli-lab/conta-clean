@@ -3,6 +3,7 @@ import { currency, monthMetrics, paidCount, upcomingBills, dueTodayBills, overdu
 import BillItem from '../BillItem';
 import { PieChart, Pie, Cell, ResponsiveContainer, Tooltip, BarChart, Bar, XAxis, YAxis, CartesianGrid } from 'recharts';
 import MonthNavigator from '../MonthNavigator';
+import MarketTicker from '../MarketTicker';
 
 const CHART_COLORS = [
   'hsl(190, 90%, 50%)',
