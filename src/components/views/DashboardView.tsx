@@ -73,6 +73,7 @@ export default function DashboardView() {
 
   const categoryData = getCategoryData(state, currentMonth);
   const totalExpenses = categoryData.reduce((a, b) => a + b.value, 0);
+  const evolutionData = getEvolutionData(state, currentMonth);
 
   return (
     <div>
