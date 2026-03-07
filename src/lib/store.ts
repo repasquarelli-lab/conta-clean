@@ -203,4 +203,3 @@ export function budgetProgress(state: AppState, month: string) {
     return { ...g, spent, pct };
   });
 }
-}
