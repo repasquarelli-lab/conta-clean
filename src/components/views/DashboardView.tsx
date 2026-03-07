@@ -69,7 +69,7 @@ const CustomTooltip = ({ active, payload }: any) => {
 };
 
 export default function DashboardView() {
-  const { state, currentMonth } = useApp();
+  const { state, currentMonth, setCurrentMonth } = useApp();
   
   ensureMonthFixedBills(state, currentMonth);
 
