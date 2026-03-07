@@ -1,8 +1,9 @@
-import { useState, useRef } from 'react';
+import { useState, useRef, useEffect } from 'react';
 import { useApp, View } from '@/contexts/AppContext';
-import { saveState } from '@/lib/store';
+import { saveState, overdueBills, dueTodayBills, currency } from '@/lib/store';
 import { LayoutDashboard, ArrowLeftRight, Pin, CalendarClock, FileText, Settings, Menu, X, Home } from 'lucide-react';
 import { AnimatePresence, motion } from 'framer-motion';
+import { toast } from 'sonner';
 
 const VIEW_ORDER: View[] = ['dashboard', 'lancamentos', 'fixas', 'agenda', 'resumo', 'config'];
 import DashboardView from './views/DashboardView';
@@ -31,6 +32,25 @@ export default function AppShell() {
   const prevViewRef = useRef(currentView);
   const direction = VIEW_ORDER.indexOf(currentView) >= VIEW_ORDER.indexOf(prevViewRef.current) ? 1 : -1;
   prevViewRef.current = currentView;
+
+  useEffect(() => {
+    const overdue = overdueBills(state);
+    const dueToday = dueTodayBills(state);
+    if (overdue.length > 0) {
+      const total = overdue.reduce((s, e) => s + Number(e.value || 0), 0);
+      toast.error(`⚠️ ${overdue.length} conta${overdue.length > 1 ? 's' : ''} atrasada${overdue.length > 1 ? 's' : ''}`, {
+        description: `Total em atraso: ${currency(total)}`,
+        duration: 6000,
+      });
+    }
+    if (dueToday.length > 0) {
+      const total = dueToday.reduce((s, e) => s + Number(e.value || 0), 0);
+      toast.warning(`📅 ${dueToday.length} conta${dueToday.length > 1 ? 's' : ''} vence${dueToday.length > 1 ? 'm' : ''} hoje`, {
+        description: `Total: ${currency(total)}`,
+        duration: 6000,
+      });
+    }
+  }, []); // eslint-disable-line react-hooks/exhaustive-deps
 
   function exportBackup() {
     const blob = new Blob([JSON.stringify(state, null, 2)], { type: 'application/json' });
