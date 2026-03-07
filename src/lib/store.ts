@@ -6,6 +6,11 @@ export interface FixedBill {
   category: string;
 }
 
+export interface BudgetGoal {
+  category: string;
+  limit: number;
+}
+
 export interface Entry {
   id: string;
   type: 'income' | 'expense';
@@ -23,6 +28,7 @@ export interface AppState {
   userName: string;
   fixedBills: FixedBill[];
   entries: Entry[];
+  budgetGoals?: BudgetGoal[];
 }
 
 const STORAGE_KEY = 'conta_clara_lite_v3';
