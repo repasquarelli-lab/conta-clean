@@ -6,6 +6,11 @@ export interface FixedBill {
   category: string;
 }
 
+export interface BudgetGoal {
+  category: string;
+  limit: number;
+}
+
 export interface Entry {
   id: string;
   type: 'income' | 'expense';
@@ -23,6 +28,7 @@ export interface AppState {
   userName: string;
   fixedBills: FixedBill[];
   entries: Entry[];
+  budgetGoals?: BudgetGoal[];
 }
 
 const STORAGE_KEY = 'conta_clara_lite_v3';
@@ -89,6 +95,13 @@ export function makeDemoData(): AppState {
       { id: uid(), type: 'expense', desc: 'Salão / Beleza', value: 180, date: `${y}-${m}-22`, category: 'Beleza', paid: false, recurring: true, sourceFixed: true },
       { id: uid(), type: 'expense', desc: 'Aluguel', value: 1800, date: `${nextY}-${nextM}-05`, category: 'Casa', paid: false, recurring: true, sourceFixed: true },
       { id: uid(), type: 'expense', desc: 'Energia', value: 215, date: `${nextY}-${nextM}-12`, category: 'Casa', paid: false, recurring: true, sourceFixed: true },
+    ],
+    budgetGoals: [
+      { category: 'Casa', limit: 2500 },
+      { category: 'Mercado', limit: 900 },
+      { category: 'Saúde', limit: 1000 },
+      { category: 'Transporte', limit: 300 },
+      { category: 'Beleza', limit: 250 },
     ],
   };
 }
@@ -179,4 +192,14 @@ export function topCategory(state: AppState, month: string): [string, number] | 
 export function paidCount(state: AppState, month: string) {
   const exps = getMonthEntries(state, month).filter(e => e.type === 'expense');
   return { paid: exps.filter(e => e.paid).length, total: exps.length };
+}
+
+export function budgetProgress(state: AppState, month: string) {
+  const goals = state.budgetGoals || [];
+  const entries = getMonthEntries(state, month).filter(e => e.type === 'expense');
+  return goals.map(g => {
+    const spent = entries.filter(e => e.category === g.category).reduce((a, b) => a + Number(b.value || 0), 0);
+    const pct = g.limit > 0 ? Math.round((spent / g.limit) * 100) : 0;
+    return { ...g, spent, pct };
+  });
 }
