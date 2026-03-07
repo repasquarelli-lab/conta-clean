@@ -136,10 +136,10 @@ export default function DashboardView() {
             <div className="h-[220px]">
               <ResponsiveContainer width="100%" height="100%">
                 <BarChart data={categoryData} layout="vertical" margin={{ left: 0, right: 10, top: 5, bottom: 5 }}>
-                  <CartesianGrid strokeDasharray="3 3" stroke="hsl(220, 20%, 20%)" horizontal={false} />
-                  <XAxis type="number" tickFormatter={(v) => `R$${v}`} tick={{ fill: 'hsl(220, 15%, 55%)', fontSize: 11 }} axisLine={false} />
-                  <YAxis type="category" dataKey="name" tick={{ fill: 'hsl(220, 15%, 75%)', fontSize: 11 }} width={90} axisLine={false} />
-                  <Tooltip content={<CustomTooltip />} cursor={{ fill: 'hsl(220, 20%, 15%)' }} />
+                  <CartesianGrid strokeDasharray="3 3" stroke="hsl(var(--border))" horizontal={false} />
+                  <XAxis type="number" tickFormatter={(v) => `R$${v}`} tick={{ fill: 'hsl(var(--muted-foreground))', fontSize: 11 }} axisLine={false} />
+                  <YAxis type="category" dataKey="name" tick={{ fill: 'hsl(var(--foreground))', fontSize: 11 }} width={90} axisLine={false} />
+                  <Tooltip content={<CustomTooltip />} cursor={{ fill: 'hsl(var(--accent))' }} />
                   <Bar dataKey="value" radius={[0, 6, 6, 0]} barSize={18}>
                     {categoryData.map((_, i) => (
                       <Cell key={i} fill={CHART_COLORS[i % CHART_COLORS.length]} />

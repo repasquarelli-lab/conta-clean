@@ -1,9 +1,10 @@
 import { useState, useRef, useEffect } from 'react';
 import { useApp, View } from '@/contexts/AppContext';
 import { saveState, overdueBills, dueTodayBills, currency } from '@/lib/store';
-import { LayoutDashboard, ArrowLeftRight, Pin, CalendarClock, FileText, Settings, Menu, X, Home } from 'lucide-react';
+import { LayoutDashboard, ArrowLeftRight, Pin, CalendarClock, FileText, Settings, Menu, X, Home, Sun, Moon } from 'lucide-react';
 import { AnimatePresence, motion } from 'framer-motion';
 import { toast } from 'sonner';
+import { useTheme } from '@/hooks/use-theme';
 
 const VIEW_ORDER: View[] = ['dashboard', 'lancamentos', 'fixas', 'agenda', 'resumo', 'config'];
 import DashboardView from './views/DashboardView';
@@ -27,6 +28,7 @@ const BOTTOM_TABS = VIEWS.filter(v => v.id !== 'config');
 
 export default function AppShell() {
   const { state, currentView, setCurrentView, setScreen, reloadDemo } = useApp();
+  const { theme, toggleTheme } = useTheme();
   const meta = VIEWS.find(v => v.id === currentView)!;
   const [sidebarOpen, setSidebarOpen] = useState(false);
   const prevViewRef = useRef(currentView);
@@ -87,7 +89,7 @@ export default function AppShell() {
   return (
     <div className="min-h-screen flex flex-col lg:grid lg:grid-cols-[280px_1fr]">
       {/* Mobile Header */}
-      <header className="lg:hidden flex items-center justify-between px-4 py-3 border-b border-border sticky top-0 z-40" style={{ background: 'hsla(222,55%,8%,0.96)', backdropFilter: 'blur(12px)' }}>
+      <header className="lg:hidden flex items-center justify-between px-4 py-3 border-b border-border sticky top-0 z-40 bg-background/95 backdrop-blur-xl">
         <div className="flex items-center gap-3">
           <div className="w-9 h-9 rounded-xl grid place-items-center brand-gradient font-black tracking-wide text-primary-foreground text-xs">CC</div>
           <div>
@@ -95,16 +97,21 @@ export default function AppShell() {
             <p className="text-[10px] text-muted-foreground">{state.userName ? `Olá, ${state.userName}` : 'Seu mês'}</p>
           </div>
         </div>
-        <button onClick={() => setSidebarOpen(!sidebarOpen)} className="w-10 h-10 rounded-xl grid place-items-center bg-card border border-border cursor-pointer">
-          {sidebarOpen ? <X className="w-5 h-5" /> : <Menu className="w-5 h-5" />}
-        </button>
+        <div className="flex items-center gap-2">
+          <button onClick={toggleTheme} className="w-10 h-10 rounded-xl grid place-items-center bg-card border border-border cursor-pointer" title={theme === 'dark' ? 'Modo claro' : 'Modo escuro'}>
+            {theme === 'dark' ? <Sun className="w-4.5 h-4.5" /> : <Moon className="w-4.5 h-4.5" />}
+          </button>
+          <button onClick={() => setSidebarOpen(!sidebarOpen)} className="w-10 h-10 rounded-xl grid place-items-center bg-card border border-border cursor-pointer">
+            {sidebarOpen ? <X className="w-5 h-5" /> : <Menu className="w-5 h-5" />}
+          </button>
+        </div>
       </header>
 
       {/* Mobile Slide-down Menu */}
       {sidebarOpen && (
         <>
           <div className="lg:hidden fixed inset-0 z-30 bg-background/60 backdrop-blur-sm" onClick={() => setSidebarOpen(false)} />
-          <div className="lg:hidden fixed top-[57px] left-0 right-0 z-40 border-b border-border p-4 animate-fade-in" style={{ background: 'hsla(222,55%,8%,0.98)', backdropFilter: 'blur(16px)' }}>
+          <div className="lg:hidden fixed top-[57px] left-0 right-0 z-40 border-b border-border p-4 animate-fade-in bg-background/98 backdrop-blur-2xl">
             <nav className="flex flex-col gap-1.5 mb-3">
               {VIEWS.map(v => (
                 <button
@@ -135,7 +142,7 @@ export default function AppShell() {
       )}
 
       {/* Desktop Sidebar */}
-      <aside className="hidden lg:block p-5 px-4 border-r border-border sticky top-0 h-screen" style={{ background: 'hsla(222,55%,8%,0.86)', backdropFilter: 'blur(12px)' }}>
+      <aside className="hidden lg:block p-5 px-4 border-r border-border sticky top-0 h-screen bg-background/90 backdrop-blur-xl">
         <div className="flex gap-3 items-center pb-4 px-2">
           <div className="w-12 h-12 rounded-2xl grid place-items-center brand-gradient font-black tracking-wide text-primary-foreground text-sm">CC</div>
           <div>
@@ -157,8 +164,11 @@ export default function AppShell() {
             </button>
           ))}
         </nav>
-        <div className="mt-4 p-3.5 rounded-[18px] bg-card border border-border">
-          <small className="block text-muted-foreground leading-relaxed text-xs">App offline. Dados salvos no navegador.</small>
+        <div className="mt-4 p-3.5 rounded-[18px] bg-card border border-border flex items-center justify-between">
+          <small className="text-muted-foreground leading-relaxed text-xs">Tema</small>
+          <button onClick={toggleTheme} className="w-9 h-9 rounded-xl grid place-items-center bg-accent border border-border cursor-pointer" title={theme === 'dark' ? 'Modo claro' : 'Modo escuro'}>
+            {theme === 'dark' ? <Sun className="w-4 h-4" /> : <Moon className="w-4 h-4" />}
+          </button>
         </div>
       </aside>
 
@@ -202,7 +212,7 @@ export default function AppShell() {
       </main>
 
       {/* Mobile Bottom Tab Bar */}
-      <nav className="lg:hidden fixed bottom-0 left-0 right-0 z-50 border-t border-border flex" style={{ background: 'hsla(222,55%,8%,0.96)', backdropFilter: 'blur(16px)' }}>
+      <nav className="lg:hidden fixed bottom-0 left-0 right-0 z-50 border-t border-border flex bg-background/95 backdrop-blur-2xl">
         {BOTTOM_TABS.map(v => {
           const isActive = v.id === currentView;
           return (
