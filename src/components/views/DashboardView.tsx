@@ -1,7 +1,7 @@
 import { useApp } from '@/contexts/AppContext';
-import { currency, monthMetrics, paidCount, upcomingBills, dueTodayBills, overdueBills, topCategory, getMonthEntries, ensureMonthFixedBills } from '@/lib/store';
+import { currency, monthMetrics, paidCount, upcomingBills, dueTodayBills, overdueBills, topCategory, getMonthEntries, ensureMonthFixedBills, AppState } from '@/lib/store';
 import BillItem from '../BillItem';
-import { PieChart, Pie, Cell, ResponsiveContainer, Tooltip, BarChart, Bar, XAxis, YAxis, CartesianGrid } from 'recharts';
+import { PieChart, Pie, Cell, ResponsiveContainer, Tooltip, BarChart, Bar, XAxis, YAxis, CartesianGrid, AreaChart, Area, Legend } from 'recharts';
 import MonthNavigator from '../MonthNavigator';
 import MarketTicker from '../MarketTicker';
 
@@ -37,6 +37,25 @@ const CustomTooltip = ({ active, payload }: any) => {
   );
 };
 
+const MONTH_NAMES = ['Jan', 'Fev', 'Mar', 'Abr', 'Mai', 'Jun', 'Jul', 'Ago', 'Set', 'Out', 'Nov', 'Dez'];
+
+function getEvolutionData(state: AppState, currentMonth: string, count: number = 6) {
+  const [y, m] = currentMonth.split('-').map(Number);
+  const data: { month: string; receitas: number; despesas: number; saldo: number }[] = [];
+  for (let i = count - 1; i >= 0; i--) {
+    const d = new Date(y, m - 1 - i, 1);
+    const key = `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}`;
+    const metrics = monthMetrics(state, key);
+    data.push({
+      month: `${MONTH_NAMES[d.getMonth()]}/${String(d.getFullYear()).slice(2)}`,
+      receitas: metrics.incomes,
+      despesas: metrics.expenses,
+      saldo: metrics.balance,
+    });
+  }
+  return data;
+}
+
 export default function DashboardView() {
   const { state, currentMonth, setCurrentMonth } = useApp();
   
@@ -54,6 +73,7 @@ export default function DashboardView() {
 
   const categoryData = getCategoryData(state, currentMonth);
   const totalExpenses = categoryData.reduce((a, b) => a + b.value, 0);
+  const evolutionData = getEvolutionData(state, currentMonth);
 
   return (
     <div>
@@ -151,6 +171,45 @@ export default function DashboardView() {
           </div>
         </div>
       )}
+
+      {/* Evolution Chart - 6 months */}
+      <div className="glass-panel p-4 mt-4">
+        <div className="mb-3">
+          <h3 className="font-bold">Evolução mensal</h3>
+          <p className="text-muted-foreground text-sm">Receitas × Despesas dos últimos 6 meses</p>
+        </div>
+        <div className="h-[260px]">
+          <ResponsiveContainer width="100%" height="100%">
+            <AreaChart data={evolutionData} margin={{ left: 0, right: 10, top: 5, bottom: 5 }}>
+              <defs>
+                <linearGradient id="gradReceitas" x1="0" y1="0" x2="0" y2="1">
+                  <stop offset="5%" stopColor="hsl(142, 71%, 45%)" stopOpacity={0.3} />
+                  <stop offset="95%" stopColor="hsl(142, 71%, 45%)" stopOpacity={0} />
+                </linearGradient>
+                <linearGradient id="gradDespesas" x1="0" y1="0" x2="0" y2="1">
+                  <stop offset="5%" stopColor="hsl(0, 72%, 51%)" stopOpacity={0.3} />
+                  <stop offset="95%" stopColor="hsl(0, 72%, 51%)" stopOpacity={0} />
+                </linearGradient>
+              </defs>
+              <CartesianGrid strokeDasharray="3 3" stroke="hsl(var(--border))" vertical={false} />
+              <XAxis dataKey="month" tick={{ fill: 'hsl(var(--muted-foreground))', fontSize: 11 }} axisLine={false} tickLine={false} />
+              <YAxis tickFormatter={(v) => `R$${(v / 1000).toFixed(1)}k`} tick={{ fill: 'hsl(var(--muted-foreground))', fontSize: 11 }} axisLine={false} tickLine={false} width={65} />
+              <Tooltip
+                formatter={(value: number, name: string) => [currency(value), name === 'receitas' ? 'Receitas' : name === 'despesas' ? 'Despesas' : 'Saldo']}
+                contentStyle={{ background: 'hsl(var(--card))', border: '1px solid hsl(var(--border))', borderRadius: '12px', fontSize: '12px' }}
+                labelStyle={{ color: 'hsl(var(--foreground))', fontWeight: 'bold' }}
+                itemStyle={{ color: 'hsl(var(--foreground))' }}
+              />
+              <Legend
+                formatter={(value) => value === 'receitas' ? 'Receitas' : value === 'despesas' ? 'Despesas' : 'Saldo'}
+                wrapperStyle={{ fontSize: '12px' }}
+              />
+              <Area type="monotone" dataKey="receitas" stroke="hsl(142, 71%, 45%)" fill="url(#gradReceitas)" strokeWidth={2.5} dot={{ r: 4, fill: 'hsl(142, 71%, 45%)' }} />
+              <Area type="monotone" dataKey="despesas" stroke="hsl(0, 72%, 51%)" fill="url(#gradDespesas)" strokeWidth={2.5} dot={{ r: 4, fill: 'hsl(0, 72%, 51%)' }} />
+            </AreaChart>
+          </ResponsiveContainer>
+        </div>
+      </div>
 
       {/* Two columns */}
       <div className="grid grid-cols-1 lg:grid-cols-[1.12fr_0.88fr] gap-4 mt-4">
