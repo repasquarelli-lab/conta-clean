@@ -37,6 +37,25 @@ const CustomTooltip = ({ active, payload }: any) => {
   );
 };
 
+const MONTH_NAMES = ['Jan', 'Fev', 'Mar', 'Abr', 'Mai', 'Jun', 'Jul', 'Ago', 'Set', 'Out', 'Nov', 'Dez'];
+
+function getEvolutionData(state: AppState, currentMonth: string, count: number = 6) {
+  const [y, m] = currentMonth.split('-').map(Number);
+  const data: { month: string; receitas: number; despesas: number; saldo: number }[] = [];
+  for (let i = count - 1; i >= 0; i--) {
+    const d = new Date(y, m - 1 - i, 1);
+    const key = `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}`;
+    const metrics = monthMetrics(state, key);
+    data.push({
+      month: `${MONTH_NAMES[d.getMonth()]}/${String(d.getFullYear()).slice(2)}`,
+      receitas: metrics.incomes,
+      despesas: metrics.expenses,
+      saldo: metrics.balance,
+    });
+  }
+  return data;
+}
+
 export default function DashboardView() {
   const { state, currentMonth, setCurrentMonth } = useApp();
   
