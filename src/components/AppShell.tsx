@@ -1,9 +1,10 @@
 import { useState, useRef, useEffect } from 'react';
 import { useApp, View } from '@/contexts/AppContext';
 import { saveState, overdueBills, dueTodayBills, currency } from '@/lib/store';
-import { LayoutDashboard, ArrowLeftRight, Pin, CalendarClock, FileText, Settings, Menu, X, Home } from 'lucide-react';
+import { LayoutDashboard, ArrowLeftRight, Pin, CalendarClock, FileText, Settings, Menu, X, Home, Sun, Moon } from 'lucide-react';
 import { AnimatePresence, motion } from 'framer-motion';
 import { toast } from 'sonner';
+import { useTheme } from '@/hooks/use-theme';
 
 const VIEW_ORDER: View[] = ['dashboard', 'lancamentos', 'fixas', 'agenda', 'resumo', 'config'];
 import DashboardView from './views/DashboardView';
