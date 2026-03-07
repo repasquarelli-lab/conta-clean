@@ -111,7 +111,7 @@ export default function AppShell() {
       {sidebarOpen && (
         <>
           <div className="lg:hidden fixed inset-0 z-30 bg-background/60 backdrop-blur-sm" onClick={() => setSidebarOpen(false)} />
-          <div className="lg:hidden fixed top-[57px] left-0 right-0 z-40 border-b border-border p-4 animate-fade-in" style={{ background: 'hsla(222,55%,8%,0.98)', backdropFilter: 'blur(16px)' }}>
+          <div className="lg:hidden fixed top-[57px] left-0 right-0 z-40 border-b border-border p-4 animate-fade-in bg-background/98 backdrop-blur-2xl">
             <nav className="flex flex-col gap-1.5 mb-3">
               {VIEWS.map(v => (
                 <button
@@ -142,7 +142,7 @@ export default function AppShell() {
       )}
 
       {/* Desktop Sidebar */}
-      <aside className="hidden lg:block p-5 px-4 border-r border-border sticky top-0 h-screen" style={{ background: 'hsla(222,55%,8%,0.86)', backdropFilter: 'blur(12px)' }}>
+      <aside className="hidden lg:block p-5 px-4 border-r border-border sticky top-0 h-screen bg-background/90 backdrop-blur-xl">
         <div className="flex gap-3 items-center pb-4 px-2">
           <div className="w-12 h-12 rounded-2xl grid place-items-center brand-gradient font-black tracking-wide text-primary-foreground text-sm">CC</div>
           <div>
@@ -212,7 +212,7 @@ export default function AppShell() {
       </main>
 
       {/* Mobile Bottom Tab Bar */}
-      <nav className="lg:hidden fixed bottom-0 left-0 right-0 z-50 border-t border-border flex" style={{ background: 'hsla(222,55%,8%,0.96)', backdropFilter: 'blur(16px)' }}>
+      <nav className="lg:hidden fixed bottom-0 left-0 right-0 z-50 border-t border-border flex bg-background/95 backdrop-blur-2xl">
         {BOTTOM_TABS.map(v => {
           const isActive = v.id === currentView;
           return (
