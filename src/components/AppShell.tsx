@@ -1,6 +1,6 @@
 import { useState, useRef, useEffect } from 'react';
 import { useApp, View } from '@/contexts/AppContext';
-import { saveState, overdueBills, dueTodayBills, currency } from '@/lib/store';
+import { saveState, overdueBills, dueTodayBills, currency, budgetProgress, todayISO } from '@/lib/store';
 import { LayoutDashboard, ArrowLeftRight, Pin, CalendarClock, FileText, Settings, Menu, X, Home, Sun, Moon } from 'lucide-react';
 import { AnimatePresence, motion } from 'framer-motion';
 import { toast } from 'sonner';
@@ -49,6 +49,25 @@ export default function AppShell() {
       const total = dueToday.reduce((s, e) => s + Number(e.value || 0), 0);
       toast.warning(`📅 ${dueToday.length} conta${dueToday.length > 1 ? 's' : ''} vence${dueToday.length > 1 ? 'm' : ''} hoje`, {
         description: `Total: ${currency(total)}`,
+        duration: 6000,
+      });
+    }
+
+    // Budget alerts
+    const currentMonth = todayISO().slice(0, 7);
+    const budgets = budgetProgress(state, currentMonth);
+    const exceeded = budgets.filter(b => b.pct > 100);
+    const nearLimit = budgets.filter(b => b.pct >= 80 && b.pct <= 100);
+
+    if (exceeded.length > 0) {
+      toast.error(`🚨 ${exceeded.length} categoria${exceeded.length > 1 ? 's' : ''} estourou o orçamento`, {
+        description: exceeded.map(b => `${b.category}: ${currency(b.spent)} de ${currency(b.limit)} (${b.pct}%)`).join(' · '),
+        duration: 8000,
+      });
+    }
+    if (nearLimit.length > 0) {
+      toast.warning(`⚡ ${nearLimit.length} categoria${nearLimit.length > 1 ? 's' : ''} perto do limite`, {
+        description: nearLimit.map(b => `${b.category}: ${b.pct}% usado`).join(' · '),
         duration: 6000,
       });
     }
