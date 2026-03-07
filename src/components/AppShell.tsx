@@ -1,6 +1,6 @@
 import { useState, useRef, useEffect } from 'react';
 import { useApp, View } from '@/contexts/AppContext';
-import { saveState, overdueBills, dueTodayBills, currency } from '@/lib/store';
+import { saveState, overdueBills, dueTodayBills, currency, budgetProgress, todayISO } from '@/lib/store';
 import { LayoutDashboard, ArrowLeftRight, Pin, CalendarClock, FileText, Settings, Menu, X, Home, Sun, Moon } from 'lucide-react';
 import { AnimatePresence, motion } from 'framer-motion';
 import { toast } from 'sonner';
