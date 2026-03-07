@@ -88,6 +88,11 @@ export default function DashboardView() {
 
   return (
     <div>
+      {/* Month Navigator */}
+      <div className="mb-4 flex justify-center sm:justify-start">
+        <MonthNavigator month={currentMonth} onChange={setCurrentMonth} />
+      </div>
+
       {/* Metrics */}
       <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-4">
         {[
