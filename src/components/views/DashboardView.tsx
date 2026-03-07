@@ -1,7 +1,7 @@
 import { useApp } from '@/contexts/AppContext';
-import { currency, monthMetrics, paidCount, upcomingBills, dueTodayBills, overdueBills, topCategory, getMonthEntries, ensureMonthFixedBills } from '@/lib/store';
+import { currency, monthMetrics, paidCount, upcomingBills, dueTodayBills, overdueBills, topCategory, getMonthEntries, ensureMonthFixedBills, AppState } from '@/lib/store';
 import BillItem from '../BillItem';
-import { PieChart, Pie, Cell, ResponsiveContainer, Tooltip, BarChart, Bar, XAxis, YAxis, CartesianGrid } from 'recharts';
+import { PieChart, Pie, Cell, ResponsiveContainer, Tooltip, BarChart, Bar, XAxis, YAxis, CartesianGrid, AreaChart, Area, Legend } from 'recharts';
 import MonthNavigator from '../MonthNavigator';
 import MarketTicker from '../MarketTicker';
 
