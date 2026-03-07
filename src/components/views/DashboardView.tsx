@@ -4,6 +4,7 @@ import BillItem from '../BillItem';
 import { PieChart, Pie, Cell, ResponsiveContainer, Tooltip, BarChart, Bar, XAxis, YAxis, CartesianGrid, AreaChart, Area, Legend } from 'recharts';
 import MonthNavigator from '../MonthNavigator';
 import MarketTicker from '../MarketTicker';
+import AiTipsWidget from '../AiTipsWidget';
 
 const CHART_COLORS = [
   'hsl(190, 90%, 50%)',
@@ -253,6 +254,9 @@ export default function DashboardView() {
           </div>
         </div>
       )}
+
+      {/* AI Copilot */}
+      <AiTipsWidget />
 
       {/* Two columns */}
       <div className="grid grid-cols-1 lg:grid-cols-[1.12fr_0.88fr] gap-4 mt-4">
