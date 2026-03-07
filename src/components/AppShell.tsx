@@ -28,6 +28,9 @@ export default function AppShell() {
   const { state, currentView, setCurrentView, setScreen, reloadDemo } = useApp();
   const meta = VIEWS.find(v => v.id === currentView)!;
   const [sidebarOpen, setSidebarOpen] = useState(false);
+  const prevViewRef = useRef(currentView);
+  const direction = VIEW_ORDER.indexOf(currentView) >= VIEW_ORDER.indexOf(prevViewRef.current) ? 1 : -1;
+  prevViewRef.current = currentView;
 
   function exportBackup() {
     const blob = new Blob([JSON.stringify(state, null, 2)], { type: 'application/json' });
