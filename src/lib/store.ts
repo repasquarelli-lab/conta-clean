@@ -96,6 +96,13 @@ export function makeDemoData(): AppState {
       { id: uid(), type: 'expense', desc: 'Aluguel', value: 1800, date: `${nextY}-${nextM}-05`, category: 'Casa', paid: false, recurring: true, sourceFixed: true },
       { id: uid(), type: 'expense', desc: 'Energia', value: 215, date: `${nextY}-${nextM}-12`, category: 'Casa', paid: false, recurring: true, sourceFixed: true },
     ],
+    budgetGoals: [
+      { category: 'Casa', limit: 2500 },
+      { category: 'Mercado', limit: 900 },
+      { category: 'Saúde', limit: 1000 },
+      { category: 'Transporte', limit: 300 },
+      { category: 'Beleza', limit: 250 },
+    ],
   };
 }
 
