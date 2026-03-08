@@ -70,6 +70,51 @@ function getEvolutionData(state: AppState, currentMonth: string, count: number =
   return data;
 }
 
+function getPrevMonth(month: string): string {
+  const [y, m] = month.split('-').map(Number);
+  const d = new Date(y, m - 2, 1);
+  return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}`;
+}
+
+const MONTH_LABELS = ['Janeiro', 'Fevereiro', 'Março', 'Abril', 'Maio', 'Junho', 'Julho', 'Agosto', 'Setembro', 'Outubro', 'Novembro', 'Dezembro'];
+function monthLabel(month: string): string {
+  const [y, m] = month.split('-').map(Number);
+  return `${MONTH_LABELS[m - 1]}/${y}`;
+}
+
+function getMonthComparison(state: AppState, month: string) {
+  const prev = getPrevMonth(month);
+  const cur = monthMetrics(state, month);
+  const prv = monthMetrics(state, prev);
+  
+  const curCatMap: Record<string, number> = {};
+  const prvCatMap: Record<string, number> = {};
+  getMonthEntries(state, month).filter(e => e.type === 'expense').forEach(e => {
+    curCatMap[e.category] = (curCatMap[e.category] || 0) + Number(e.value || 0);
+  });
+  getMonthEntries(state, prev).filter(e => e.type === 'expense').forEach(e => {
+    prvCatMap[e.category] = (prvCatMap[e.category] || 0) + Number(e.value || 0);
+  });
+
+  const allCats = [...new Set([...Object.keys(curCatMap), ...Object.keys(prvCatMap)])];
+  const categories = allCats.map(cat => {
+    const curVal = curCatMap[cat] || 0;
+    const prvVal = prvCatMap[cat] || 0;
+    const diff = curVal - prvVal;
+    const pct = prvVal > 0 ? Math.round(((curVal - prvVal) / prvVal) * 100) : curVal > 0 ? 100 : 0;
+    const status = prvVal === 0 && curVal > 0 ? 'NOVO' : curVal === 0 && prvVal > 0 ? 'ZEROU' : null;
+    return { cat, curVal, prvVal, diff, pct, status };
+  }).sort((a, b) => Math.abs(b.diff) - Math.abs(a.diff));
+
+  return {
+    cur, prv, prev,
+    incomeDiff: cur.incomes - prv.incomes,
+    expenseDiff: cur.expenses - prv.expenses,
+    balanceDiff: cur.balance - prv.balance,
+    categories,
+  };
+}
+
 export default function DashboardView() {
   const { state, currentMonth, setCurrentMonth } = useApp();
   
