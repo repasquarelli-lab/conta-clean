@@ -308,9 +308,12 @@ export default function DashboardView() {
 
         {/* Quick status */}
         <div className="glass-panel p-4">
-          <div className="mb-3">
-            <h3 className="font-bold">Situação rápida</h3>
-            <p className="text-muted-foreground text-sm">Leitura simples do seu mês</p>
+          <div className="mb-3 flex items-start gap-2.5">
+            <Activity className="size-5 text-muted-foreground mt-0.5 shrink-0" strokeWidth={1.5} />
+            <div>
+              <h3 className="font-bold">Situação rápida</h3>
+              <p className="text-muted-foreground text-sm">Leitura simples do seu mês</p>
+            </div>
           </div>
           <div className="grid grid-cols-2 gap-3">
             <div className="p-3.5 rounded-[18px] bg-accent border border-border leading-relaxed text-sm">
