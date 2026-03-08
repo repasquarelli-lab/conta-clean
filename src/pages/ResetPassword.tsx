@@ -51,7 +51,7 @@ export default function ResetPassword() {
     return (
       <section className="min-h-screen grid place-items-center p-4">
         <div className="glass-panel p-7 max-w-md w-full text-center">
-          <div className="w-12 h-12 rounded-2xl grid place-items-center brand-gradient font-black tracking-wide text-primary-foreground mx-auto mb-4">CC</div>
+          <img src="/favicon.png" alt="Conta Clara" className="w-12 h-12 rounded-2xl mx-auto mb-4" />
           <h2 className="text-xl font-bold mb-2">Link inválido</h2>
           <p className="text-muted-foreground text-sm mb-4">Este link de redefinição de senha é inválido ou expirou.</p>
           <button onClick={() => navigate('/')} className="brand-gradient border-none rounded-2xl px-4 py-3 font-bold cursor-pointer text-primary-foreground text-sm">
