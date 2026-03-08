@@ -81,7 +81,7 @@ export default function Auth() {
               ))}
             </div>
             <div className="mt-4">
-              <button onClick={() => setScreen('landing')} className="glass-panel rounded-2xl px-4 py-3 font-bold cursor-pointer text-sm">Voltar</button>
+              <button onClick={() => setScreen('landing')} className="glass-panel rounded-2xl px-4 py-3 font-bold cursor-pointer text-sm flex items-center gap-1.5"><ArrowLeft className="size-4" strokeWidth={1.5} /> Voltar</button>
             </div>
           </div>
           <div className="absolute right-[-70px] bottom-[-70px] w-[220px] h-[220px] rounded-full opacity-25 pointer-events-none" style={{ background: 'radial-gradient(circle, hsl(260 60% 60%), transparent 72%)' }} />
