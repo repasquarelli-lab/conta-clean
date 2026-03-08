@@ -197,16 +197,19 @@ export default function AppShell() {
         </div>
         <nav className="flex flex-col gap-1.5 flex-1">
           {visibleViews.map(v => (
-            <button
+            <motion.button
               key={v.id}
               onClick={() => setCurrentView(v.id)}
-              className={`w-full text-left px-3.5 py-2.5 rounded-2xl border text-sm cursor-pointer transition-all flex items-center gap-3 ${
+              whileHover={{ scale: 1.02, x: 4 }}
+              whileTap={{ scale: 0.97 }}
+              transition={{ type: 'spring', stiffness: 400, damping: 25 }}
+              className={`w-full text-left px-3.5 py-2.5 rounded-2xl border text-sm cursor-pointer transition-colors flex items-center gap-3 ${
                 v.id === currentView ? 'bg-card border-border shadow-sm' : 'bg-transparent border-transparent hover:bg-card/50 hover:border-border/50'
               }`}
             >
               <v.icon className={`w-4 h-4 shrink-0 transition-colors ${v.id === currentView ? 'text-primary' : 'text-muted-foreground'}`} />
               {v.name}
-            </button>
+            </motion.button>
           ))}
         </nav>
         {/* User info */}
