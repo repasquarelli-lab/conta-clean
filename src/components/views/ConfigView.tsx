@@ -1,7 +1,7 @@
 import { useState } from 'react';
 import { useApp } from '@/contexts/AppContext';
 import { categories, currency, BudgetGoal } from '@/lib/store';
-import { Plus, Trash2 } from 'lucide-react';
+import { Plus, Trash2, Mail, User } from 'lucide-react';
 
 export default function ConfigView() {
   const { state, updateState, reloadDemo } = useApp();
