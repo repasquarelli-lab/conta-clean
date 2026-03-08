@@ -1,8 +1,9 @@
 import { useApp } from '@/contexts/AppContext';
 import { monthMetrics, paidCount, topCategory, currency, budgetProgress, getMonthEntries, AppState } from '@/lib/store';
 import MonthNavigator from '../MonthNavigator';
-import { Lightbulb, TrendingUp, TrendingDown, AlertTriangle, CheckCircle, Target, ShieldCheck, ArrowUpRight, ArrowDownRight, Minus, DollarSign, CreditCard, HelpCircle, PiggyBank } from 'lucide-react';
+import { Lightbulb, TrendingUp, TrendingDown, AlertTriangle, CheckCircle, Target, ShieldCheck, ArrowUpRight, ArrowDownRight, Minus, DollarSign, CreditCard, HelpCircle, PiggyBank, BarChart3 } from 'lucide-react';
 import { getCategoryIcon } from '@/lib/categoryIcons';
+import { BarChart, Bar, XAxis, YAxis, Tooltip, ResponsiveContainer, Cell } from 'recharts';
 
 function generateTips(state: any, month: string) {
   const m = monthMetrics(state, month);
@@ -172,6 +173,21 @@ function monthLabel(month: string) {
   return `${MONTH_LABELS[m - 1]}/${String(y).slice(2)}`;
 }
 
+const BAR_COLORS = [
+  'hsl(262, 83%, 58%)', 'hsl(199, 89%, 48%)', 'hsl(142, 71%, 45%)',
+  'hsl(38, 92%, 50%)', 'hsl(0, 84%, 60%)', 'hsl(280, 65%, 60%)',
+  'hsl(174, 72%, 46%)', 'hsl(45, 93%, 47%)', 'hsl(210, 40%, 55%)',
+];
+
+function getCategoryData(state: AppState, month: string) {
+  const entries = getMonthEntries(state, month).filter(e => e.type === 'expense');
+  const map: Record<string, number> = {};
+  entries.forEach(e => { map[e.category] = (map[e.category] || 0) + Number(e.value || 0); });
+  return Object.entries(map)
+    .map(([name, value]) => ({ name, value: Math.round(value * 100) / 100 }))
+    .sort((a, b) => b.value - a.value);
+}
+
 export default function ResumoView() {
   const { state, currentMonth, setCurrentMonth } = useApp();
 
@@ -180,6 +196,7 @@ export default function ResumoView() {
   const tips = generateTips(state, currentMonth);
   const comparison = getCategoryComparison(state, currentMonth);
   const prevMonthStr = getPrevMonth(currentMonth);
+  const categoryData = getCategoryData(state, currentMonth);
 
   return (
     <div>
@@ -207,6 +224,38 @@ export default function ResumoView() {
           ))}
         </div>
       </div>
+
+      {/* Category Bar Chart */}
+      {categoryData.length > 0 && (
+        <div className="glass-panel p-4 mb-4">
+          <div className="mb-3 flex items-start gap-2.5">
+            <BarChart3 className="size-5 text-muted-foreground mt-0.5 shrink-0" strokeWidth={1.5} />
+            <div>
+              <h3 className="font-bold">Despesas por categoria</h3>
+              <p className="text-muted-foreground text-sm">Visualize onde seu dinheiro está indo neste mês</p>
+            </div>
+          </div>
+          <div className="h-64 w-full">
+            <ResponsiveContainer width="100%" height="100%">
+              <BarChart data={categoryData} layout="vertical" margin={{ left: 8, right: 16, top: 4, bottom: 4 }}>
+                <XAxis type="number" tickFormatter={(v: number) => `R$${v}`} tick={{ fontSize: 11, fill: 'hsl(var(--muted-foreground))' }} axisLine={false} tickLine={false} />
+                <YAxis type="category" dataKey="name" width={90} tick={{ fontSize: 12, fill: 'hsl(var(--foreground))' }} axisLine={false} tickLine={false} />
+                <Tooltip
+                  formatter={(value: number) => [currency(value), 'Gasto']}
+                  contentStyle={{ background: 'hsl(var(--card))', border: '1px solid hsl(var(--border))', borderRadius: '12px', fontSize: '13px' }}
+                  labelStyle={{ color: 'hsl(var(--foreground))', fontWeight: 'bold' }}
+                  cursor={{ fill: 'hsl(var(--accent) / 0.5)' }}
+                />
+                <Bar dataKey="value" radius={[0, 8, 8, 0]} maxBarSize={32}>
+                  {categoryData.map((_, i) => (
+                    <Cell key={i} fill={BAR_COLORS[i % BAR_COLORS.length]} />
+                  ))}
+                </Bar>
+              </BarChart>
+            </ResponsiveContainer>
+          </div>
+        </div>
+      )}
 
       {/* Month comparison */}
       {comparison.length > 0 && (
