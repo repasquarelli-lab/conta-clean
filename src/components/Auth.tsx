@@ -125,7 +125,7 @@ export default function Auth() {
             </div>
             {mode !== 'forgot' && (
               <div>
-                <label className="text-sm font-medium mb-1 block">Senha</label>
+                <label className="text-sm font-medium mb-1 flex items-center gap-1.5"><Lock className="size-3.5 text-muted-foreground" strokeWidth={1.5} /> Senha</label>
                 <input
                   type="password"
                   value={password}
