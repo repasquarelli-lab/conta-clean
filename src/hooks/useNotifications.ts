@@ -1,5 +1,5 @@
 import { useEffect, useCallback, useRef } from 'react';
-import { AppState, dueTodayBills, overdueBills, defaultNotificationSettings } from '@/lib/store';
+import { AppState, dueTodayBills, overdueBills, dueSoonBills, defaultNotificationSettings } from '@/lib/store';
 
 const NOTIFICATION_KEY = 'cc_notif_last_check';
 
