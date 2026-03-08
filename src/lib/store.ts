@@ -27,12 +27,14 @@ export interface NotificationSettings {
   enabled: boolean;
   dueTodayAlert: boolean;
   overdueAlert: boolean;
+  dueSoonAlert: boolean;
 }
 
 export const defaultNotificationSettings: NotificationSettings = {
   enabled: true,
   dueTodayAlert: true,
   overdueAlert: true,
+  dueSoonAlert: true,
 };
 
 export interface AppState {
