@@ -125,7 +125,7 @@ export default function AppShell() {
       {/* Mobile Header */}
       <header className="lg:hidden flex items-center justify-between px-4 py-3 border-b border-border sticky top-0 z-40 bg-background/95 backdrop-blur-xl" style={{ paddingTop: 'max(0.75rem, env(safe-area-inset-top))' }}>
         <div className="flex items-center gap-3">
-          <div className="w-9 h-9 rounded-xl grid place-items-center brand-gradient font-black tracking-wide text-primary-foreground text-[10px] shadow-md">CC</div>
+          <img src="/favicon.png" alt="Conta Clara" className="w-9 h-9 rounded-xl shadow-md" />
           <div>
             <h1 className="text-sm font-bold leading-tight">{meta.shortName || 'Conta Clara'}</h1>
             <p className="text-[10px] text-muted-foreground">{state.userName ? `Olá, ${state.userName}` : 'Finanças'}</p>
