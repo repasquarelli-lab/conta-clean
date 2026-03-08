@@ -5,7 +5,7 @@ import { useCloudSync } from '@/hooks/useCloudSync';
 import { toast } from 'sonner';
 
 type Screen = 'landing' | 'auth' | 'app';
-type View = 'dashboard' | 'lancamentos' | 'fixas' | 'agenda' | 'resumo' | 'config';
+type View = 'dashboard' | 'lancamentos' | 'fixas' | 'agenda' | 'resumo' | 'config' | 'admin';
 
 interface AppContextType {
   state: AppState;
