@@ -14,7 +14,8 @@ export default function AgendaView() {
   const isCurrentMonth = currentMonth === todayISO().slice(0, 7);
 
   const today = isCurrentMonth ? dueTodayBills(state) : [];
-  const week = isCurrentMonth ? upcomingBills(state, 7).filter(e => e.date !== todayISO()) : [];
+  const soon = isCurrentMonth ? dueSoonBills(state, 3) : [];
+  const week = isCurrentMonth ? upcomingBills(state, 7).filter(e => e.date !== todayISO() && !soon.some(s => s.id === e.id)) : [];
   const overdue = isCurrentMonth ? overdueBills(state) : [];
 
   const monthEntries = !isCurrentMonth
