@@ -98,7 +98,7 @@ export default function Auth() {
               : 'Informe seu e-mail para receber um link de redefinição.'}
           </p>
           <form onSubmit={handleSubmit} className="mt-5 grid gap-3">
-            {mode === 'signup' && (
+            {mode === 'forgot' ? null : mode === 'signup' && (
               <div>
                 <label className="text-sm font-medium mb-1 block">Seu nome</label>
                 <input
