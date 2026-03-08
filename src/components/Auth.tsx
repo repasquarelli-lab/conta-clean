@@ -88,12 +88,14 @@ export default function Auth() {
         {/* Auth Form */}
         <div className="glass-panel p-7">
           <h2 className="text-xl font-bold mb-2">
-            {mode === 'login' ? 'Entrar na sua conta' : 'Criar conta'}
+            {mode === 'login' ? 'Entrar na sua conta' : mode === 'signup' ? 'Criar conta' : 'Recuperar senha'}
           </h2>
           <p className="text-muted-foreground text-sm">
             {mode === 'login'
               ? 'Acesse seus dados financeiros salvos na nuvem.'
-              : 'Cadastre-se para salvar seus dados com segurança.'}
+              : mode === 'signup'
+              ? 'Cadastre-se para salvar seus dados com segurança.'
+              : 'Informe seu e-mail para receber um link de redefinição.'}
           </p>
           <form onSubmit={handleSubmit} className="mt-5 grid gap-3">
             {mode === 'signup' && (
