@@ -1,18 +1,20 @@
 import { useState, useRef, useEffect } from 'react';
 import { useApp, View } from '@/contexts/AppContext';
 import { saveState, overdueBills, dueTodayBills, currency, budgetProgress, todayISO } from '@/lib/store';
-import { LayoutDashboard, ArrowLeftRight, Pin, CalendarClock, FileText, Settings, Menu, X, LogOut, Sun, Moon, Download, Upload } from 'lucide-react';
+import { LayoutDashboard, ArrowLeftRight, Pin, CalendarClock, FileText, Settings, Menu, X, LogOut, Sun, Moon, Download, Upload, ShieldCheck } from 'lucide-react';
 import { AnimatePresence, motion } from 'framer-motion';
 import { toast } from 'sonner';
 import { useTheme } from '@/hooks/use-theme';
+import { supabase } from '@/integrations/supabase/client';
 
-const VIEW_ORDER: View[] = ['dashboard', 'lancamentos', 'fixas', 'agenda', 'resumo', 'config'];
+const VIEW_ORDER: View[] = ['dashboard', 'lancamentos', 'fixas', 'agenda', 'resumo', 'config', 'admin'];
 import DashboardView from './views/DashboardView';
 import LancamentosView from './views/LancamentosView';
 import FixasView from './views/FixasView';
 import AgendaView from './views/AgendaView';
 import ResumoView from './views/ResumoView';
 import ConfigView from './views/ConfigView';
+import AdminView from './views/AdminView';
 
 const VIEWS: { id: View; name: string; shortName: string; subtitle: string; icon: typeof LayoutDashboard }[] = [
   { id: 'dashboard', name: 'Painel do Mês', shortName: 'Painel', subtitle: 'Veja rapidamente quanto entrou, quanto saiu e o que ainda falta pagar.', icon: LayoutDashboard },
@@ -21,20 +23,32 @@ const VIEWS: { id: View; name: string; shortName: string; subtitle: string; icon
   { id: 'agenda', name: 'Agenda de Vencimentos', shortName: 'Agenda', subtitle: 'Saiba o que vence hoje, nesta semana e o que está atrasado.', icon: CalendarClock },
   { id: 'resumo', name: 'Resumo do Mês', shortName: 'Resumo', subtitle: 'Entenda o seu mês em linguagem simples.', icon: FileText },
   { id: 'config', name: 'Configurações', shortName: 'Config', subtitle: 'Ajustes básicos, backup e personalização.', icon: Settings },
+  { id: 'admin', name: 'Administração', shortName: 'Admin', subtitle: 'Gerencie usuários e papéis da plataforma.', icon: ShieldCheck },
 ];
 
-// Bottom tabs: show 5 main views, config goes in hamburger
-const BOTTOM_TABS = VIEWS.filter(v => v.id !== 'config');
+// Bottom tabs: show 5 main views, config and admin go in hamburger
+const BOTTOM_TABS = VIEWS.filter(v => v.id !== 'config' && v.id !== 'admin');
 
 export default function AppShell() {
   const { state, currentView, setCurrentView, setScreen, reloadDemo, logout, onAuthSuccess } = useApp();
   const userEmail = onAuthSuccess.user?.email || '';
+  const userId = onAuthSuccess.user?.id || '';
   const { theme, toggleTheme } = useTheme();
+  const [isAdmin, setIsAdmin] = useState(false);
   const meta = VIEWS.find(v => v.id === currentView)!;
   const [sidebarOpen, setSidebarOpen] = useState(false);
   const prevViewRef = useRef(currentView);
   const direction = VIEW_ORDER.indexOf(currentView) >= VIEW_ORDER.indexOf(prevViewRef.current) ? 1 : -1;
   prevViewRef.current = currentView;
+
+  // Check admin role
+  useEffect(() => {
+    if (!userId) return;
+    supabase.from('user_roles').select('role').eq('user_id', userId).eq('role', 'admin').maybeSingle()
+      .then(({ data }) => setIsAdmin(!!data));
+  }, [userId]);
+
+  const visibleViews = VIEWS.filter(v => v.id !== 'admin' || isAdmin);
 
   useEffect(() => {
     const overdue = overdueBills(state);
@@ -133,7 +147,7 @@ export default function AppShell() {
           <div className="lg:hidden fixed inset-0 z-30 bg-background/60 backdrop-blur-sm" onClick={() => setSidebarOpen(false)} />
           <div className="lg:hidden fixed top-[57px] left-0 right-0 z-40 border-b border-border p-4 animate-fade-in bg-background/98 backdrop-blur-2xl">
             <nav className="flex flex-col gap-1.5 mb-3">
-              {VIEWS.map(v => (
+              {visibleViews.map(v => (
                 <button
                   key={v.id}
                   onClick={() => navigateTo(v.id)}
@@ -165,7 +179,7 @@ export default function AppShell() {
           </div>
         </div>
         <nav className="flex flex-col gap-2">
-          {VIEWS.map(v => (
+          {visibleViews.map(v => (
             <button
               key={v.id}
               onClick={() => setCurrentView(v.id)}
@@ -221,6 +235,7 @@ export default function AppShell() {
               {currentView === 'agenda' && <AgendaView />}
               {currentView === 'resumo' && <ResumoView />}
               {currentView === 'config' && <ConfigView />}
+              {currentView === 'admin' && isAdmin && <AdminView />}
             </motion.div>
           </AnimatePresence>
         </div>
