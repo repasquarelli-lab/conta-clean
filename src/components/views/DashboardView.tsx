@@ -7,6 +7,17 @@ import MarketTicker from '../MarketTicker';
 import AiTipsWidget from '../AiTipsWidget';
 import { TrendingUp, TrendingDown, Clock, Wallet, AlertCircle, PieChart as PieChartIcon, BarChart3, LineChart, Target, CalendarClock, Activity, CheckCircle2, Percent, FolderOpen, type LucideIcon } from 'lucide-react';
 import { getCategoryIcon } from '@/lib/categoryIcons';
+import { motion } from 'framer-motion';
+
+const fadeUp = {
+  hidden: { opacity: 0, y: 20 },
+  visible: { opacity: 1, y: 0 },
+};
+
+const staggerContainer = {
+  hidden: {},
+  visible: { transition: { staggerChildren: 0.07 } },
+};
 
 const CHART_COLORS = [
   'hsl(190, 90%, 50%)',
