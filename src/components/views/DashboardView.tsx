@@ -247,7 +247,8 @@ export default function DashboardView() {
               return (
                 <div key={g.category} className="p-3.5 rounded-2xl bg-accent border border-border">
                   <div className="flex justify-between items-center mb-1.5">
-                    <span className="text-sm font-semibold">{g.category}</span>
+                    {(() => { const CatIcon = getCategoryIcon(g.category); return <CatIcon className="size-4 text-muted-foreground shrink-0" strokeWidth={1.5} />; })()}
+                    <span className="text-sm font-semibold flex-1 ml-2">{g.category}</span>
                     <span className={`text-xs font-bold ${overBudget ? 'text-red-400' : nearLimit ? 'text-yellow-400' : 'text-emerald-400'}`}>
                       {g.pct}%
                     </span>
