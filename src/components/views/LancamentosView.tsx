@@ -2,6 +2,8 @@ import { useState } from 'react';
 import { useApp } from '@/contexts/AppContext';
 import { getMonthEntries, currency, formatDate, todayISO, uid, categories, incomeCategories } from '@/lib/store';
 import MonthNavigator from '../MonthNavigator';
+import { PlusCircle, List, Search, Check, Undo2, Trash2, ArrowDownCircle, ArrowUpCircle, Save } from 'lucide-react';
+import { getCategoryIcon } from '@/lib/categoryIcons';
 
 export default function LancamentosView() {
   const { state, updateState, currentMonth, setCurrentMonth } = useApp();
