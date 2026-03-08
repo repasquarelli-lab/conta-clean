@@ -104,7 +104,7 @@ export default function FixasView() {
                   <td className="p-3 border-b border-border text-sm">Dia {f.day}</td>
                   <td className="p-3 border-b border-border text-sm">{currency(f.value)}</td>
                   <td className="p-3 border-b border-border text-sm">
-                    <button onClick={() => removeFixed(f.id)} className="badge-bad cursor-pointer text-xs font-bold">Excluir</button>
+                    <button onClick={() => removeFixed(f.id)} className="badge-bad cursor-pointer text-xs font-bold flex items-center gap-1"><Trash2 className="size-3" /> Excluir</button>
                   </td>
                 </tr>
               ))}

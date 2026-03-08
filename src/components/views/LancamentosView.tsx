@@ -157,10 +157,12 @@ export default function LancamentosView() {
                   </td>
                   <td className="p-3 border-b border-border text-sm">
                     <div className="flex gap-2 flex-wrap">
-                      <button onClick={() => togglePaid(e.id)} className={`${e.paid ? 'badge-warn' : 'badge-good'} cursor-pointer text-xs font-bold`}>
-                        {e.paid ? 'Marcar pendente' : 'Marcar pago'}
+                      <button onClick={() => togglePaid(e.id)} className={`${e.paid ? 'badge-warn' : 'badge-good'} cursor-pointer text-xs font-bold flex items-center gap-1`}>
+                        {e.paid ? <><Undo2 className="size-3" /> Marcar pendente</> : <><Check className="size-3" /> Marcar pago</>}
                       </button>
-                      <button onClick={() => removeEntry(e.id)} className="badge-bad cursor-pointer text-xs font-bold">Excluir</button>
+                      <button onClick={() => removeEntry(e.id)} className="badge-bad cursor-pointer text-xs font-bold flex items-center gap-1">
+                        <Trash2 className="size-3" /> Excluir
+                      </button>
                     </div>
                   </td>
                 </tr>
