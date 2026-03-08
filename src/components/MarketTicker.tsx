@@ -23,15 +23,17 @@ export default function MarketTicker() {
     setLoading(true);
     try {
       const [currRes, cryptoRes, indicesRes] = await Promise.all([
-        fetch('https://economia.awesomeapi.com.br/json/last/USD-BRL,EUR-BRL,GBP-BRL'),
-        fetch('https://api.coingecko.com/api/v3/simple/price?ids=bitcoin&vs_currencies=brl&include_24hr_change=true'),
-        fetch('https://brapi.dev/api/quote/%5EBVSP,%5EIXIC').catch(() => null),
+        fetch('https://economia.awesomeapi.com.br/json/last/USD-BRL,EUR-BRL,GBP-BRL').catch(() => null),
+        fetch('https://api.coingecko.com/api/v3/simple/price?ids=bitcoin&vs_currencies=brl&include_24hr_change=true').catch(() => null),
+        supabase.functions.invoke('market-indices').catch(() => null),
       ]);
 
-      const curr = await currRes.json();
-      const crypto = await cryptoRes.json();
+      let curr: any = {};
+      let crypto: any = {};
       let indices: any = null;
-      try { if (indicesRes?.ok) indices = await indicesRes.json(); } catch {}
+      try { if (currRes?.ok) curr = await currRes.json(); } catch {}
+      try { if (cryptoRes?.ok) crypto = await cryptoRes.json(); } catch {}
+      try { if (indicesRes?.data) indices = indicesRes.data; } catch {}
 
       const items: MarketItem[] = [];
 
