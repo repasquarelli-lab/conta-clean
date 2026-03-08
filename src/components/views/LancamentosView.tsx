@@ -143,15 +143,24 @@ export default function LancamentosView() {
             </button>
           </div>
         </div>
-        <div className="flex gap-2.5 flex-wrap mb-3">
+        <div className="flex gap-2 flex-wrap mb-3">
           <div className="flex-1 min-w-[160px] relative">
             <Search className="size-4 text-muted-foreground absolute left-3 top-1/2 -translate-y-1/2" strokeWidth={1.5} />
             <input placeholder="Buscar por descrição..." value={search} onChange={e => setSearch(e.target.value)} className="w-full pl-9 pr-3 py-2.5 rounded-[14px] border border-border bg-input text-foreground text-sm outline-none placeholder:text-muted-foreground" />
           </div>
-          <select value={filterType} onChange={e => setFilterType(e.target.value)} className="min-w-[160px] px-3 py-2.5 rounded-[14px] border border-border bg-input text-foreground text-sm outline-none">
-            <option value="all">Todos</option>
+          <select value={filterType} onChange={e => setFilterType(e.target.value)} className="min-w-[120px] px-3 py-2.5 rounded-[14px] border border-border bg-input text-foreground text-sm outline-none">
+            <option value="all">Todos os tipos</option>
             <option value="income">Só receitas</option>
             <option value="expense">Só despesas</option>
+          </select>
+          <select value={filterCategory} onChange={e => setFilterCategory(e.target.value)} className="min-w-[120px] px-3 py-2.5 rounded-[14px] border border-border bg-input text-foreground text-sm outline-none">
+            <option value="all">Todas categorias</option>
+            {allMonthCategories.map(c => <option key={c} value={c}>{c}</option>)}
+          </select>
+          <select value={filterStatus} onChange={e => setFilterStatus(e.target.value)} className="min-w-[110px] px-3 py-2.5 rounded-[14px] border border-border bg-input text-foreground text-sm outline-none">
+            <option value="all">Qualquer status</option>
+            <option value="paid">Pagos/Recebidos</option>
+            <option value="pending">Pendentes</option>
           </select>
         </div>
 
