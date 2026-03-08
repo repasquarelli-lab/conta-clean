@@ -127,7 +127,7 @@ export default function MarketTicker() {
                     <span className="text-xs font-medium">{item.name}</span>
                   </div>
                   <span className="text-sm font-bold">{item.value}</span>
-                  <div className={`flex items-center gap-0.5 text-[11px] font-semibold ${positive ? 'text-emerald-400' : 'text-red-400'}`}>
+                  <div className={`flex items-center gap-0.5 text-[11px] font-semibold ${positive ? 'text-emerald-600 dark:text-emerald-400' : 'text-red-600 dark:text-red-400'}`}>
                     {positive ? <TrendingUp className="w-3 h-3" /> : <TrendingDown className="w-3 h-3" />}
                     {positive ? '+' : ''}{item.change}%
                   </div>

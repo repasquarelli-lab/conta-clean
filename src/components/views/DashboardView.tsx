@@ -249,7 +249,7 @@ export default function DashboardView() {
                   <div className="flex justify-between items-center mb-1.5">
                     {(() => { const CatIcon = getCategoryIcon(g.category); return <CatIcon className="size-4 text-muted-foreground shrink-0" strokeWidth={1.5} />; })()}
                     <span className="text-sm font-semibold flex-1 ml-2">{g.category}</span>
-                    <span className={`text-xs font-bold ${overBudget ? 'text-red-400' : nearLimit ? 'text-yellow-400' : 'text-emerald-400'}`}>
+                    <span className={`text-xs font-bold ${overBudget ? 'text-red-600 dark:text-red-400' : nearLimit ? 'text-yellow-600 dark:text-yellow-400' : 'text-emerald-600 dark:text-emerald-400'}`}>
                       {g.pct}%
                     </span>
                   </div>

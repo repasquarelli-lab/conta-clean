@@ -18,14 +18,14 @@ function generateTips(state: any, month: string) {
   if (m.balance >= 0) {
     tips.push({
       icon: TrendingUp,
-      color: 'text-emerald-400',
+      color: 'text-emerald-600 dark:text-emerald-400',
       title: 'Mês positivo',
       text: `Você está com saldo de ${currency(m.balance)}. Continue assim! Se possível, guarde esse valor como reserva.`,
     });
   } else {
     tips.push({
       icon: TrendingDown,
-      color: 'text-red-400',
+      color: 'text-red-600 dark:text-red-400',
       title: 'Mês no vermelho',
       text: `Suas despesas superaram a renda em ${currency(Math.abs(m.balance))}. Revise gastos variáveis para equilibrar o mês.`,
     });
@@ -35,14 +35,14 @@ function generateTips(state: any, month: string) {
   if (fixedPct > 70) {
     tips.push({
       icon: AlertTriangle,
-      color: 'text-yellow-400',
+      color: 'text-yellow-600 dark:text-yellow-400',
       title: 'Contas fixas pesando',
       text: `${fixedPct}% da sua renda vai para contas fixas. O ideal é manter abaixo de 60%. Tente renegociar algum contrato.`,
     });
   } else if (fixedPct > 0) {
     tips.push({
       icon: ShieldCheck,
-      color: 'text-emerald-400',
+      color: 'text-emerald-600 dark:text-emerald-400',
       title: 'Fixas sob controle',
       text: `Suas contas fixas representam ${fixedPct}% da renda — dentro de uma faixa saudável.`,
     });
@@ -54,7 +54,7 @@ function generateTips(state: any, month: string) {
     if (topPct > 40) {
       tips.push({
         icon: Target,
-        color: 'text-yellow-400',
+        color: 'text-yellow-600 dark:text-yellow-400',
         title: `${top[0]} domina seus gastos`,
         text: `A categoria "${top[0]}" representa ${topPct}% de todas as despesas (${currency(top[1])}). Avalie se há como reduzir.`,
       });
@@ -76,7 +76,7 @@ function generateTips(state: any, month: string) {
   if (exceeded.length > 0) {
     tips.push({
       icon: AlertTriangle,
-      color: 'text-red-400',
+      color: 'text-red-600 dark:text-red-400',
       title: `${exceeded.length} meta${exceeded.length > 1 ? 's' : ''} estourada${exceeded.length > 1 ? 's' : ''}`,
       text: exceeded.map(b => `"${b.category}" passou ${b.pct - 100}% do limite (${currency(b.spent)} de ${currency(b.limit)})`).join('. ') + '. Revise esses gastos com atenção.',
     });
@@ -85,7 +85,7 @@ function generateTips(state: any, month: string) {
   if (nearLimit.length > 0) {
     tips.push({
       icon: Lightbulb,
-      color: 'text-yellow-400',
+      color: 'text-yellow-600 dark:text-yellow-400',
       title: `${nearLimit.length} meta${nearLimit.length > 1 ? 's' : ''} quase no limite`,
       text: nearLimit.map(b => `"${b.category}" está em ${b.pct}%`).join(', ') + '. Cuidado para não ultrapassar até o fim do mês.',
     });
@@ -94,7 +94,7 @@ function generateTips(state: any, month: string) {
   if (underControl.length > 0 && exceeded.length === 0) {
     tips.push({
       icon: CheckCircle,
-      color: 'text-emerald-400',
+      color: 'text-emerald-600 dark:text-emerald-400',
       title: 'Orçamento sob controle',
       text: `${underControl.length} categoria${underControl.length > 1 ? 's' : ''} está abaixo de 50% do limite — ótima disciplina financeira!`,
     });
@@ -106,7 +106,7 @@ function generateTips(state: any, month: string) {
     if (paidPct === 100) {
       tips.push({
         icon: CheckCircle,
-        color: 'text-emerald-400',
+        color: 'text-emerald-600 dark:text-emerald-400',
         title: 'Tudo pago!',
         text: 'Todas as contas do mês estão quitadas. Parabéns pela organização!',
       });
@@ -240,7 +240,7 @@ export default function ResumoView() {
                     </div>
                   </div>
                   <div className={`flex items-center gap-1 text-sm font-bold shrink-0 ${
-                    increased ? 'text-red-400' : decreased ? 'text-emerald-400' : 'text-muted-foreground'
+                    increased ? 'text-red-600 dark:text-red-400' : decreased ? 'text-emerald-600 dark:text-emerald-400' : 'text-muted-foreground'
                   }`}>
                     {increased ? <ArrowUpRight className="w-4 h-4" /> : decreased ? <ArrowDownRight className="w-4 h-4" /> : <Minus className="w-4 h-4" />}
                     {c.diff !== 0 ? (
@@ -250,7 +250,7 @@ export default function ResumoView() {
                     )}
                   </div>
                   {c.pct !== 0 && !isNew && !removed && (
-                    <span className={`text-[11px] font-semibold shrink-0 ${increased ? 'text-red-400' : 'text-emerald-400'}`}>
+                    <span className={`text-[11px] font-semibold shrink-0 ${increased ? 'text-red-600 dark:text-red-400' : 'text-emerald-600 dark:text-emerald-400'}`}>
                       {c.pct > 0 ? '+' : ''}{c.pct}%
                     </span>
                   )}
