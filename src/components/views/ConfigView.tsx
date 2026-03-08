@@ -1,7 +1,7 @@
 import { useState } from 'react';
 import { useApp } from '@/contexts/AppContext';
-import { categories, currency, BudgetGoal } from '@/lib/store';
-import { Plus, Trash2, Mail, User, Target, Download, RefreshCw, AlertTriangle, Save, Database } from 'lucide-react';
+import { categories, currency, BudgetGoal, defaultNotificationSettings } from '@/lib/store';
+import { Plus, Trash2, Mail, User, Target, Download, RefreshCw, AlertTriangle, Save, Database, Bell, BellOff } from 'lucide-react';
 import { getCategoryIcon } from '@/lib/categoryIcons';
 
 export default function ConfigView() {
@@ -159,6 +159,76 @@ export default function ConfigView() {
         {goals.length === 0 && availableCategories.length === 0 && (
           <p className="text-muted-foreground text-sm">Nenhuma categoria disponível.</p>
         )}
+      </div>
+
+      {/* Notification Settings */}
+      <div className="glass-panel p-4 mb-4">
+        <div className="flex items-start gap-2.5 mb-3">
+          <Bell className="size-5 text-muted-foreground mt-0.5 shrink-0" strokeWidth={1.5} />
+          <div>
+            <h3 className="font-bold">Notificações</h3>
+            <p className="text-muted-foreground text-sm">Configure alertas de vencimento e atraso</p>
+          </div>
+        </div>
+        {(() => {
+          const notifSettings = state.notificationSettings || defaultNotificationSettings;
+          const permissionStatus = 'Notification' in window ? Notification.permission : 'unsupported';
+
+          const toggle = (key: keyof typeof notifSettings) => {
+            updateState(prev => ({
+              ...prev,
+              notificationSettings: {
+                ...(prev.notificationSettings || defaultNotificationSettings),
+                [key]: !(prev.notificationSettings || defaultNotificationSettings)[key],
+              },
+            }));
+          };
+
+          return (
+            <div className="flex flex-col gap-2.5">
+              {permissionStatus === 'unsupported' && (
+                <div className="p-3 rounded-xl bg-destructive/10 border border-destructive/20 text-sm text-destructive">
+                  Seu navegador não suporta notificações.
+                </div>
+              )}
+              {permissionStatus === 'denied' && (
+                <div className="p-3 rounded-xl bg-destructive/10 border border-destructive/20 text-sm text-destructive">
+                  Notificações bloqueadas. Habilite nas configurações do navegador.
+                </div>
+              )}
+
+              <label className="flex items-center justify-between p-3 rounded-xl bg-accent border border-border cursor-pointer" onClick={() => toggle('enabled')}>
+                <div className="flex items-center gap-2.5">
+                  {notifSettings.enabled ? <Bell className="size-4 text-primary" strokeWidth={1.5} /> : <BellOff className="size-4 text-muted-foreground" strokeWidth={1.5} />}
+                  <span className="text-sm font-medium">Ativar notificações</span>
+                </div>
+                <div className={`w-10 h-6 rounded-full transition-colors relative ${notifSettings.enabled ? 'bg-primary' : 'bg-muted'}`}>
+                  <div className={`absolute top-1 w-4 h-4 rounded-full bg-primary-foreground transition-transform ${notifSettings.enabled ? 'left-5' : 'left-1'}`} />
+                </div>
+              </label>
+
+              <label className={`flex items-center justify-between p-3 rounded-xl bg-accent border border-border cursor-pointer transition-opacity ${!notifSettings.enabled ? 'opacity-50 pointer-events-none' : ''}`} onClick={() => notifSettings.enabled && toggle('dueTodayAlert')}>
+                <div className="flex items-center gap-2.5">
+                  <span className="text-base">📅</span>
+                  <span className="text-sm">Alerta de contas vencendo hoje</span>
+                </div>
+                <div className={`w-10 h-6 rounded-full transition-colors relative ${notifSettings.dueTodayAlert ? 'bg-primary' : 'bg-muted'}`}>
+                  <div className={`absolute top-1 w-4 h-4 rounded-full bg-primary-foreground transition-transform ${notifSettings.dueTodayAlert ? 'left-5' : 'left-1'}`} />
+                </div>
+              </label>
+
+              <label className={`flex items-center justify-between p-3 rounded-xl bg-accent border border-border cursor-pointer transition-opacity ${!notifSettings.enabled ? 'opacity-50 pointer-events-none' : ''}`} onClick={() => notifSettings.enabled && toggle('overdueAlert')}>
+                <div className="flex items-center gap-2.5">
+                  <span className="text-base">⚠️</span>
+                  <span className="text-sm">Alerta de contas atrasadas</span>
+                </div>
+                <div className={`w-10 h-6 rounded-full transition-colors relative ${notifSettings.overdueAlert ? 'bg-primary' : 'bg-muted'}`}>
+                  <div className={`absolute top-1 w-4 h-4 rounded-full bg-primary-foreground transition-transform ${notifSettings.overdueAlert ? 'left-5' : 'left-1'}`} />
+                </div>
+              </label>
+            </div>
+          );
+        })()}
       </div>
 
       <div className="glass-panel p-4">

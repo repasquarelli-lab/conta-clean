@@ -23,12 +23,25 @@ export interface Entry {
   sourceFixed?: boolean;
 }
 
+export interface NotificationSettings {
+  enabled: boolean;
+  dueTodayAlert: boolean;
+  overdueAlert: boolean;
+}
+
+export const defaultNotificationSettings: NotificationSettings = {
+  enabled: true,
+  dueTodayAlert: true,
+  overdueAlert: true,
+};
+
 export interface AppState {
   brandName: string;
   userName: string;
   fixedBills: FixedBill[];
   entries: Entry[];
   budgetGoals?: BudgetGoal[];
+  notificationSettings?: NotificationSettings;
 }
 
 const STORAGE_KEY = 'conta_clara_lite_v3';
