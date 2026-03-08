@@ -233,9 +233,12 @@ export default function DashboardView() {
       {/* Budget Goals */}
       {(state.budgetGoals?.length ?? 0) > 0 && (
         <div className="glass-panel p-4 mt-4">
-          <div className="mb-3">
-            <h3 className="font-bold">Metas de orçamento</h3>
-            <p className="text-muted-foreground text-sm">Acompanhe seus limites por categoria</p>
+          <div className="mb-3 flex items-start gap-2.5">
+            <Target className="size-5 text-muted-foreground mt-0.5 shrink-0" strokeWidth={1.5} />
+            <div>
+              <h3 className="font-bold">Metas de orçamento</h3>
+              <p className="text-muted-foreground text-sm">Acompanhe seus limites por categoria</p>
+            </div>
           </div>
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3">
             {budgetProgress(state, currentMonth).map(g => {
