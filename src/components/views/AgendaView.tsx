@@ -2,6 +2,7 @@ import { useApp } from '@/contexts/AppContext';
 import { dueTodayBills, upcomingBills, overdueBills, todayISO, getMonthEntries, daysDiff } from '@/lib/store';
 import BillItem from '../BillItem';
 import MonthNavigator from '../MonthNavigator';
+import { AlertTriangle, CalendarClock, Clock, CalendarDays, type LucideIcon } from 'lucide-react';
 
 export default function AgendaView() {
   const { state, currentMonth, setCurrentMonth } = useApp();
@@ -17,14 +18,14 @@ export default function AgendaView() {
     ? getMonthEntries(state, currentMonth).filter(e => e.type === 'expense').sort((a, b) => a.date.localeCompare(b.date))
     : [];
 
-  const sections = isCurrentMonth
+  const sections: { title: string; subtitle: string; icon: LucideIcon; items: any[]; getLabel: (e: any) => string; variant: 'good' | 'warn' | 'bad'; emptyMsg: string }[] = isCurrentMonth
     ? [
-        { title: 'Vence hoje', subtitle: 'Prioridade máxima', items: today, getLabel: () => 'Hoje', variant: 'bad' as const, emptyMsg: 'Nenhuma conta vence hoje.' },
-        { title: 'Próximos 7 dias', subtitle: 'Para você se organizar', items: week, getLabel: (e: any) => e.delta === 1 ? 'Amanhã' : `Em ${e.delta} dias`, variant: 'warn' as const, emptyMsg: 'Nenhuma conta nesta semana.' },
-        { title: 'Atrasadas', subtitle: 'Contas que já passaram do prazo', items: overdue, getLabel: () => 'Atrasada', variant: 'bad' as const, emptyMsg: 'Nenhuma conta atrasada.' },
+        { title: 'Vence hoje', subtitle: 'Prioridade máxima', icon: Clock, items: today, getLabel: () => 'Hoje', variant: 'bad', emptyMsg: 'Nenhuma conta vence hoje.' },
+        { title: 'Próximos 7 dias', subtitle: 'Para você se organizar', icon: CalendarClock, items: week, getLabel: (e: any) => e.delta === 1 ? 'Amanhã' : `Em ${e.delta} dias`, variant: 'warn', emptyMsg: 'Nenhuma conta nesta semana.' },
+        { title: 'Atrasadas', subtitle: 'Contas que já passaram do prazo', icon: AlertTriangle, items: overdue, getLabel: () => 'Atrasada', variant: 'bad', emptyMsg: 'Nenhuma conta atrasada.' },
       ]
     : [
-        { title: 'Contas do mês', subtitle: 'Todas as despesas deste mês', items: monthEntries, getLabel: (e: any) => e.paid ? 'Pago' : 'Pendente', variant: 'warn' as const, emptyMsg: 'Nenhuma conta neste mês.' },
+        { title: 'Contas do mês', subtitle: 'Todas as despesas deste mês', icon: CalendarDays, items: monthEntries, getLabel: (e: any) => e.paid ? 'Pago' : 'Pendente', variant: 'warn', emptyMsg: 'Nenhuma conta neste mês.' },
       ];
 
   return (
@@ -35,9 +36,12 @@ export default function AgendaView() {
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-4">
         {sections.map(section => (
           <div key={section.title} className="glass-panel p-4">
-            <div className="mb-3">
-              <h3 className="font-bold">{section.title}</h3>
-              <p className="text-muted-foreground text-sm">{section.subtitle}</p>
+            <div className="mb-3 flex items-start gap-2.5">
+              <section.icon className="size-5 text-muted-foreground mt-0.5 shrink-0" strokeWidth={1.5} />
+              <div>
+                <h3 className="font-bold">{section.title}</h3>
+                <p className="text-muted-foreground text-sm">{section.subtitle}</p>
+              </div>
             </div>
             <div className="flex flex-col gap-2.5">
               {section.items.length === 0 ? (
