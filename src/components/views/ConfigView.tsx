@@ -151,13 +151,13 @@ export default function ConfigView() {
 
       <div className="glass-panel p-4">
         <h3 className="font-bold mb-1">Backup e limpeza</h3>
-        <p className="text-muted-foreground text-sm mb-3">O app funciona com armazenamento local no próprio navegador</p>
+        <p className="text-muted-foreground text-sm mb-3">Seus dados são sincronizados na nuvem automaticamente</p>
         <div className="flex gap-2.5 flex-wrap">
           <button onClick={exportBackup} className="glass-panel rounded-2xl px-4 py-2.5 font-bold cursor-pointer text-sm">Exportar backup</button>
-          <button onClick={reloadDemo} className="glass-panel rounded-2xl px-4 py-2.5 font-bold cursor-pointer text-sm">Recarregar dados demo</button>
+          <button onClick={reloadDemo} className="glass-panel rounded-2xl px-4 py-2.5 font-bold cursor-pointer text-sm">Carregar dados demo</button>
           <button onClick={clearAll} className="badge-bad cursor-pointer px-4 py-2.5 rounded-2xl font-bold text-sm">Apagar tudo</button>
         </div>
-        <div className="mt-3.5 text-xs text-muted-foreground">Versão v3 comercial, pronta para demo, validação e início de narrativa de venda.</div>
+        <div className="mt-3.5 text-xs text-muted-foreground">Conta Clara v1.0 · Suas finanças, simples e seguras.</div>
       </div>
     </div>
   );

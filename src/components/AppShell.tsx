@@ -112,10 +112,10 @@ export default function AppShell() {
       {/* Mobile Header */}
       <header className="lg:hidden flex items-center justify-between px-4 py-3 border-b border-border sticky top-0 z-40 bg-background/95 backdrop-blur-xl">
         <div className="flex items-center gap-3">
-          <div className="w-9 h-9 rounded-xl grid place-items-center brand-gradient font-black tracking-wide text-primary-foreground text-xs">CC</div>
+          <div className="w-9 h-9 rounded-xl grid place-items-center brand-gradient font-black tracking-wide text-primary-foreground text-[10px] shadow-md">CC</div>
           <div>
             <h1 className="text-sm font-bold leading-tight">Conta Clara</h1>
-            <p className="text-[10px] text-muted-foreground">{state.userName ? `Olá, ${state.userName}` : 'Seu mês'}</p>
+            <p className="text-[10px] text-muted-foreground">{state.userName ? `Olá, ${state.userName}` : 'Finanças'}</p>
           </div>
         </div>
         <div className="flex items-center gap-2">
