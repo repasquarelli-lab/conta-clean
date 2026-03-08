@@ -1,20 +1,40 @@
 import { useState } from 'react';
 import { useApp } from '@/contexts/AppContext';
-import { makeDemoData, saveState, todayISO } from '@/lib/store';
+import { toast } from 'sonner';
 
 export default function Auth() {
-  const { state, setState, setScreen, setCurrentMonth } = useApp();
-  const [name, setName] = useState(state.userName || 'Norma');
-  const [month, setMonth] = useState(todayISO().slice(0, 7));
-  const [mode, setMode] = useState<'demo' | 'current'>('demo');
+  const { setScreen, onAuthSuccess } = useApp();
+  const [mode, setMode] = useState<'login' | 'signup'>('login');
+  const [email, setEmail] = useState('');
+  const [password, setPassword] = useState('');
+  const [userName, setUserName] = useState('');
+  const [loading, setLoading] = useState(false);
 
-  function handleSubmit(e: React.FormEvent) {
+  async function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
-    let newState = mode === 'demo' ? makeDemoData() : { ...state };
-    newState.userName = name.trim() || state.userName || 'Usuário';
-    setState(newState);
-    setCurrentMonth(month || todayISO().slice(0, 7));
-    setScreen('app');
+    setLoading(true);
+
+    try {
+      if (mode === 'signup') {
+        const { error } = await onAuthSuccess.signUp(email, password, userName);
+        if (error) {
+          toast.error(error.message === 'User already registered'
+            ? 'Este e-mail já está cadastrado.'
+            : error.message);
+        } else {
+          toast.success('Cadastro realizado! Verifique seu e-mail para confirmar.');
+        }
+      } else {
+        const { error } = await onAuthSuccess.signIn(email, password);
+        if (error) {
+          toast.error(error.message === 'Invalid login credentials'
+            ? 'E-mail ou senha incorretos.'
+            : error.message);
+        }
+      }
+    } finally {
+      setLoading(false);
+    }
   }
 
   return (
@@ -30,14 +50,16 @@ export default function Auth() {
                 <p className="text-sm text-muted-foreground mt-0.5">Simples de entender. Simples de usar.</p>
               </div>
             </div>
-            <h2 className="text-xl font-bold mt-5 mb-2">Um app para quem quer paz no fim do mês.</h2>
-            <p className="text-muted-foreground leading-relaxed text-sm">Ideal para quem não quer banco conectado, planilha complicada ou interface técnica. Basta entrar, lançar as contas e acompanhar o mês.</p>
+            <h2 className="text-xl font-bold mt-5 mb-2">Seus dados salvos na nuvem.</h2>
+            <p className="text-muted-foreground leading-relaxed text-sm">
+              Crie sua conta para manter suas contas, lançamentos e metas sincronizados entre dispositivos. Tudo seguro e acessível de qualquer lugar.
+            </p>
             <div className="grid grid-cols-2 gap-3 mt-4">
               {[
-                { title: 'Uso prático', desc: 'Registrar, pagar e acompanhar.' },
-                { title: 'Visual limpo', desc: 'Foco no que importa.' },
-                { title: 'Demo pronta', desc: 'Com dados sintéticos reais.' },
-                { title: 'Base comercial', desc: 'Pronta para vender e validar.' },
+                { title: 'Sincronizado', desc: 'Dados salvos na nuvem automaticamente.' },
+                { title: 'Seguro', desc: 'Seus dados protegidos com login.' },
+                { title: 'Multi-dispositivo', desc: 'Acesse de qualquer aparelho.' },
+                { title: 'Backup automático', desc: 'Nunca perca seus dados.' },
               ].map(item => (
                 <div key={item.title} className="p-3.5 rounded-[20px] border border-border" style={{ background: 'hsla(220,40%,95%,0.03)' }}>
                   <strong className="block text-sm mb-1">{item.title}</strong>
@@ -54,28 +76,66 @@ export default function Auth() {
 
         {/* Auth Form */}
         <div className="glass-panel p-7">
-          <h2 className="text-xl font-bold mb-2">Entrar no app</h2>
-          <p className="text-muted-foreground text-sm">Preencha apenas o básico para personalizar a experiência.</p>
+          <h2 className="text-xl font-bold mb-2">
+            {mode === 'login' ? 'Entrar na sua conta' : 'Criar conta'}
+          </h2>
+          <p className="text-muted-foreground text-sm">
+            {mode === 'login'
+              ? 'Acesse seus dados financeiros salvos na nuvem.'
+              : 'Cadastre-se para salvar seus dados com segurança.'}
+          </p>
           <form onSubmit={handleSubmit} className="mt-5 grid gap-3">
+            {mode === 'signup' && (
+              <div>
+                <label className="text-sm font-medium mb-1 block">Seu nome</label>
+                <input
+                  value={userName}
+                  onChange={e => setUserName(e.target.value)}
+                  placeholder="Ex.: Norma"
+                  required
+                  className="w-full px-3 py-3 rounded-[14px] border border-border bg-input text-foreground outline-none placeholder:text-muted-foreground text-sm"
+                />
+              </div>
+            )}
             <div>
-              <label className="text-sm font-medium mb-1 block">Seu nome</label>
-              <input value={name} onChange={e => setName(e.target.value)} placeholder="Ex.: Norma" required className="w-full px-3 py-3 rounded-[14px] border border-border bg-input text-foreground outline-none placeholder:text-muted-foreground text-sm" />
+              <label className="text-sm font-medium mb-1 block">E-mail</label>
+              <input
+                type="email"
+                value={email}
+                onChange={e => setEmail(e.target.value)}
+                placeholder="seu@email.com"
+                required
+                className="w-full px-3 py-3 rounded-[14px] border border-border bg-input text-foreground outline-none placeholder:text-muted-foreground text-sm"
+              />
             </div>
             <div>
-              <label className="text-sm font-medium mb-1 block">Mês de referência</label>
-              <input type="month" value={month} onChange={e => setMonth(e.target.value)} className="w-full px-3 py-3 rounded-[14px] border border-border bg-input text-foreground outline-none text-sm" />
+              <label className="text-sm font-medium mb-1 block">Senha</label>
+              <input
+                type="password"
+                value={password}
+                onChange={e => setPassword(e.target.value)}
+                placeholder="Mínimo 6 caracteres"
+                required
+                minLength={6}
+                className="w-full px-3 py-3 rounded-[14px] border border-border bg-input text-foreground outline-none placeholder:text-muted-foreground text-sm"
+              />
             </div>
-            <div>
-              <label className="text-sm font-medium mb-1 block">Modo inicial</label>
-              <select value={mode} onChange={e => setMode(e.target.value as 'demo' | 'current')} className="w-full px-3 py-3 rounded-[14px] border border-border bg-input text-foreground outline-none text-sm">
-                <option value="demo">Abrir com dados demo</option>
-                <option value="current">Abrir meus dados atuais</option>
-              </select>
-            </div>
-            <button type="submit" className="brand-gradient border-none rounded-2xl px-4 py-3 font-bold cursor-pointer text-primary-foreground mt-2">
-              Abrir painel
+            <button
+              type="submit"
+              disabled={loading}
+              className="brand-gradient border-none rounded-2xl px-4 py-3 font-bold cursor-pointer text-primary-foreground mt-2 disabled:opacity-50"
+            >
+              {loading ? 'Aguarde...' : mode === 'login' ? 'Entrar' : 'Criar conta'}
             </button>
           </form>
+          <div className="mt-4 text-center">
+            <button
+              onClick={() => setMode(mode === 'login' ? 'signup' : 'login')}
+              className="text-sm text-muted-foreground hover:text-foreground cursor-pointer bg-transparent border-none underline"
+            >
+              {mode === 'login' ? 'Não tem conta? Cadastre-se' : 'Já tem conta? Entrar'}
+            </button>
+          </div>
         </div>
       </div>
     </section>
