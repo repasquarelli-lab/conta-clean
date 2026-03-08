@@ -173,6 +173,21 @@ function monthLabel(month: string) {
   return `${MONTH_LABELS[m - 1]}/${String(y).slice(2)}`;
 }
 
+const BAR_COLORS = [
+  'hsl(262, 83%, 58%)', 'hsl(199, 89%, 48%)', 'hsl(142, 71%, 45%)',
+  'hsl(38, 92%, 50%)', 'hsl(0, 84%, 60%)', 'hsl(280, 65%, 60%)',
+  'hsl(174, 72%, 46%)', 'hsl(45, 93%, 47%)', 'hsl(210, 40%, 55%)',
+];
+
+function getCategoryData(state: AppState, month: string) {
+  const entries = getMonthEntries(state, month).filter(e => e.type === 'expense');
+  const map: Record<string, number> = {};
+  entries.forEach(e => { map[e.category] = (map[e.category] || 0) + Number(e.value || 0); });
+  return Object.entries(map)
+    .map(([name, value]) => ({ name, value: Math.round(value * 100) / 100 }))
+    .sort((a, b) => b.value - a.value);
+}
+
 export default function ResumoView() {
   const { state, currentMonth, setCurrentMonth } = useApp();
 
@@ -181,6 +196,7 @@ export default function ResumoView() {
   const tips = generateTips(state, currentMonth);
   const comparison = getCategoryComparison(state, currentMonth);
   const prevMonthStr = getPrevMonth(currentMonth);
+  const categoryData = getCategoryData(state, currentMonth);
 
   return (
     <div>
