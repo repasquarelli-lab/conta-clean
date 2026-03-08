@@ -310,10 +310,10 @@ export default function DashboardView() {
               const isGood = item.positive ? item.diff >= 0 : item.diff <= 0;
               const pct = item.prev !== 0 ? Math.round(Math.abs(item.diff / item.prev) * 100) : item.diff !== 0 ? 100 : 0;
               return (
-                <div key={item.label} className="p-3 rounded-2xl bg-accent border border-border text-center">
-                  <p className="text-xs text-muted-foreground mb-1">{item.label}</p>
-                  <p className="font-bold text-sm">{currency(item.cur)}</p>
-                  <div className={`flex items-center justify-center gap-1 mt-1 text-xs font-semibold ${isGood ? 'text-emerald-600 dark:text-emerald-400' : 'text-red-500 dark:text-red-400'}`}>
+                <div key={item.label} className="p-2 sm:p-3 rounded-xl sm:rounded-2xl bg-accent border border-border text-center">
+                  <p className="text-[10px] sm:text-xs text-muted-foreground mb-0.5 sm:mb-1">{item.label}</p>
+                  <p className="font-bold text-xs sm:text-sm">{currency(item.cur)}</p>
+                  <div className={`flex items-center justify-center gap-0.5 sm:gap-1 mt-0.5 sm:mt-1 text-[10px] sm:text-xs font-semibold ${isGood ? 'text-emerald-600 dark:text-emerald-400' : 'text-red-500 dark:text-red-400'}`}>
                     {item.diff > 0 ? <ArrowUpRight className="size-3" /> : item.diff < 0 ? <ArrowDownRight className="size-3" /> : <Minus className="size-3" />}
                     <span>{pct}%</span>
                   </div>
