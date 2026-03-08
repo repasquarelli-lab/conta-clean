@@ -133,25 +133,38 @@
   .badge-good {
     @apply px-3 py-1.5 rounded-full text-xs font-bold;
     background: hsla(142, 71%, 45%, 0.14);
-    color: hsl(142, 80%, 80%);
+    color: hsl(142, 60%, 32%);
+  }
+  .dark .badge-good {
+    color: hsl(142, 80%, 72%);
   }
 
   .badge-warn {
     @apply px-3 py-1.5 rounded-full text-xs font-bold;
     background: hsla(38, 92%, 50%, 0.14);
-    color: hsl(38, 90%, 80%);
+    color: hsl(32, 80%, 32%);
+  }
+  .dark .badge-warn {
+    color: hsl(38, 90%, 75%);
   }
 
   .badge-bad {
     @apply px-3 py-1.5 rounded-full text-xs font-bold;
     background: hsla(0, 72%, 51%, 0.14);
-    color: hsl(0, 80%, 85%);
+    color: hsl(0, 70%, 40%);
+  }
+  .dark .badge-bad {
+    color: hsl(0, 80%, 78%);
   }
 
   .badge-neutral {
     @apply px-3 py-1.5 rounded-full text-xs font-bold;
+    background: hsla(220, 15%, 50%, 0.1);
+    color: hsl(220, 15%, 40%);
+  }
+  .dark .badge-neutral {
     background: hsla(220, 40%, 95%, 0.08);
-    color: hsl(220, 40%, 90%);
+    color: hsl(220, 40%, 85%);
   }
 
   .brand-gradient {
@@ -160,6 +173,9 @@
 
   .progress-bar {
     @apply h-3 rounded-full overflow-hidden;
+    background: hsla(220, 15%, 50%, 0.12);
+  }
+  .dark .progress-bar {
     background: hsla(220, 40%, 95%, 0.08);
   }
 
