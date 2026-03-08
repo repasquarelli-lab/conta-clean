@@ -133,6 +133,8 @@ export default function DashboardView() {
   const categoryData = getCategoryData(state, currentMonth);
   const totalExpenses = categoryData.reduce((a, b) => a + b.value, 0);
   const evolutionData = getEvolutionData(state, currentMonth);
+  const comparison = getMonthComparison(state, currentMonth);
+  const prevMonthStr = getPrevMonth(currentMonth);
 
   return (
     <motion.div initial="hidden" animate="visible" variants={staggerContainer}>
