@@ -269,7 +269,7 @@ export default function LancamentosView() {
                       <span className={`text-lg font-black ${e.type === 'income' ? 'text-emerald-600 dark:text-emerald-400' : 'text-red-600 dark:text-red-400'}`}>
                         {e.type === 'income' ? '+' : '-'} {currency(e.value)}
                       </span>
-                      <p className="text-[11px] text-muted-foreground mt-0.5">{formatDate(e.date)}</p>
+                      <p className="text-[11px] text-muted-foreground mt-0.5">{e.type === 'income' ? '📅 Receb.' : '📅 Venc.'} {formatDate(e.date)}</p>
                     </div>
                     <div className="flex gap-1.5">
                       <button onClick={() => togglePaid(e.id)} className={`${e.paid ? 'badge-warn' : 'badge-good'} cursor-pointer text-[11px] font-bold flex items-center gap-1 active:scale-95 transition-transform`}>
