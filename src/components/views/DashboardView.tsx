@@ -92,15 +92,18 @@ export default function DashboardView() {
 
       {/* Metrics */}
       <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-4">
-        {[
-          { label: 'Entrou no mês', value: currency(m.incomes), sub: 'Receitas registradas' },
-          { label: 'Saiu no mês', value: currency(m.expenses), sub: 'Todas as despesas do mês' },
-          { label: 'Em aberto', value: currency(m.open), sub: 'Contas ainda não pagas' },
-          { label: 'Saldo do mês', value: currency(m.balance), sub: savingsTone },
-          { label: 'Vence hoje', value: String(today.length), sub: 'Contas com vencimento hoje' },
-        ].map(metric => (
+        {([
+          { label: 'Entrou no mês', value: currency(m.incomes), sub: 'Receitas registradas', icon: TrendingUp },
+          { label: 'Saiu no mês', value: currency(m.expenses), sub: 'Todas as despesas do mês', icon: TrendingDown },
+          { label: 'Em aberto', value: currency(m.open), sub: 'Contas ainda não pagas', icon: AlertCircle },
+          { label: 'Saldo do mês', value: currency(m.balance), sub: savingsTone, icon: Wallet },
+          { label: 'Vence hoje', value: String(today.length), sub: 'Contas com vencimento hoje', icon: Clock },
+        ] as { label: string; value: string; sub: string; icon: LucideIcon }[]).map(metric => (
           <div key={metric.label} className="glass-panel p-4">
-            <h3 className="text-muted-foreground text-sm mb-1.5">{metric.label}</h3>
+            <div className="flex items-center gap-2 mb-1.5">
+              <metric.icon className="size-4 text-muted-foreground shrink-0" strokeWidth={1.5} />
+              <h3 className="text-muted-foreground text-sm">{metric.label}</h3>
+            </div>
             <p className="text-2xl font-extrabold">{metric.value}</p>
             <div className="text-xs text-muted-foreground mt-1">{metric.sub}</div>
           </div>
