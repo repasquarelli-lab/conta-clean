@@ -68,12 +68,13 @@ export default function Auth() {
             </p>
             <div className="grid grid-cols-2 gap-3 mt-4">
               {[
-                { title: 'Sincronizado', desc: 'Dados salvos na nuvem automaticamente.' },
-                { title: 'Seguro', desc: 'Seus dados protegidos com login.' },
-                { title: 'Multi-dispositivo', desc: 'Acesse de qualquer aparelho.' },
-                { title: 'Backup automático', desc: 'Nunca perca seus dados.' },
+                { title: 'Sincronizado', desc: 'Dados salvos na nuvem automaticamente.', icon: Cloud },
+                { title: 'Seguro', desc: 'Seus dados protegidos com login.', icon: ShieldCheck },
+                { title: 'Multi-dispositivo', desc: 'Acesse de qualquer aparelho.', icon: Smartphone },
+                { title: 'Backup automático', desc: 'Nunca perca seus dados.', icon: DatabaseBackup },
               ].map(item => (
                 <div key={item.title} className="p-3.5 rounded-[20px] border border-border" style={{ background: 'hsla(220,40%,95%,0.03)' }}>
+                  <item.icon className="size-5 text-primary mb-2" strokeWidth={1.5} />
                   <strong className="block text-sm mb-1">{item.title}</strong>
                   <span className="text-muted-foreground text-xs leading-relaxed">{item.desc}</span>
                 </div>
