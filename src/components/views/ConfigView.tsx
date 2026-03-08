@@ -1,7 +1,7 @@
 import { useState } from 'react';
 import { useApp } from '@/contexts/AppContext';
-import { categories, currency, BudgetGoal } from '@/lib/store';
-import { Plus, Trash2, Mail, User, Target, Download, RefreshCw, AlertTriangle, Save, Database } from 'lucide-react';
+import { categories, currency, BudgetGoal, defaultNotificationSettings } from '@/lib/store';
+import { Plus, Trash2, Mail, User, Target, Download, RefreshCw, AlertTriangle, Save, Database, Bell, BellOff } from 'lucide-react';
 import { getCategoryIcon } from '@/lib/categoryIcons';
 
 export default function ConfigView() {

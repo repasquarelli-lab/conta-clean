@@ -31,29 +31,35 @@ export function useNotifications(state: AppState, isAuthenticated: boolean) {
   const checkAndNotify = useCallback((appState: AppState) => {
     if (!('Notification' in window) || Notification.permission !== 'granted') return;
 
+    const settings = appState.notificationSettings || defaultNotificationSettings;
+    if (!settings.enabled) return;
+
     const today = new Date().toISOString().slice(0, 10);
     const lastCheck = localStorage.getItem(NOTIFICATION_KEY);
-    if (lastCheck === today) return; // Already notified today
+    if (lastCheck === today) return;
 
-    const dueToday = dueTodayBills(appState);
-    const overdue = overdueBills(appState);
-
-    if (dueToday.length > 0) {
-      const total = dueToday.reduce((s, e) => s + e.value, 0);
-      sendNotification(
-        '📅 Contas vencem hoje!',
-        `Você tem ${dueToday.length} conta${dueToday.length > 1 ? 's' : ''} vencendo hoje, totalizando R$ ${total.toFixed(2).replace('.', ',')}`,
-        'due-today'
-      );
+    if (settings.dueTodayAlert) {
+      const dueToday = dueTodayBills(appState);
+      if (dueToday.length > 0) {
+        const total = dueToday.reduce((s, e) => s + e.value, 0);
+        sendNotification(
+          '📅 Contas vencem hoje!',
+          `Você tem ${dueToday.length} conta${dueToday.length > 1 ? 's' : ''} vencendo hoje, totalizando R$ ${total.toFixed(2).replace('.', ',')}`,
+          'due-today'
+        );
+      }
     }
 
-    if (overdue.length > 0) {
-      const total = overdue.reduce((s, e) => s + e.value, 0);
-      sendNotification(
-        '⚠️ Contas atrasadas!',
-        `${overdue.length} conta${overdue.length > 1 ? 's' : ''} atrasada${overdue.length > 1 ? 's' : ''}: R$ ${total.toFixed(2).replace('.', ',')}`,
-        'overdue'
-      );
+    if (settings.overdueAlert) {
+      const overdue = overdueBills(appState);
+      if (overdue.length > 0) {
+        const total = overdue.reduce((s, e) => s + e.value, 0);
+        sendNotification(
+          '⚠️ Contas atrasadas!',
+          `${overdue.length} conta${overdue.length > 1 ? 's' : ''} atrasada${overdue.length > 1 ? 's' : ''}: R$ ${total.toFixed(2).replace('.', ',')}`,
+          'overdue'
+        );
+      }
     }
 
     localStorage.setItem(NOTIFICATION_KEY, today);
