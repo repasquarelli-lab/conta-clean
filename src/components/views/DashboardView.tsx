@@ -351,15 +351,15 @@ export default function DashboardView() {
 
       {/* Budget Goals */}
       {(state.budgetGoals?.length ?? 0) > 0 && (
-        <motion.div className="glass-panel p-4 mt-4" variants={fadeUp} transition={{ duration: 0.5 }}>
-          <div className="mb-3 flex items-start gap-2.5">
-            <Target className="size-5 text-muted-foreground mt-0.5 shrink-0" strokeWidth={1.5} />
+        <motion.div className="glass-panel p-3 sm:p-4 mt-3 sm:mt-4" variants={fadeUp} transition={{ duration: 0.5 }}>
+          <div className="mb-2 sm:mb-3 flex items-start gap-2">
+            <Target className="size-4 sm:size-5 text-muted-foreground mt-0.5 shrink-0" strokeWidth={1.5} />
             <div>
-              <h3 className="font-bold">Metas de orçamento</h3>
-              <p className="text-muted-foreground text-sm">Acompanhe seus limites por categoria</p>
+              <h3 className="font-bold text-sm sm:text-base">Metas de orçamento</h3>
+              <p className="text-muted-foreground text-xs sm:text-sm hidden sm:block">Acompanhe seus limites por categoria</p>
             </div>
           </div>
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3">
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-2 sm:gap-3">
             {budgetProgress(state, currentMonth).map(g => {
               const overBudget = g.pct > 100;
               const nearLimit = g.pct >= 80 && g.pct <= 100;
