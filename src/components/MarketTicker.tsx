@@ -68,19 +68,20 @@ export default function MarketTicker() {
         });
       }
 
-      // Indices from brapi
-      if (indices?.results) {
-        for (const idx of indices.results) {
-          const name = idx.symbol === '^BVSP' ? 'IBOVESPA' : idx.symbol === '^IXIC' ? 'NASDAQ' : idx.symbol;
-          if (idx.regularMarketPrice) {
+      // Indices from edge function
+      if (indices) {
+        const indexMap: Record<string, string> = { '^BVSP': 'IBOVESPA', '^IXIC': 'NASDAQ' };
+        for (const [symbol, label] of Object.entries(indexMap)) {
+          const d = indices[symbol];
+          if (d?.price) {
             items.push({
-              name,
-              value: Number(idx.regularMarketPrice).toLocaleString('pt-BR', { maximumFractionDigits: 0 }),
-              change: Number((idx.regularMarketChangePercent ?? 0).toFixed(2)),
+              name: label,
+              value: Number(d.price).toLocaleString('pt-BR', { maximumFractionDigits: 0 }),
+              change: Number((d.change ?? 0).toFixed(2)),
               icon: <BarChart3 className="w-4 h-4" />,
               extra: {
-                high: Number(idx.regularMarketDayHigh || 0).toLocaleString('pt-BR', { maximumFractionDigits: 0 }),
-                low: Number(idx.regularMarketDayLow || 0).toLocaleString('pt-BR', { maximumFractionDigits: 0 }),
+                high: d.high ? Number(d.high).toLocaleString('pt-BR', { maximumFractionDigits: 0 }) : undefined,
+                low: d.low ? Number(d.low).toLocaleString('pt-BR', { maximumFractionDigits: 0 }) : undefined,
               },
             });
           }
