@@ -155,7 +155,7 @@ export default function LancamentosView() {
               <table className="w-full border-collapse min-w-[760px]" style={{ background: 'hsl(var(--accent))' }}>
                 <thead>
                   <tr>
-                    {['Tipo', 'Descrição', 'Categoria', 'Data', 'Valor', 'Situação', 'Ações'].map(h => (
+                    {['Tipo', 'Descrição', 'Categoria', 'Venc./Receb.', 'Valor', 'Situação', 'Ações'].map(h => (
                       <th key={h} className="p-3 border-b border-border text-left text-sm font-bold text-muted-foreground" style={{ background: 'hsla(220,40%,95%,0.02)' }}>{h}</th>
                     ))}
                   </tr>
