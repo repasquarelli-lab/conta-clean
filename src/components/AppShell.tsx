@@ -179,7 +179,7 @@ export default function AppShell() {
           </div>
         </div>
         <nav className="flex flex-col gap-2">
-          {VIEWS.map(v => (
+          {visibleViews.map(v => (
             <button
               key={v.id}
               onClick={() => setCurrentView(v.id)}
