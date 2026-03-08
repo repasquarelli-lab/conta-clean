@@ -25,7 +25,7 @@ function generateTips(state: any, month: string) {
   } else {
     tips.push({
       icon: TrendingDown,
-      color: 'text-red-400',
+      color: 'text-red-600 dark:text-red-400',
       title: 'Mês no vermelho',
       text: `Suas despesas superaram a renda em ${currency(Math.abs(m.balance))}. Revise gastos variáveis para equilibrar o mês.`,
     });
