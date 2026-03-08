@@ -27,12 +27,14 @@ export interface NotificationSettings {
   enabled: boolean;
   dueTodayAlert: boolean;
   overdueAlert: boolean;
+  dueSoonAlert: boolean;
 }
 
 export const defaultNotificationSettings: NotificationSettings = {
   enabled: true,
   dueTodayAlert: true,
   overdueAlert: true,
+  dueSoonAlert: true,
 };
 
 export interface AppState {
@@ -191,6 +193,14 @@ export function overdueBills(state: AppState) {
 export function dueTodayBills(state: AppState) {
   const today = todayISO();
   return state.entries.filter(e => e.type === 'expense' && !e.paid && e.date === today);
+}
+
+export function dueSoonBills(state: AppState, days = 3) {
+  const today = todayISO();
+  const future = new Date();
+  future.setDate(future.getDate() + days);
+  const futureISO = future.toISOString().slice(0, 10);
+  return state.entries.filter(e => e.type === 'expense' && !e.paid && e.date > today && e.date <= futureISO).sort((a, b) => a.date.localeCompare(b.date));
 }
 
 export function topCategory(state: AppState, month: string): [string, number] | null {

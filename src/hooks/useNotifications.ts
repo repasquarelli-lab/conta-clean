@@ -1,5 +1,5 @@
 import { useEffect, useCallback, useRef } from 'react';
-import { AppState, dueTodayBills, overdueBills, defaultNotificationSettings } from '@/lib/store';
+import { AppState, dueTodayBills, overdueBills, dueSoonBills, defaultNotificationSettings } from '@/lib/store';
 
 const NOTIFICATION_KEY = 'cc_notif_last_check';
 
@@ -58,6 +58,18 @@ export function useNotifications(state: AppState, isAuthenticated: boolean) {
           '⚠️ Contas atrasadas!',
           `${overdue.length} conta${overdue.length > 1 ? 's' : ''} atrasada${overdue.length > 1 ? 's' : ''}: R$ ${total.toFixed(2).replace('.', ',')}`,
           'overdue'
+        );
+      }
+    }
+
+    if (settings.dueSoonAlert) {
+      const dueSoon = dueSoonBills(appState, 3);
+      if (dueSoon.length > 0) {
+        const total = dueSoon.reduce((s, e) => s + e.value, 0);
+        sendNotification(
+          '🔔 Contas nos próximos 3 dias',
+          `${dueSoon.length} conta${dueSoon.length > 1 ? 's' : ''} vencendo em breve, totalizando R$ ${total.toFixed(2).replace('.', ',')}`,
+          'due-soon'
         );
       }
     }
