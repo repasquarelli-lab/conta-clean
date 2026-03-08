@@ -54,9 +54,12 @@ export default function LancamentosView() {
     <div>
       <div className="glass-panel p-4 mb-4">
         <div className="flex justify-between items-center mb-3 flex-wrap gap-2">
-          <div>
-            <h3 className="font-bold">Novo lançamento</h3>
-            <p className="text-muted-foreground text-sm">Cadastre uma entrada ou saída em poucos campos</p>
+          <div className="flex items-start gap-2.5">
+            <PlusCircle className="size-5 text-muted-foreground mt-0.5 shrink-0" strokeWidth={1.5} />
+            <div>
+              <h3 className="font-bold">Novo lançamento</h3>
+              <p className="text-muted-foreground text-sm">Cadastre uma entrada ou saída em poucos campos</p>
+            </div>
           </div>
           <MonthNavigator month={currentMonth} onChange={setCurrentMonth} />
         </div>
