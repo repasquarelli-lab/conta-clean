@@ -240,7 +240,7 @@ export default function ResumoView() {
                     </div>
                   </div>
                   <div className={`flex items-center gap-1 text-sm font-bold shrink-0 ${
-                    increased ? 'text-red-400' : decreased ? 'text-emerald-400' : 'text-muted-foreground'
+                    increased ? 'text-red-600 dark:text-red-400' : decreased ? 'text-emerald-600 dark:text-emerald-400' : 'text-muted-foreground'
                   }`}>
                     {increased ? <ArrowUpRight className="w-4 h-4" /> : decreased ? <ArrowDownRight className="w-4 h-4" /> : <Minus className="w-4 h-4" />}
                     {c.diff !== 0 ? (
