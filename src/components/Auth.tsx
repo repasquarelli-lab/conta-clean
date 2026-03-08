@@ -57,7 +57,7 @@ export default function Auth() {
             <div className="flex items-center gap-3">
               <div className="w-12 h-12 rounded-2xl grid place-items-center brand-gradient font-black tracking-wide text-primary-foreground">CC</div>
               <div>
-                <h1 className="text-base font-bold">Conta Clara Lite</h1>
+                <h1 className="text-base font-bold">Conta Clara</h1>
                 <p className="text-sm text-muted-foreground mt-0.5">Simples de entender. Simples de usar.</p>
               </div>
             </div>

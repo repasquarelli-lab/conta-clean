@@ -1,121 +1,170 @@
 import { useApp } from '@/contexts/AppContext';
-import { currency } from '@/lib/store';
+import { motion } from 'framer-motion';
+import { Shield, Zap, Smartphone, BarChart3, CalendarCheck, PiggyBank, ArrowRight, Sparkles } from 'lucide-react';
+
+const fadeUp = {
+  hidden: { opacity: 0, y: 24 },
+  visible: (i: number) => ({ opacity: 1, y: 0, transition: { delay: i * 0.08, duration: 0.5, ease: [0.25, 0.1, 0.25, 1] as const } }),
+};
 
 export default function Landing() {
   const { setScreen } = useApp();
 
   return (
-    <section className="min-h-screen p-4 md:p-6">
+    <section className="min-h-screen p-4 md:p-6 overflow-hidden">
       <div className="max-w-[1280px] mx-auto">
-        <div className="grid grid-cols-1 lg:grid-cols-[1.08fr_0.92fr] gap-4">
-          {/* Hero Card */}
-          <div className="glass-panel p-6 md:p-8 relative overflow-hidden glow-blue">
+        {/* Hero */}
+        <div className="grid grid-cols-1 lg:grid-cols-[1.1fr_0.9fr] gap-5">
+          <motion.div
+            className="glass-panel p-7 md:p-10 relative overflow-hidden glow-blue"
+            initial="hidden"
+            animate="visible"
+            variants={fadeUp}
+            custom={0}
+          >
             <div className="flex justify-between gap-3 items-center flex-wrap relative z-10">
               <div className="flex items-center gap-3">
-                <div className="w-12 h-12 rounded-2xl grid place-items-center brand-gradient font-black tracking-wide text-primary-foreground">CC</div>
+                <div className="w-12 h-12 rounded-2xl grid place-items-center brand-gradient font-black tracking-wide text-primary-foreground shadow-lg">CC</div>
                 <div>
-                  <h1 className="text-base font-bold">Conta Clara Lite</h1>
-                  <p className="text-sm text-muted-foreground mt-0.5">Finanças simples para o dia a dia</p>
+                  <h1 className="text-base font-bold">Conta Clara</h1>
+                  <p className="text-sm text-muted-foreground mt-0.5">Finanças pessoais simplificadas</p>
                 </div>
               </div>
-              <span className="inline-flex items-center gap-2 px-3 py-2 rounded-full text-sm font-bold border" style={{ background: 'hsla(217,100%,72%,0.12)', borderColor: 'hsla(217,100%,72%,0.22)', color: 'hsl(220,40%,90%)' }}>
-                MVP v3 • Offline
+              <span className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full text-xs font-bold bg-primary/10 text-primary border border-primary/20">
+                <Sparkles className="w-3 h-3" /> Com inteligência artificial
               </span>
             </div>
 
-            <h2 className="text-3xl md:text-4xl lg:text-5xl font-black leading-[1.02] mt-5 mb-3.5 max-w-[720px] relative z-10">
-              Organize suas contas sem planilha, sem internet e sem complicação.
+            <h2 className="text-3xl md:text-4xl lg:text-[3.2rem] font-black leading-[1.05] mt-6 mb-4 max-w-[680px] relative z-10">
+              Suas contas organizadas de forma{' '}
+              <span className="bg-clip-text text-transparent" style={{ backgroundImage: 'var(--gradient-brand)' }}>
+                simples e inteligente.
+              </span>
             </h2>
-            <p className="max-w-[700px] text-muted-foreground text-base leading-relaxed relative z-10">
-              Um app leve para quem só quer entender o mês, registrar gastos fixos, acompanhar vencimentos e saber quanto ainda sobra. Feito para público leigo, com linguagem simples e navegação direta.
+            <p className="max-w-[640px] text-muted-foreground text-base leading-relaxed relative z-10">
+              Registre receitas e despesas, acompanhe vencimentos e entenda para onde vai o seu dinheiro — tudo com linguagem clara e em poucos toques.
             </p>
 
-            <div className="flex gap-3 flex-wrap mt-6 relative z-10">
-              <button onClick={() => setScreen('auth')} className="brand-gradient border-none rounded-2xl px-4 py-3 font-bold cursor-pointer text-primary-foreground">
-                Entrar no app
+            <div className="flex gap-3 flex-wrap mt-7 relative z-10">
+              <button
+                onClick={() => setScreen('auth')}
+                className="brand-gradient border-none rounded-2xl px-5 py-3.5 font-bold cursor-pointer text-primary-foreground shadow-lg hover:shadow-xl transition-shadow flex items-center gap-2"
+              >
+                Começar agora <ArrowRight className="w-4 h-4" />
               </button>
-              <button onClick={() => document.getElementById('planSection')?.scrollIntoView({ behavior: 'smooth', block: 'center' })} className="glass-panel rounded-2xl px-4 py-3 font-bold cursor-pointer">
-                Ver proposta do produto
+              <button
+                onClick={() => document.getElementById('features')?.scrollIntoView({ behavior: 'smooth' })}
+                className="glass-panel rounded-2xl px-5 py-3.5 font-bold cursor-pointer hover:bg-accent transition-colors"
+              >
+                Conheça os recursos
               </button>
             </div>
 
-            <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 mt-6 relative z-10">
+            <div className="grid grid-cols-3 gap-3 mt-8 relative z-10">
               {[
-                { title: '2 a 3 toques', desc: 'para registrar uma conta ou marcar como paga.' },
-                { title: '100% offline', desc: 'dados salvos no navegador do aparelho.' },
-                { title: 'Linguagem humana', desc: 'sem termos técnicos difíceis.' },
-              ].map(item => (
-                <div key={item.title} className="p-4 rounded-[20px] border border-border" style={{ background: 'hsla(220,40%,95%,0.03)' }}>
-                  <strong className="block text-lg mb-1">{item.title}</strong>
-                  <span className="text-muted-foreground text-sm leading-relaxed">{item.desc}</span>
-                </div>
+                { icon: Zap, title: '2‒3 toques', desc: 'para registrar qualquer conta' },
+                { icon: Shield, title: 'Dados seguros', desc: 'salvos na nuvem com login' },
+                { icon: Smartphone, title: 'Multiplataforma', desc: 'acesse de qualquer aparelho' },
+              ].map((item, i) => (
+                <motion.div
+                  key={item.title}
+                  variants={fadeUp}
+                  custom={i + 2}
+                  className="p-4 rounded-[20px] border border-border bg-card/30 backdrop-blur-sm"
+                >
+                  <item.icon className="w-5 h-5 text-primary mb-2" />
+                  <strong className="block text-sm mb-0.5">{item.title}</strong>
+                  <span className="text-muted-foreground text-xs leading-relaxed">{item.desc}</span>
+                </motion.div>
               ))}
             </div>
-          </div>
+          </motion.div>
 
-          {/* Side Stack */}
-          <div className="grid gap-4">
-            <div className="glass-panel p-6">
-              <h3 className="text-base font-bold mb-3">Por que esse produto faz sentido</h3>
-              <p className="text-muted-foreground leading-relaxed">O mercado está cheio de apps complexos. Conta Clara Lite ataca a dor real de quem quer apenas controlar contas da casa, receitas, vencimentos e gastos recorrentes com clareza.</p>
+          {/* Side */}
+          <div className="grid gap-5">
+            <motion.div className="glass-panel p-6" variants={fadeUp} custom={1} initial="hidden" animate="visible">
+              <h3 className="text-base font-bold mb-3">Por que o Conta Clara?</h3>
+              <p className="text-muted-foreground leading-relaxed text-sm">
+                Feito para quem quer controlar as finanças da casa sem complicação. Sem jargão técnico, sem integração com banco — apenas o que você precisa ver.
+              </p>
               <div className="grid gap-2.5 mt-4">
-                {['Tela inicial com visão do mês', 'Contas fixas que se repetem automaticamente', 'Agenda visual de vencimentos', 'Resumo amigável com leitura rápida'].map(f => (
-                  <div key={f} className="p-3 rounded-2xl border border-border text-sm" style={{ background: 'hsla(220,40%,95%,0.03)' }}>{f}</div>
+                {[
+                  { icon: BarChart3, text: 'Painel do mês com visão completa' },
+                  { icon: CalendarCheck, text: 'Agenda de vencimentos com alertas' },
+                  { icon: PiggyBank, text: 'Metas de orçamento por categoria' },
+                  { icon: Sparkles, text: 'Dicas personalizadas com IA' },
+                ].map(f => (
+                  <div key={f.text} className="p-3 rounded-2xl border border-border text-sm flex items-center gap-3 bg-card/30">
+                    <f.icon className="w-4 h-4 text-primary shrink-0" />
+                    {f.text}
+                  </div>
                 ))}
               </div>
-            </div>
+            </motion.div>
 
-            <div className="glass-panel p-6" id="planSection">
-              <h3 className="text-base font-bold mb-3">Estratégia comercial inicial</h3>
-              <p className="text-muted-foreground leading-relaxed">Produto de entrada para público 40+, famílias, autônomos simples e pessoas que desistiram de apps financeiros mais pesados.</p>
-              <div className="flex justify-between gap-2.5 items-end mt-4">
-                <div>
-                  <div className="text-xs text-muted-foreground">Linha recomendada</div>
-                  <strong className="text-3xl">Free + Premium</strong>
-                </div>
-                <button onClick={() => setScreen('auth')} className="glass-panel rounded-2xl px-4 py-3 font-bold cursor-pointer">Abrir demo</button>
-              </div>
-            </div>
+            <motion.div className="glass-panel p-6" variants={fadeUp} custom={2} initial="hidden" animate="visible">
+              <h3 className="text-base font-bold mb-2">Pronto para começar?</h3>
+              <p className="text-muted-foreground leading-relaxed text-sm mb-4">
+                Crie sua conta gratuitamente e comece a organizar suas finanças em minutos.
+              </p>
+              <button
+                onClick={() => setScreen('auth')}
+                className="brand-gradient border-none rounded-2xl px-5 py-3 font-bold cursor-pointer text-primary-foreground flex items-center gap-2 shadow-lg"
+              >
+                Criar minha conta <ArrowRight className="w-4 h-4" />
+              </button>
+            </motion.div>
           </div>
         </div>
 
-        {/* Value Section */}
-        <div className="mt-6">
-          <h2 className="text-2xl font-bold mb-2.5">O que o MVP resolve muito bem</h2>
-          <p className="text-muted-foreground max-w-[860px] leading-relaxed">A proposta não é ser um super app financeiro. A proposta é resolver o básico com excelência: o que entrou, o que saiu, o que vence, o que já foi pago e quanto ainda sobra.</p>
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mt-4">
+        {/* Features */}
+        <div className="mt-10" id="features">
+          <motion.div initial="hidden" whileInView="visible" viewport={{ once: true }} variants={fadeUp} custom={0}>
+            <h2 className="text-2xl font-bold mb-2">Tudo o que você precisa</h2>
+            <p className="text-muted-foreground max-w-[720px] leading-relaxed">
+              Controle o que entrou, o que saiu, o que vence e quanto ainda sobra — tudo em um só lugar.
+            </p>
+          </motion.div>
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-5 mt-5">
             {[
-              { title: 'Controle do mês', desc: 'Entradas, saídas, saldo e pendências sem excesso de telas ou linguagem difícil.' },
-              { title: 'Contas fixas', desc: 'Aluguel, água, energia, internet, farmácia, salão, plano de saúde e outras despesas recorrentes.' },
-              { title: 'Previsibilidade', desc: 'A pessoa vê rapidamente o que vence hoje, nesta semana e o que já atrasou.' },
-            ].map(item => (
-              <div key={item.title} className="glass-panel p-5">
+              {
+                icon: BarChart3,
+                title: 'Controle do mês',
+                desc: 'Veja receitas, despesas, saldo e pendências em um painel visual e intuitivo.',
+              },
+              {
+                icon: CalendarCheck,
+                title: 'Contas fixas e agenda',
+                desc: 'Cadastre uma vez e acompanhe vencimentos automáticos mês a mês.',
+              },
+              {
+                icon: Sparkles,
+                title: 'Copilot com IA',
+                desc: 'Receba dicas personalizadas baseadas nos seus dados reais para economizar mais.',
+              },
+            ].map((item, i) => (
+              <motion.div
+                key={item.title}
+                className="glass-panel p-6"
+                initial="hidden"
+                whileInView="visible"
+                viewport={{ once: true }}
+                variants={fadeUp}
+                custom={i + 1}
+              >
+                <item.icon className="w-6 h-6 text-primary mb-3" />
                 <h3 className="font-bold mb-2">{item.title}</h3>
                 <p className="text-muted-foreground leading-relaxed text-sm">{item.desc}</p>
-              </div>
+              </motion.div>
             ))}
           </div>
         </div>
 
-        {/* Pricing Section */}
-        <div className="mt-6">
-          <h2 className="text-2xl font-bold mb-2.5">Proposta de monetização</h2>
-          <p className="text-muted-foreground max-w-[860px] leading-relaxed">Modelo simples para validar mercado: versão grátis para uso básico e versão premium para ampliar valor percebido.</p>
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mt-4">
-            {[
-              { title: 'Grátis', desc: 'Uso leve, ideal para aquisição.', items: ['Resumo do mês', 'Lançamentos básicos', 'Contas fixas limitadas', '1 perfil'] },
-              { title: 'Premium', desc: 'Ticket baixo, foco em volume.', items: ['Contas fixas ilimitadas', 'Histórico completo', 'Backup facilitado', 'Resumo mais avançado'] },
-              { title: 'Família', desc: 'Possível evolução comercial.', items: ['Mais de um perfil', 'Controle da casa', 'Organização compartilhada', 'Base para v4'] },
-            ].map(plan => (
-              <div key={plan.title} className="glass-panel p-5">
-                <h3 className="font-bold mb-2">{plan.title}</h3>
-                <p className="text-muted-foreground leading-relaxed text-sm">{plan.desc}</p>
-                <ul className="mt-3.5 pl-4 text-muted-foreground leading-relaxed text-sm list-disc">
-                  {plan.items.map(i => <li key={i}>{i}</li>)}
-                </ul>
-              </div>
-            ))}
-          </div>
+        {/* Footer */}
+        <div className="mt-10 pb-6 text-center">
+          <p className="text-xs text-muted-foreground">
+            © {new Date().getFullYear()} Conta Clara · Feito com carinho para simplificar sua vida financeira
+          </p>
         </div>
       </div>
     </section>

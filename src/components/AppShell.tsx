@@ -1,7 +1,7 @@
 import { useState, useRef, useEffect } from 'react';
 import { useApp, View } from '@/contexts/AppContext';
 import { saveState, overdueBills, dueTodayBills, currency, budgetProgress, todayISO } from '@/lib/store';
-import { LayoutDashboard, ArrowLeftRight, Pin, CalendarClock, FileText, Settings, Menu, X, Home, Sun, Moon } from 'lucide-react';
+import { LayoutDashboard, ArrowLeftRight, Pin, CalendarClock, FileText, Settings, Menu, X, LogOut, Sun, Moon, Download, Upload } from 'lucide-react';
 import { AnimatePresence, motion } from 'framer-motion';
 import { toast } from 'sonner';
 import { useTheme } from '@/hooks/use-theme';
@@ -95,7 +95,7 @@ export default function AppShell() {
         saveState(parsed);
         window.location.reload();
       } catch {
-        alert('Não foi possível importar o arquivo.');
+        toast.error('Não foi possível importar o arquivo.');
       }
     };
     reader.readAsText(file);
@@ -111,10 +111,10 @@ export default function AppShell() {
       {/* Mobile Header */}
       <header className="lg:hidden flex items-center justify-between px-4 py-3 border-b border-border sticky top-0 z-40 bg-background/95 backdrop-blur-xl">
         <div className="flex items-center gap-3">
-          <div className="w-9 h-9 rounded-xl grid place-items-center brand-gradient font-black tracking-wide text-primary-foreground text-xs">CC</div>
+          <div className="w-9 h-9 rounded-xl grid place-items-center brand-gradient font-black tracking-wide text-primary-foreground text-[10px] shadow-md">CC</div>
           <div>
             <h1 className="text-sm font-bold leading-tight">Conta Clara</h1>
-            <p className="text-[10px] text-muted-foreground">{state.userName ? `Olá, ${state.userName}` : 'Seu mês'}</p>
+            <p className="text-[10px] text-muted-foreground">{state.userName ? `Olá, ${state.userName}` : 'Finanças'}</p>
           </div>
         </div>
         <div className="flex items-center gap-2">
@@ -147,15 +147,9 @@ export default function AppShell() {
               ))}
             </nav>
             <div className="border-t border-border pt-3 flex flex-wrap gap-2">
-              <button onClick={() => { logout(); setSidebarOpen(false); }} className="glass-panel rounded-xl px-3 py-2 font-bold cursor-pointer text-xs flex items-center gap-2">
-                <Home className="w-3.5 h-3.5" /> Sair
+              <button onClick={() => { logout(); setSidebarOpen(false); }} className="glass-panel rounded-xl px-3 py-2 font-bold cursor-pointer text-xs flex items-center gap-2 text-destructive">
+                <LogOut className="w-3.5 h-3.5" /> Sair da conta
               </button>
-              <button onClick={() => { reloadDemo(); setSidebarOpen(false); }} className="glass-panel rounded-xl px-3 py-2 font-bold cursor-pointer text-xs">Recarregar demo</button>
-              <button onClick={exportBackup} className="glass-panel rounded-xl px-3 py-2 font-bold cursor-pointer text-xs">Exportar</button>
-              <label className="glass-panel rounded-xl px-3 py-2 font-bold cursor-pointer text-xs">
-                Importar
-                <input type="file" accept="application/json" className="hidden" onChange={handleImport} />
-              </label>
             </div>
           </div>
         </>
@@ -163,11 +157,11 @@ export default function AppShell() {
 
       {/* Desktop Sidebar */}
       <aside className="hidden lg:block p-5 px-4 border-r border-border sticky top-0 h-screen bg-background/90 backdrop-blur-xl">
-        <div className="flex gap-3 items-center pb-4 px-2">
-          <div className="w-12 h-12 rounded-2xl grid place-items-center brand-gradient font-black tracking-wide text-primary-foreground text-sm">CC</div>
+        <div className="flex gap-3 items-center pb-5 px-2">
+          <div className="w-11 h-11 rounded-2xl grid place-items-center brand-gradient font-black tracking-wide text-primary-foreground text-xs shadow-lg">CC</div>
           <div>
-            <h1 className="text-sm font-bold">Conta Clara Lite</h1>
-            <p className="text-xs text-muted-foreground mt-0.5">{state.userName ? `Olá, ${state.userName}` : 'Seu mês, sem complicação'}</p>
+            <h1 className="text-sm font-bold">Conta Clara</h1>
+            <p className="text-[11px] text-muted-foreground mt-0.5">{state.userName ? `Olá, ${state.userName}` : 'Seu controle financeiro'}</p>
           </div>
         </div>
         <nav className="flex flex-col gap-2">
@@ -205,14 +199,10 @@ export default function AppShell() {
             <h2 className="text-xl lg:text-2xl font-bold mb-1">{meta.name}</h2>
             <p className="text-muted-foreground text-sm hidden sm:block">{meta.subtitle}</p>
           </div>
-          <div className="hidden lg:flex gap-2.5 flex-wrap">
-            <button onClick={logout} className="glass-panel rounded-2xl px-3 py-2.5 font-bold cursor-pointer text-xs">Sair</button>
-            <button onClick={reloadDemo} className="glass-panel rounded-2xl px-3 py-2.5 font-bold cursor-pointer text-xs">Recarregar demo</button>
-            <button onClick={exportBackup} className="glass-panel rounded-2xl px-3 py-2.5 font-bold cursor-pointer text-xs">Exportar backup</button>
-            <label className="glass-panel rounded-2xl px-3 py-2.5 font-bold cursor-pointer text-xs">
-              Importar backup
-              <input type="file" accept="application/json" className="hidden" onChange={handleImport} />
-            </label>
+          <div className="hidden lg:flex gap-2 items-center">
+            <button onClick={logout} className="flex items-center gap-1.5 glass-panel rounded-xl px-3 py-2 font-semibold cursor-pointer text-xs text-muted-foreground hover:text-destructive transition-colors">
+              <LogOut className="w-3.5 h-3.5" /> Sair
+            </button>
           </div>
         </div>
 
