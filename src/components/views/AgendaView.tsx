@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import { useApp } from '@/contexts/AppContext';
-import { dueTodayBills, upcomingBills, overdueBills, todayISO, getMonthEntries, currency, formatDate } from '@/lib/store';
+import { dueTodayBills, upcomingBills, overdueBills, dueSoonBills, todayISO, getMonthEntries, currency, formatDate } from '@/lib/store';
 import BillItem from '../BillItem';
 import MonthNavigator from '../MonthNavigator';
 import { AlertTriangle, CalendarClock, Clock, CalendarDays, List, LayoutGrid, type LucideIcon } from 'lucide-react';
