@@ -18,7 +18,7 @@ function generateTips(state: any, month: string) {
   if (m.balance >= 0) {
     tips.push({
       icon: TrendingUp,
-      color: 'text-emerald-400',
+      color: 'text-emerald-600 dark:text-emerald-400',
       title: 'Mês positivo',
       text: `Você está com saldo de ${currency(m.balance)}. Continue assim! Se possível, guarde esse valor como reserva.`,
     });
