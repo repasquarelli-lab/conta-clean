@@ -5,6 +5,8 @@ import { PieChart, Pie, Cell, ResponsiveContainer, Tooltip, BarChart, Bar, XAxis
 import MonthNavigator from '../MonthNavigator';
 import MarketTicker from '../MarketTicker';
 import AiTipsWidget from '../AiTipsWidget';
+import { TrendingUp, TrendingDown, Clock, Wallet, AlertCircle, PieChart as PieChartIcon, BarChart3, LineChart, Target, CalendarClock, Activity, CheckCircle2, Percent, FolderOpen, type LucideIcon } from 'lucide-react';
+import { getCategoryIcon } from '@/lib/categoryIcons';
 
 const CHART_COLORS = [
   'hsl(190, 90%, 50%)',
@@ -90,15 +92,18 @@ export default function DashboardView() {
 
       {/* Metrics */}
       <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-4">
-        {[
-          { label: 'Entrou no mês', value: currency(m.incomes), sub: 'Receitas registradas' },
-          { label: 'Saiu no mês', value: currency(m.expenses), sub: 'Todas as despesas do mês' },
-          { label: 'Em aberto', value: currency(m.open), sub: 'Contas ainda não pagas' },
-          { label: 'Saldo do mês', value: currency(m.balance), sub: savingsTone },
-          { label: 'Vence hoje', value: String(today.length), sub: 'Contas com vencimento hoje' },
-        ].map(metric => (
+        {([
+          { label: 'Entrou no mês', value: currency(m.incomes), sub: 'Receitas registradas', icon: TrendingUp },
+          { label: 'Saiu no mês', value: currency(m.expenses), sub: 'Todas as despesas do mês', icon: TrendingDown },
+          { label: 'Em aberto', value: currency(m.open), sub: 'Contas ainda não pagas', icon: AlertCircle },
+          { label: 'Saldo do mês', value: currency(m.balance), sub: savingsTone, icon: Wallet },
+          { label: 'Vence hoje', value: String(today.length), sub: 'Contas com vencimento hoje', icon: Clock },
+        ] as { label: string; value: string; sub: string; icon: LucideIcon }[]).map(metric => (
           <div key={metric.label} className="glass-panel p-4">
-            <h3 className="text-muted-foreground text-sm mb-1.5">{metric.label}</h3>
+            <div className="flex items-center gap-2 mb-1.5">
+              <metric.icon className="size-4 text-muted-foreground shrink-0" strokeWidth={1.5} />
+              <h3 className="text-muted-foreground text-sm">{metric.label}</h3>
+            </div>
             <p className="text-2xl font-extrabold">{metric.value}</p>
             <div className="text-xs text-muted-foreground mt-1">{metric.sub}</div>
           </div>
@@ -109,10 +114,13 @@ export default function DashboardView() {
       {categoryData.length > 0 && (
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 mt-4">
           {/* Pie Chart */}
-          <div className="glass-panel p-4">
-            <div className="mb-3">
-              <h3 className="font-bold">Gastos por categoria</h3>
-              <p className="text-muted-foreground text-sm">Onde seu dinheiro está indo</p>
+           <div className="glass-panel p-4">
+            <div className="mb-3 flex items-start gap-2.5">
+              <PieChartIcon className="size-5 text-muted-foreground mt-0.5 shrink-0" strokeWidth={1.5} />
+              <div>
+                <h3 className="font-bold">Gastos por categoria</h3>
+                <p className="text-muted-foreground text-sm">Onde seu dinheiro está indo</p>
+              </div>
             </div>
             <div className="flex flex-col sm:flex-row items-center gap-4">
               <div className="w-full sm:w-1/2 h-[200px]">
@@ -137,22 +145,29 @@ export default function DashboardView() {
                 </ResponsiveContainer>
               </div>
               <div className="flex flex-col gap-1.5 w-full sm:w-1/2">
-                {categoryData.map((cat, i) => (
-                  <div key={cat.name} className="flex items-center gap-2 text-sm">
-                    <div className="w-3 h-3 rounded-full shrink-0" style={{ background: CHART_COLORS[i % CHART_COLORS.length] }} />
-                    <span className="flex-1 truncate">{cat.name}</span>
-                    <span className="text-muted-foreground text-xs">{Math.round((cat.value / totalExpenses) * 100)}%</span>
-                  </div>
-                ))}
+                {categoryData.map((cat, i) => {
+                  const CatIcon = getCategoryIcon(cat.name);
+                  return (
+                    <div key={cat.name} className="flex items-center gap-2 text-sm">
+                      <div className="w-3 h-3 rounded-full shrink-0" style={{ background: CHART_COLORS[i % CHART_COLORS.length] }} />
+                      <CatIcon className="size-3.5 text-muted-foreground shrink-0" strokeWidth={1.5} />
+                      <span className="flex-1 truncate">{cat.name}</span>
+                      <span className="text-muted-foreground text-xs">{Math.round((cat.value / totalExpenses) * 100)}%</span>
+                    </div>
+                  );
+                })}
               </div>
             </div>
           </div>
 
           {/* Bar Chart */}
           <div className="glass-panel p-4">
-            <div className="mb-3">
-              <h3 className="font-bold">Comparativo por categoria</h3>
-              <p className="text-muted-foreground text-sm">Valores absolutos dos gastos</p>
+            <div className="mb-3 flex items-start gap-2.5">
+              <BarChart3 className="size-5 text-muted-foreground mt-0.5 shrink-0" strokeWidth={1.5} />
+              <div>
+                <h3 className="font-bold">Comparativo por categoria</h3>
+                <p className="text-muted-foreground text-sm">Valores absolutos dos gastos</p>
+              </div>
             </div>
             <div className="h-[220px]">
               <ResponsiveContainer width="100%" height="100%">
@@ -175,9 +190,12 @@ export default function DashboardView() {
 
       {/* Evolution Chart - 6 months */}
       <div className="glass-panel p-4 mt-4">
-        <div className="mb-3">
-          <h3 className="font-bold">Evolução mensal</h3>
-          <p className="text-muted-foreground text-sm">Receitas × Despesas dos últimos 6 meses</p>
+        <div className="mb-3 flex items-start gap-2.5">
+          <LineChart className="size-5 text-muted-foreground mt-0.5 shrink-0" strokeWidth={1.5} />
+          <div>
+            <h3 className="font-bold">Evolução mensal</h3>
+            <p className="text-muted-foreground text-sm">Receitas × Despesas dos últimos 6 meses</p>
+          </div>
         </div>
         <div className="h-[260px]">
           <ResponsiveContainer width="100%" height="100%">
@@ -215,9 +233,12 @@ export default function DashboardView() {
       {/* Budget Goals */}
       {(state.budgetGoals?.length ?? 0) > 0 && (
         <div className="glass-panel p-4 mt-4">
-          <div className="mb-3">
-            <h3 className="font-bold">Metas de orçamento</h3>
-            <p className="text-muted-foreground text-sm">Acompanhe seus limites por categoria</p>
+          <div className="mb-3 flex items-start gap-2.5">
+            <Target className="size-5 text-muted-foreground mt-0.5 shrink-0" strokeWidth={1.5} />
+            <div>
+              <h3 className="font-bold">Metas de orçamento</h3>
+              <p className="text-muted-foreground text-sm">Acompanhe seus limites por categoria</p>
+            </div>
           </div>
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3">
             {budgetProgress(state, currentMonth).map(g => {
@@ -226,7 +247,8 @@ export default function DashboardView() {
               return (
                 <div key={g.category} className="p-3.5 rounded-2xl bg-accent border border-border">
                   <div className="flex justify-between items-center mb-1.5">
-                    <span className="text-sm font-semibold">{g.category}</span>
+                    {(() => { const CatIcon = getCategoryIcon(g.category); return <CatIcon className="size-4 text-muted-foreground shrink-0" strokeWidth={1.5} />; })()}
+                    <span className="text-sm font-semibold flex-1 ml-2">{g.category}</span>
                     <span className={`text-xs font-bold ${overBudget ? 'text-red-400' : nearLimit ? 'text-yellow-400' : 'text-emerald-400'}`}>
                       {g.pct}%
                     </span>
@@ -263,9 +285,12 @@ export default function DashboardView() {
         {/* Upcoming bills */}
         <div className="glass-panel p-4">
           <div className="flex justify-between items-center mb-3">
-            <div>
-              <h3 className="font-bold">Próximas contas</h3>
-              <p className="text-muted-foreground text-sm">O que precisa de atenção agora</p>
+            <div className="flex items-start gap-2.5">
+              <CalendarClock className="size-5 text-muted-foreground mt-0.5 shrink-0" strokeWidth={1.5} />
+              <div>
+                <h3 className="font-bold">Próximas contas</h3>
+                <p className="text-muted-foreground text-sm">O que precisa de atenção agora</p>
+              </div>
             </div>
           </div>
           <div className="flex flex-col gap-2.5">
@@ -283,25 +308,40 @@ export default function DashboardView() {
 
         {/* Quick status */}
         <div className="glass-panel p-4">
-          <div className="mb-3">
-            <h3 className="font-bold">Situação rápida</h3>
-            <p className="text-muted-foreground text-sm">Leitura simples do seu mês</p>
+          <div className="mb-3 flex items-start gap-2.5">
+            <Activity className="size-5 text-muted-foreground mt-0.5 shrink-0" strokeWidth={1.5} />
+            <div>
+              <h3 className="font-bold">Situação rápida</h3>
+              <p className="text-muted-foreground text-sm">Leitura simples do seu mês</p>
+            </div>
           </div>
           <div className="grid grid-cols-2 gap-3">
-            <div className="p-3.5 rounded-[18px] bg-accent border border-border leading-relaxed text-sm">
-              <strong>{counts.paid}/{counts.total}</strong><br />contas pagas
-              <div className="progress-bar mt-2">
-                <div className="progress-bar-fill" style={{ width: `${progressPct}%` }} />
+            <div className="p-3.5 rounded-[18px] bg-accent border border-border leading-relaxed text-sm flex items-start gap-2">
+              <CheckCircle2 className="size-4 text-muted-foreground mt-0.5 shrink-0" strokeWidth={1.5} />
+              <div>
+                <strong>{counts.paid}/{counts.total}</strong><br />contas pagas
+                <div className="progress-bar mt-2">
+                  <div className="progress-bar-fill" style={{ width: `${progressPct}%` }} />
+                </div>
               </div>
             </div>
-            <div className="p-3.5 rounded-[18px] bg-accent border border-border leading-relaxed text-sm">
-              <strong>{fixedPct}%</strong><br />da renda vai para contas fixas
+            <div className="p-3.5 rounded-[18px] bg-accent border border-border leading-relaxed text-sm flex items-start gap-2">
+              <Percent className="size-4 text-muted-foreground mt-0.5 shrink-0" strokeWidth={1.5} />
+              <div>
+                <strong>{fixedPct}%</strong><br />da renda vai para contas fixas
+              </div>
             </div>
-            <div className="p-3.5 rounded-[18px] bg-accent border border-border leading-relaxed text-sm">
-              <strong>{top ? top[0] : '—'}</strong><br />maior categoria do mês
+            <div className="p-3.5 rounded-[18px] bg-accent border border-border leading-relaxed text-sm flex items-start gap-2">
+              <FolderOpen className="size-4 text-muted-foreground mt-0.5 shrink-0" strokeWidth={1.5} />
+              <div>
+                <strong>{top ? top[0] : '—'}</strong><br />maior categoria do mês
+              </div>
             </div>
-            <div className="p-3.5 rounded-[18px] bg-accent border border-border leading-relaxed text-sm">
-              <strong>{overdue.length}</strong><br />contas atrasadas
+            <div className="p-3.5 rounded-[18px] bg-accent border border-border leading-relaxed text-sm flex items-start gap-2">
+              <AlertCircle className="size-4 text-muted-foreground mt-0.5 shrink-0" strokeWidth={1.5} />
+              <div>
+                <strong>{overdue.length}</strong><br />contas atrasadas
+              </div>
             </div>
           </div>
           <div className="mt-3.5 text-xs text-muted-foreground">Resumo pensado para uso leigo: rápido de entender e com foco no cotidiano.</div>

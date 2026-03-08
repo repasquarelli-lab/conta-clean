@@ -2,6 +2,8 @@ import { useState } from 'react';
 import { useApp } from '@/contexts/AppContext';
 import { getMonthEntries, currency, formatDate, todayISO, uid, categories, incomeCategories } from '@/lib/store';
 import MonthNavigator from '../MonthNavigator';
+import { PlusCircle, List, Search, Check, Undo2, Trash2, ArrowDownCircle, ArrowUpCircle, Save } from 'lucide-react';
+import { getCategoryIcon } from '@/lib/categoryIcons';
 
 export default function LancamentosView() {
   const { state, updateState, currentMonth, setCurrentMonth } = useApp();
@@ -52,19 +54,22 @@ export default function LancamentosView() {
     <div>
       <div className="glass-panel p-4 mb-4">
         <div className="flex justify-between items-center mb-3 flex-wrap gap-2">
-          <div>
-            <h3 className="font-bold">Novo lançamento</h3>
-            <p className="text-muted-foreground text-sm">Cadastre uma entrada ou saída em poucos campos</p>
+          <div className="flex items-start gap-2.5">
+            <PlusCircle className="size-5 text-muted-foreground mt-0.5 shrink-0" strokeWidth={1.5} />
+            <div>
+              <h3 className="font-bold">Novo lançamento</h3>
+              <p className="text-muted-foreground text-sm">Cadastre uma entrada ou saída em poucos campos</p>
+            </div>
           </div>
           <MonthNavigator month={currentMonth} onChange={setCurrentMonth} />
         </div>
 
         <div className="flex gap-2 mb-4">
-          <button onClick={() => setEntryType('income')} className={`px-3 py-2.5 rounded-xl border text-sm cursor-pointer ${entryType === 'income' ? 'brand-gradient border-transparent text-primary-foreground font-bold' : 'bg-card border-border'}`}>
-            Receita
+          <button onClick={() => setEntryType('income')} className={`px-3 py-2.5 rounded-xl border text-sm cursor-pointer flex items-center gap-1.5 ${entryType === 'income' ? 'brand-gradient border-transparent text-primary-foreground font-bold' : 'bg-card border-border'}`}>
+            <ArrowDownCircle className="size-4" strokeWidth={1.5} /> Receita
           </button>
-          <button onClick={() => setEntryType('expense')} className={`px-3 py-2.5 rounded-xl border text-sm cursor-pointer ${entryType === 'expense' ? 'brand-gradient border-transparent text-primary-foreground font-bold' : 'bg-card border-border'}`}>
-            Despesa
+          <button onClick={() => setEntryType('expense')} className={`px-3 py-2.5 rounded-xl border text-sm cursor-pointer flex items-center gap-1.5 ${entryType === 'expense' ? 'brand-gradient border-transparent text-primary-foreground font-bold' : 'bg-card border-border'}`}>
+            <ArrowUpCircle className="size-4" strokeWidth={1.5} /> Despesa
           </button>
         </div>
 
@@ -104,15 +109,21 @@ export default function LancamentosView() {
             </div>
           </div>
           <div className="mt-3">
-            <button type="submit" className="brand-gradient border-none rounded-2xl px-4 py-2.5 font-bold cursor-pointer text-sm text-primary-foreground">Salvar lançamento</button>
+            <button type="submit" className="brand-gradient border-none rounded-2xl px-4 py-2.5 font-bold cursor-pointer text-sm text-primary-foreground flex items-center gap-1.5"><Save className="size-4" strokeWidth={1.5} /> Salvar lançamento</button>
           </div>
         </form>
       </div>
 
       <div className="glass-panel p-4">
-        <h3 className="font-bold mb-3">Lançamentos do mês</h3>
+        <h3 className="font-bold mb-3 flex items-center gap-2">
+          <List className="size-5 text-muted-foreground" strokeWidth={1.5} />
+          Lançamentos do mês
+        </h3>
         <div className="flex gap-2.5 flex-wrap mb-3">
-          <input placeholder="Buscar por descrição..." value={search} onChange={e => setSearch(e.target.value)} className="flex-1 min-w-[160px] px-3 py-2.5 rounded-[14px] border border-border bg-input text-foreground text-sm outline-none placeholder:text-muted-foreground" />
+          <div className="flex-1 min-w-[160px] relative">
+            <Search className="size-4 text-muted-foreground absolute left-3 top-1/2 -translate-y-1/2" strokeWidth={1.5} />
+            <input placeholder="Buscar por descrição..." value={search} onChange={e => setSearch(e.target.value)} className="w-full pl-9 pr-3 py-2.5 rounded-[14px] border border-border bg-input text-foreground text-sm outline-none placeholder:text-muted-foreground" />
+          </div>
           <select value={filterType} onChange={e => setFilterType(e.target.value)} className="min-w-[160px] px-3 py-2.5 rounded-[14px] border border-border bg-input text-foreground text-sm outline-none">
             <option value="all">Todos</option>
             <option value="income">Só receitas</option>
@@ -146,10 +157,12 @@ export default function LancamentosView() {
                   </td>
                   <td className="p-3 border-b border-border text-sm">
                     <div className="flex gap-2 flex-wrap">
-                      <button onClick={() => togglePaid(e.id)} className={`${e.paid ? 'badge-warn' : 'badge-good'} cursor-pointer text-xs font-bold`}>
-                        {e.paid ? 'Marcar pendente' : 'Marcar pago'}
+                      <button onClick={() => togglePaid(e.id)} className={`${e.paid ? 'badge-warn' : 'badge-good'} cursor-pointer text-xs font-bold flex items-center gap-1`}>
+                        {e.paid ? <><Undo2 className="size-3" /> Marcar pendente</> : <><Check className="size-3" /> Marcar pago</>}
                       </button>
-                      <button onClick={() => removeEntry(e.id)} className="badge-bad cursor-pointer text-xs font-bold">Excluir</button>
+                      <button onClick={() => removeEntry(e.id)} className="badge-bad cursor-pointer text-xs font-bold flex items-center gap-1">
+                        <Trash2 className="size-3" /> Excluir
+                      </button>
                     </div>
                   </td>
                 </tr>

@@ -1,5 +1,7 @@
 import { useApp } from '@/contexts/AppContext';
 import { uid, categories, currency, ensureMonthFixedBills } from '@/lib/store';
+import { PlusCircle, List, Save, Trash2 } from 'lucide-react';
+import { getCategoryIcon } from '@/lib/categoryIcons';
 
 export default function FixasView() {
   const { state, updateState, currentMonth, setCurrentMonth } = useApp();
@@ -37,8 +39,13 @@ export default function FixasView() {
   return (
     <div>
       <div className="glass-panel p-4 mb-4">
-        <h3 className="font-bold mb-1">Nova conta fixa</h3>
-        <p className="text-muted-foreground text-sm mb-3">Cadastre uma vez e use todo mês</p>
+        <div className="flex items-start gap-2.5 mb-1">
+          <PlusCircle className="size-5 text-muted-foreground mt-0.5 shrink-0" strokeWidth={1.5} />
+          <div>
+            <h3 className="font-bold">Nova conta fixa</h3>
+            <p className="text-muted-foreground text-sm mb-3">Cadastre uma vez e use todo mês</p>
+          </div>
+        </div>
         <form onSubmit={handleSubmit}>
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3">
             <div>
@@ -61,17 +68,20 @@ export default function FixasView() {
             </div>
           </div>
           <div className="mt-3">
-            <button type="submit" className="brand-gradient border-none rounded-2xl px-4 py-2.5 font-bold cursor-pointer text-sm text-primary-foreground">Salvar conta fixa</button>
+            <button type="submit" className="brand-gradient border-none rounded-2xl px-4 py-2.5 font-bold cursor-pointer text-sm text-primary-foreground flex items-center gap-1.5"><Save className="size-4" strokeWidth={1.5} /> Salvar conta fixa</button>
           </div>
         </form>
       </div>
 
       <div className="glass-panel p-4">
-        <div className="flex justify-between items-center mb-3 flex-wrap gap-2">
-          <div>
-            <h3 className="font-bold">Lista de contas fixas</h3>
-            <p className="text-muted-foreground text-sm">O sistema usa essa base para montar os próximos meses</p>
-          </div>
+          <div className="flex justify-between items-center mb-3 flex-wrap gap-2">
+            <div className="flex items-start gap-2.5">
+              <List className="size-5 text-muted-foreground mt-0.5 shrink-0" strokeWidth={1.5} />
+              <div>
+                <h3 className="font-bold">Lista de contas fixas</h3>
+                <p className="text-muted-foreground text-sm">O sistema usa essa base para montar os próximos meses</p>
+              </div>
+            </div>
           <input type="month" value={currentMonth} onChange={e => setCurrentMonth(e.target.value)} className="px-3 py-2 rounded-[14px] border border-border bg-input text-foreground text-sm outline-none" />
         </div>
 
@@ -94,7 +104,7 @@ export default function FixasView() {
                   <td className="p-3 border-b border-border text-sm">Dia {f.day}</td>
                   <td className="p-3 border-b border-border text-sm">{currency(f.value)}</td>
                   <td className="p-3 border-b border-border text-sm">
-                    <button onClick={() => removeFixed(f.id)} className="badge-bad cursor-pointer text-xs font-bold">Excluir</button>
+                    <button onClick={() => removeFixed(f.id)} className="badge-bad cursor-pointer text-xs font-bold flex items-center gap-1"><Trash2 className="size-3" /> Excluir</button>
                   </td>
                 </tr>
               ))}

@@ -1,7 +1,8 @@
 import { useApp } from '@/contexts/AppContext';
 import { monthMetrics, paidCount, topCategory, currency, budgetProgress, getMonthEntries, AppState } from '@/lib/store';
 import MonthNavigator from '../MonthNavigator';
-import { Lightbulb, TrendingUp, TrendingDown, AlertTriangle, CheckCircle, Target, ShieldCheck, ArrowUpRight, ArrowDownRight, Minus } from 'lucide-react';
+import { Lightbulb, TrendingUp, TrendingDown, AlertTriangle, CheckCircle, Target, ShieldCheck, ArrowUpRight, ArrowDownRight, Minus, DollarSign, CreditCard, HelpCircle, PiggyBank } from 'lucide-react';
+import { getCategoryIcon } from '@/lib/categoryIcons';
 
 function generateTips(state: any, month: string) {
   const m = monthMetrics(state, month);
@@ -210,12 +211,15 @@ export default function ResumoView() {
       {/* Month comparison */}
       {comparison.length > 0 && (
         <div className="glass-panel p-4 mb-4">
-          <div className="mb-3">
+        <div className="mb-3 flex items-start gap-2.5">
+          <ArrowUpRight className="size-5 text-muted-foreground mt-0.5 shrink-0" strokeWidth={1.5} />
+          <div>
             <h3 className="font-bold">Comparação com mês anterior</h3>
             <p className="text-muted-foreground text-sm">
               {monthLabel(currentMonth)} vs {monthLabel(prevMonthStr)} — por categoria
             </p>
           </div>
+        </div>
           <div className="flex flex-col gap-2">
             {comparison.map(c => {
               const increased = c.diff > 0;
@@ -259,17 +263,25 @@ export default function ResumoView() {
 
       {/* Quick numbers */}
       <div className="glass-panel p-4">
-        <h3 className="font-bold mb-1">Distribuição rápida</h3>
-        <p className="text-muted-foreground text-sm mb-3">Quanto entrou, quanto saiu e quanto ainda está pendente</p>
+        <div className="mb-3 flex items-start gap-2.5">
+          <DollarSign className="size-5 text-muted-foreground mt-0.5 shrink-0" strokeWidth={1.5} />
+          <div>
+            <h3 className="font-bold">Distribuição rápida</h3>
+            <p className="text-muted-foreground text-sm">Quanto entrou, quanto saiu e quanto ainda está pendente</p>
+          </div>
+        </div>
         <div className="grid grid-cols-2 lg:grid-cols-4 gap-3">
-          {[
-            { label: 'Entradas', value: currency(m.incomes) },
-            { label: 'Saídas', value: currency(m.expenses) },
-            { label: 'Em aberto', value: currency(m.open) },
-            { label: 'Sobra estimada', value: currency(m.free) },
-          ].map(item => (
-            <div key={item.label} className="p-3.5 rounded-[18px] bg-accent border border-border leading-relaxed text-sm">
-              <strong>{item.value}</strong><br />{item.label}
+          {([
+            { label: 'Entradas', value: currency(m.incomes), icon: TrendingUp },
+            { label: 'Saídas', value: currency(m.expenses), icon: CreditCard },
+            { label: 'Em aberto', value: currency(m.open), icon: HelpCircle },
+            { label: 'Sobra estimada', value: currency(m.free), icon: PiggyBank },
+          ] as { label: string; value: string; icon: typeof TrendingUp }[]).map(item => (
+            <div key={item.label} className="p-3.5 rounded-[18px] bg-accent border border-border leading-relaxed text-sm flex items-start gap-2">
+              <item.icon className="size-4 text-muted-foreground mt-0.5 shrink-0" strokeWidth={1.5} />
+              <div>
+                <strong>{item.value}</strong><br />{item.label}
+              </div>
             </div>
           ))}
         </div>
