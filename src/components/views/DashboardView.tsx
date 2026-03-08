@@ -5,6 +5,8 @@ import { PieChart, Pie, Cell, ResponsiveContainer, Tooltip, BarChart, Bar, XAxis
 import MonthNavigator from '../MonthNavigator';
 import MarketTicker from '../MarketTicker';
 import AiTipsWidget from '../AiTipsWidget';
+import { TrendingUp, TrendingDown, Clock, Wallet, AlertCircle, PieChart as PieChartIcon, BarChart3, LineChart, Target, CalendarClock, Activity, CheckCircle2, Percent, FolderOpen, type LucideIcon } from 'lucide-react';
+import { getCategoryIcon } from '@/lib/categoryIcons';
 
 const CHART_COLORS = [
   'hsl(190, 90%, 50%)',
