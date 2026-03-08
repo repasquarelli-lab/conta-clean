@@ -220,15 +220,15 @@ export default function DashboardView() {
           </motion.div>
 
           {/* Bar Chart */}
-          <motion.div className="glass-panel p-4" variants={fadeUp} transition={{ duration: 0.5 }}>
-            <div className="mb-3 flex items-start gap-2.5">
-              <BarChart3 className="size-5 text-muted-foreground mt-0.5 shrink-0" strokeWidth={1.5} />
+          <motion.div className="glass-panel p-3 sm:p-4" variants={fadeUp} transition={{ duration: 0.5 }}>
+            <div className="mb-2 sm:mb-3 flex items-start gap-2">
+              <BarChart3 className="size-4 sm:size-5 text-muted-foreground mt-0.5 shrink-0" strokeWidth={1.5} />
               <div>
-                <h3 className="font-bold">Comparativo por categoria</h3>
-                <p className="text-muted-foreground text-sm">Valores absolutos dos gastos</p>
+                <h3 className="font-bold text-sm sm:text-base">Comparativo por categoria</h3>
+                <p className="text-muted-foreground text-xs sm:text-sm hidden sm:block">Valores absolutos dos gastos</p>
               </div>
             </div>
-            <div className="h-[220px]">
+            <div className="h-[180px] sm:h-[220px]">
               <ResponsiveContainer width="100%" height="100%">
                 <BarChart data={categoryData} layout="vertical" margin={{ left: 0, right: 10, top: 5, bottom: 5 }}>
                   <CartesianGrid strokeDasharray="3 3" stroke="hsl(var(--border))" horizontal={false} />
