@@ -5,7 +5,7 @@ import { PieChart, Pie, Cell, ResponsiveContainer, Tooltip, BarChart, Bar, XAxis
 import MonthNavigator from '../MonthNavigator';
 import MarketTicker from '../MarketTicker';
 import AiTipsWidget from '../AiTipsWidget';
-import { TrendingUp, TrendingDown, Clock, Wallet, AlertCircle, PieChart as PieChartIcon, BarChart3, LineChart, Target, CalendarClock, Activity, CheckCircle2, Percent, FolderOpen, type LucideIcon } from 'lucide-react';
+import { TrendingUp, TrendingDown, Clock, Wallet, AlertCircle, PieChart as PieChartIcon, BarChart3, LineChart, Target, CalendarClock, Activity, CheckCircle2, Percent, ArrowUpRight, ArrowDownRight, Minus, type LucideIcon } from 'lucide-react';
 import { getCategoryIcon } from '@/lib/categoryIcons';
 import { motion } from 'framer-motion';
 
@@ -70,6 +70,51 @@ function getEvolutionData(state: AppState, currentMonth: string, count: number =
   return data;
 }
 
+function getPrevMonth(month: string): string {
+  const [y, m] = month.split('-').map(Number);
+  const d = new Date(y, m - 2, 1);
+  return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}`;
+}
+
+const MONTH_LABELS = ['Janeiro', 'Fevereiro', 'Março', 'Abril', 'Maio', 'Junho', 'Julho', 'Agosto', 'Setembro', 'Outubro', 'Novembro', 'Dezembro'];
+function monthLabel(month: string): string {
+  const [y, m] = month.split('-').map(Number);
+  return `${MONTH_LABELS[m - 1]}/${y}`;
+}
+
+function getMonthComparison(state: AppState, month: string) {
+  const prev = getPrevMonth(month);
+  const cur = monthMetrics(state, month);
+  const prv = monthMetrics(state, prev);
+  
+  const curCatMap: Record<string, number> = {};
+  const prvCatMap: Record<string, number> = {};
+  getMonthEntries(state, month).filter(e => e.type === 'expense').forEach(e => {
+    curCatMap[e.category] = (curCatMap[e.category] || 0) + Number(e.value || 0);
+  });
+  getMonthEntries(state, prev).filter(e => e.type === 'expense').forEach(e => {
+    prvCatMap[e.category] = (prvCatMap[e.category] || 0) + Number(e.value || 0);
+  });
+
+  const allCats = [...new Set([...Object.keys(curCatMap), ...Object.keys(prvCatMap)])];
+  const categories = allCats.map(cat => {
+    const curVal = curCatMap[cat] || 0;
+    const prvVal = prvCatMap[cat] || 0;
+    const diff = curVal - prvVal;
+    const pct = prvVal > 0 ? Math.round(((curVal - prvVal) / prvVal) * 100) : curVal > 0 ? 100 : 0;
+    const status = prvVal === 0 && curVal > 0 ? 'NOVO' : curVal === 0 && prvVal > 0 ? 'ZEROU' : null;
+    return { cat, curVal, prvVal, diff, pct, status };
+  }).sort((a, b) => Math.abs(b.diff) - Math.abs(a.diff));
+
+  return {
+    cur, prv, prev,
+    incomeDiff: cur.incomes - prv.incomes,
+    expenseDiff: cur.expenses - prv.expenses,
+    balanceDiff: cur.balance - prv.balance,
+    categories,
+  };
+}
+
 export default function DashboardView() {
   const { state, currentMonth, setCurrentMonth } = useApp();
   
@@ -88,6 +133,8 @@ export default function DashboardView() {
   const categoryData = getCategoryData(state, currentMonth);
   const totalExpenses = categoryData.reduce((a, b) => a + b.value, 0);
   const evolutionData = getEvolutionData(state, currentMonth);
+  const comparison = getMonthComparison(state, currentMonth);
+  const prevMonthStr = getPrevMonth(currentMonth);
 
   return (
     <motion.div initial="hidden" animate="visible" variants={staggerContainer}>
@@ -241,6 +288,66 @@ export default function DashboardView() {
           </ResponsiveContainer>
         </div>
       </motion.div>
+
+      {/* Month Comparison */}
+      {(comparison.categories.length > 0 || comparison.prv.expenses > 0) && (
+        <motion.div className="glass-panel p-4 mt-4" variants={fadeUp} transition={{ duration: 0.5 }}>
+          <div className="mb-3 flex items-start gap-2.5">
+            <ArrowUpRight className="size-5 text-muted-foreground mt-0.5 shrink-0" strokeWidth={1.5} />
+            <div>
+              <h3 className="font-bold">Comparação com mês anterior</h3>
+              <p className="text-muted-foreground text-sm">{monthLabel(currentMonth)} vs {monthLabel(prevMonthStr)}</p>
+            </div>
+          </div>
+
+          {/* Summary cards */}
+          <div className="grid grid-cols-3 gap-3 mb-4">
+            {([
+              { label: 'Receitas', cur: comparison.cur.incomes, prev: comparison.prv.incomes, diff: comparison.incomeDiff, positive: true },
+              { label: 'Despesas', cur: comparison.cur.expenses, prev: comparison.prv.expenses, diff: comparison.expenseDiff, positive: false },
+              { label: 'Saldo', cur: comparison.cur.balance, prev: comparison.prv.balance, diff: comparison.balanceDiff, positive: true },
+            ]).map(item => {
+              const isGood = item.positive ? item.diff >= 0 : item.diff <= 0;
+              const pct = item.prev !== 0 ? Math.round(Math.abs(item.diff / item.prev) * 100) : item.diff !== 0 ? 100 : 0;
+              return (
+                <div key={item.label} className="p-3 rounded-2xl bg-accent border border-border text-center">
+                  <p className="text-xs text-muted-foreground mb-1">{item.label}</p>
+                  <p className="font-bold text-sm">{currency(item.cur)}</p>
+                  <div className={`flex items-center justify-center gap-1 mt-1 text-xs font-semibold ${isGood ? 'text-emerald-600 dark:text-emerald-400' : 'text-red-500 dark:text-red-400'}`}>
+                    {item.diff > 0 ? <ArrowUpRight className="size-3" /> : item.diff < 0 ? <ArrowDownRight className="size-3" /> : <Minus className="size-3" />}
+                    <span>{pct}%</span>
+                  </div>
+                </div>
+              );
+            })}
+          </div>
+
+          {/* Category breakdown */}
+          <div className="flex flex-col gap-2">
+            {comparison.categories.slice(0, 5).map(c => {
+              const CatIcon = getCategoryIcon(c.cat);
+              const increased = c.diff > 0;
+              const decreased = c.diff < 0;
+              return (
+                <div key={c.cat} className="flex items-center gap-2.5 p-2.5 rounded-xl bg-accent/50 border border-border/50">
+                  <CatIcon className="size-4 text-muted-foreground shrink-0" strokeWidth={1.5} />
+                  <span className="text-sm font-medium flex-1 truncate">{c.cat}</span>
+                  {c.status && (
+                    <span className={`text-[10px] font-bold px-1.5 py-0.5 rounded ${c.status === 'NOVO' ? 'bg-primary/10 text-primary' : 'bg-muted text-muted-foreground'}`}>
+                      {c.status}
+                    </span>
+                  )}
+                  <span className="text-xs text-muted-foreground">{currency(c.curVal)}</span>
+                  <div className={`flex items-center gap-0.5 text-xs font-semibold min-w-[50px] justify-end ${increased ? 'text-red-500 dark:text-red-400' : decreased ? 'text-emerald-600 dark:text-emerald-400' : 'text-muted-foreground'}`}>
+                    {increased ? <ArrowUpRight className="size-3" /> : decreased ? <ArrowDownRight className="size-3" /> : <Minus className="size-3" />}
+                    <span>{c.status ? '—' : `${Math.abs(c.pct)}%`}</span>
+                  </div>
+                </div>
+              );
+            })}
+          </div>
+        </motion.div>
+      )}
 
       {/* Budget Goals */}
       {(state.budgetGoals?.length ?? 0) > 0 && (
