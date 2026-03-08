@@ -200,14 +200,10 @@ export default function AppShell() {
             <h2 className="text-xl lg:text-2xl font-bold mb-1">{meta.name}</h2>
             <p className="text-muted-foreground text-sm hidden sm:block">{meta.subtitle}</p>
           </div>
-          <div className="hidden lg:flex gap-2.5 flex-wrap">
-            <button onClick={logout} className="glass-panel rounded-2xl px-3 py-2.5 font-bold cursor-pointer text-xs">Sair</button>
-            <button onClick={reloadDemo} className="glass-panel rounded-2xl px-3 py-2.5 font-bold cursor-pointer text-xs">Recarregar demo</button>
-            <button onClick={exportBackup} className="glass-panel rounded-2xl px-3 py-2.5 font-bold cursor-pointer text-xs">Exportar backup</button>
-            <label className="glass-panel rounded-2xl px-3 py-2.5 font-bold cursor-pointer text-xs">
-              Importar backup
-              <input type="file" accept="application/json" className="hidden" onChange={handleImport} />
-            </label>
+          <div className="hidden lg:flex gap-2 items-center">
+            <button onClick={logout} className="flex items-center gap-1.5 glass-panel rounded-xl px-3 py-2 font-semibold cursor-pointer text-xs text-muted-foreground hover:text-destructive transition-colors">
+              <LogOut className="w-3.5 h-3.5" /> Sair
+            </button>
           </div>
         </div>
 
