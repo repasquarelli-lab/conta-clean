@@ -106,7 +106,7 @@ function generateTips(state: any, month: string) {
     if (paidPct === 100) {
       tips.push({
         icon: CheckCircle,
-        color: 'text-emerald-400',
+        color: 'text-emerald-600 dark:text-emerald-400',
         title: 'Tudo pago!',
         text: 'Todas as contas do mês estão quitadas. Parabéns pela organização!',
       });
