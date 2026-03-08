@@ -27,7 +27,7 @@ const VIEWS: { id: View; name: string; shortName: string; subtitle: string; icon
 const BOTTOM_TABS = VIEWS.filter(v => v.id !== 'config');
 
 export default function AppShell() {
-  const { state, currentView, setCurrentView, setScreen, reloadDemo } = useApp();
+  const { state, currentView, setCurrentView, setScreen, reloadDemo, logout } = useApp();
   const { theme, toggleTheme } = useTheme();
   const meta = VIEWS.find(v => v.id === currentView)!;
   const [sidebarOpen, setSidebarOpen] = useState(false);
