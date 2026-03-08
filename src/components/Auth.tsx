@@ -16,6 +16,16 @@ export default function Auth() {
     setLoading(true);
 
     try {
+      if (mode === 'forgot') {
+        const { error } = await onAuthSuccess.resetPassword(email);
+        if (error) {
+          toast.error(error.message);
+        } else {
+          toast.success('E-mail de recuperação enviado! Verifique sua caixa de entrada.');
+          setMode('login');
+        }
+        return;
+      }
       if (mode === 'signup') {
         const { error } = await onAuthSuccess.signUp(email, password, userName);
         if (error) {
