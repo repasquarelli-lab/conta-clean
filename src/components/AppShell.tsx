@@ -147,7 +147,7 @@ export default function AppShell() {
           <div className="lg:hidden fixed inset-0 z-30 bg-background/60 backdrop-blur-sm" onClick={() => setSidebarOpen(false)} />
           <div className="lg:hidden fixed top-[57px] left-0 right-0 z-40 border-b border-border p-4 animate-fade-in bg-background/98 backdrop-blur-2xl">
             <nav className="flex flex-col gap-1.5 mb-3">
-              {VIEWS.map(v => (
+              {visibleViews.map(v => (
                 <button
                   key={v.id}
                   onClick={() => navigateTo(v.id)}
