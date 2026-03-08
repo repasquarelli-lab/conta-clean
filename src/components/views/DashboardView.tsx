@@ -248,15 +248,15 @@ export default function DashboardView() {
       )}
 
       {/* Evolution Chart - 6 months */}
-      <motion.div className="glass-panel p-4 mt-4" variants={fadeUp} transition={{ duration: 0.5 }}>
-        <div className="mb-3 flex items-start gap-2.5">
-          <LineChart className="size-5 text-muted-foreground mt-0.5 shrink-0" strokeWidth={1.5} />
+      <motion.div className="glass-panel p-3 sm:p-4 mt-3 sm:mt-4" variants={fadeUp} transition={{ duration: 0.5 }}>
+        <div className="mb-2 sm:mb-3 flex items-start gap-2">
+          <LineChart className="size-4 sm:size-5 text-muted-foreground mt-0.5 shrink-0" strokeWidth={1.5} />
           <div>
-            <h3 className="font-bold">Evolução mensal</h3>
-            <p className="text-muted-foreground text-sm">Receitas × Despesas dos últimos 6 meses</p>
+            <h3 className="font-bold text-sm sm:text-base">Evolução mensal</h3>
+            <p className="text-muted-foreground text-xs sm:text-sm hidden sm:block">Receitas × Despesas dos últimos 6 meses</p>
           </div>
         </div>
-        <div className="h-[260px]">
+        <div className="h-[200px] sm:h-[260px]">
           <ResponsiveContainer width="100%" height="100%">
             <AreaChart data={evolutionData} margin={{ left: 0, right: 10, top: 5, bottom: 5 }}>
               <defs>
