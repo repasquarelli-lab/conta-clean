@@ -105,6 +105,7 @@ export default function ConfigView() {
           <div className="flex flex-col gap-2 mb-4">
             {goals.map(g => (
               <div key={g.category} className="flex items-center gap-2 p-2.5 rounded-xl bg-accent border border-border">
+                {(() => { const CatIcon = getCategoryIcon(g.category); return <CatIcon className="size-4 text-muted-foreground shrink-0" strokeWidth={1.5} />; })()}
                 <span className="text-sm font-medium flex-1">{g.category}</span>
                 <span className="text-xs text-muted-foreground">R$</span>
                 <input
