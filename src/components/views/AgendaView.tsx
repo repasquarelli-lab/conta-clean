@@ -25,6 +25,7 @@ export default function AgendaView() {
   const sections: { title: string; subtitle: string; icon: LucideIcon; items: any[]; getLabel: (e: any) => string; variant: 'good' | 'warn' | 'bad'; emptyMsg: string }[] = isCurrentMonth
     ? [
         { title: 'Vence hoje', subtitle: 'Prioridade máxima', icon: Clock, items: today, getLabel: () => 'Hoje', variant: 'bad', emptyMsg: 'Nenhuma conta vence hoje.' },
+        { title: 'Próximos 3 dias', subtitle: 'Lembrete antecipado', icon: Bell, items: soon, getLabel: (e: any) => { const d = Math.ceil((new Date(e.date).getTime() - new Date(todayISO()).getTime()) / 86400000); return d === 1 ? 'Amanhã' : `Em ${d} dias`; }, variant: 'warn', emptyMsg: 'Nenhuma conta nos próximos 3 dias.' },
         { title: 'Próximos 7 dias', subtitle: 'Para você se organizar', icon: CalendarClock, items: week, getLabel: (e: any) => e.delta === 1 ? 'Amanhã' : `Em ${e.delta} dias`, variant: 'warn', emptyMsg: 'Nenhuma conta nesta semana.' },
         { title: 'Atrasadas', subtitle: 'Contas que já passaram do prazo', icon: AlertTriangle, items: overdue, getLabel: () => 'Atrasada', variant: 'bad', emptyMsg: 'Nenhuma conta atrasada.' },
       ]
