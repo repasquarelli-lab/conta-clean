@@ -13,6 +13,7 @@ export default function LancamentosView() {
   const [filterType, setFilterType] = useState('all');
   const [filterCategory, setFilterCategory] = useState('all');
   const [filterStatus, setFilterStatus] = useState('all');
+  const [viewMode, setViewMode] = useState<'list' | 'grid'>('list');
 
   const entries = getMonthEntries(state, currentMonth).sort((a, b) => a.date.localeCompare(b.date));
   const cats = entryType === 'income' ? incomeCategories : categories;
