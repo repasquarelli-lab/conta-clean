@@ -131,7 +131,8 @@ export default function LancamentosView() {
           </select>
         </div>
 
-        <div className="overflow-auto border border-border rounded-2xl">
+        {/* Desktop table */}
+        <div className="overflow-auto border border-border rounded-2xl hidden sm:block">
           <table className="w-full border-collapse min-w-[760px]" style={{ background: 'hsl(var(--accent))' }}>
             <thead>
               <tr>
@@ -158,7 +159,7 @@ export default function LancamentosView() {
                   <td className="p-3 border-b border-border text-sm">
                     <div className="flex gap-2 flex-wrap">
                       <button onClick={() => togglePaid(e.id)} className={`${e.paid ? 'badge-warn' : 'badge-good'} cursor-pointer text-xs font-bold flex items-center gap-1`}>
-                        {e.paid ? <><Undo2 className="size-3" /> Marcar pendente</> : <><Check className="size-3" /> Marcar pago</>}
+                        {e.paid ? <><Undo2 className="size-3" /> Pendente</> : <><Check className="size-3" /> Pago</>}
                       </button>
                       <button onClick={() => removeEntry(e.id)} className="badge-bad cursor-pointer text-xs font-bold flex items-center gap-1">
                         <Trash2 className="size-3" /> Excluir
@@ -169,6 +170,48 @@ export default function LancamentosView() {
               ))}
             </tbody>
           </table>
+        </div>
+
+        {/* Mobile card list */}
+        <div className="flex flex-col gap-2 sm:hidden">
+          {filtered.length === 0 ? (
+            <div className="p-5 rounded-2xl border border-dashed border-border text-muted-foreground text-center text-sm">
+              Nenhum lançamento encontrado.
+            </div>
+          ) : filtered.map(e => {
+            const CatIcon = getCategoryIcon(e.category);
+            return (
+              <div key={e.id} className="p-3 rounded-2xl bg-accent border border-border">
+                <div className="flex items-start justify-between gap-2 mb-2">
+                  <div className="flex items-center gap-2 min-w-0">
+                    <div className="w-8 h-8 rounded-xl grid place-items-center bg-card border border-border shrink-0">
+                      <CatIcon className="size-3.5 text-muted-foreground" strokeWidth={1.5} />
+                    </div>
+                    <div className="min-w-0">
+                      <p className="text-sm font-semibold truncate">{e.desc}</p>
+                      <p className="text-[11px] text-muted-foreground">{e.category} · {formatDate(e.date)}</p>
+                    </div>
+                  </div>
+                  <span className={e.paid ? 'badge-good' : 'badge-warn'}>
+                    {e.type === 'income' ? (e.paid ? 'Recebido' : 'Pendente') : (e.paid ? 'Pago' : 'Pendente')}
+                  </span>
+                </div>
+                <div className="flex items-center justify-between">
+                  <span className={`text-sm font-bold ${e.type === 'income' ? 'text-emerald-600 dark:text-emerald-400' : 'text-foreground'}`}>
+                    {e.type === 'income' ? '+' : '-'} {currency(e.value)}
+                  </span>
+                  <div className="flex gap-1.5">
+                    <button onClick={() => togglePaid(e.id)} className={`${e.paid ? 'badge-warn' : 'badge-good'} cursor-pointer text-[11px] font-bold flex items-center gap-1 active:scale-95 transition-transform`}>
+                      {e.paid ? <Undo2 className="size-3" /> : <Check className="size-3" />}
+                    </button>
+                    <button onClick={() => removeEntry(e.id)} className="badge-bad cursor-pointer text-[11px] font-bold flex items-center gap-1 active:scale-95 transition-transform">
+                      <Trash2 className="size-3" />
+                    </button>
+                  </div>
+                </div>
+              </div>
+            );
+          })}
         </div>
       </div>
     </div>
