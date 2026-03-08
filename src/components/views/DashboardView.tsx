@@ -437,25 +437,25 @@ export default function DashboardView() {
             </div>
           </div>
           <div className="grid grid-cols-2 gap-2 sm:gap-3">
-            <div className="p-3.5 rounded-[18px] bg-accent border border-border leading-relaxed text-sm flex items-start gap-2">
-              <CheckCircle2 className="size-4 text-muted-foreground mt-0.5 shrink-0" strokeWidth={1.5} />
+            <div className="p-2.5 sm:p-3.5 rounded-2xl bg-accent border border-border leading-relaxed text-xs sm:text-sm flex items-start gap-1.5 sm:gap-2">
+              <CheckCircle2 className="size-3.5 sm:size-4 text-muted-foreground mt-0.5 shrink-0" strokeWidth={1.5} />
               <div>
                 <strong>{counts.paid}/{counts.total}</strong><br />contas pagas
-                <div className="progress-bar mt-2">
+                <div className="progress-bar mt-1.5 sm:mt-2">
                   <div className="progress-bar-fill" style={{ width: `${progressPct}%` }} />
                 </div>
               </div>
             </div>
-            <div className="p-3.5 rounded-[18px] bg-accent border border-border leading-relaxed text-sm flex items-start gap-2">
-              <Percent className="size-4 text-muted-foreground mt-0.5 shrink-0" strokeWidth={1.5} />
+            <div className="p-2.5 sm:p-3.5 rounded-2xl bg-accent border border-border leading-relaxed text-xs sm:text-sm flex items-start gap-1.5 sm:gap-2">
+              <Percent className="size-3.5 sm:size-4 text-muted-foreground mt-0.5 shrink-0" strokeWidth={1.5} />
               <div>
-                <strong>{fixedPct}%</strong><br />da renda vai para contas fixas
+                <strong>{fixedPct}%</strong><br />da renda vai para fixas
               </div>
             </div>
-            <div className="p-3.5 rounded-[18px] bg-accent border border-border leading-relaxed text-sm flex items-start gap-2">
-              <AlertCircle className="size-4 text-muted-foreground mt-0.5 shrink-0" strokeWidth={1.5} />
+            <div className="p-2.5 sm:p-3.5 rounded-2xl bg-accent border border-border leading-relaxed text-xs sm:text-sm flex items-start gap-1.5 sm:gap-2">
+              <AlertCircle className="size-3.5 sm:size-4 text-muted-foreground mt-0.5 shrink-0" strokeWidth={1.5} />
               <div>
-                <strong>{overdue.length}</strong><br />contas atrasadas
+                <strong>{overdue.length}</strong><br />atrasadas
               </div>
             </div>
             {/* Mini donut chart */}
