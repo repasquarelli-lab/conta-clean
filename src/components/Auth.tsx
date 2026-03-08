@@ -2,6 +2,7 @@ import { useState } from 'react';
 import { useApp } from '@/contexts/AppContext';
 import { toast } from 'sonner';
 import { lovable } from '@/integrations/lovable/index';
+import { Cloud, ShieldCheck, Smartphone, DatabaseBackup, ArrowLeft, Mail, Lock, User, LogIn, UserPlus, KeyRound, Send } from 'lucide-react';
 
 export default function Auth() {
   const { setScreen, onAuthSuccess } = useApp();
@@ -67,19 +68,20 @@ export default function Auth() {
             </p>
             <div className="grid grid-cols-2 gap-3 mt-4">
               {[
-                { title: 'Sincronizado', desc: 'Dados salvos na nuvem automaticamente.' },
-                { title: 'Seguro', desc: 'Seus dados protegidos com login.' },
-                { title: 'Multi-dispositivo', desc: 'Acesse de qualquer aparelho.' },
-                { title: 'Backup automático', desc: 'Nunca perca seus dados.' },
+                { title: 'Sincronizado', desc: 'Dados salvos na nuvem automaticamente.', icon: Cloud },
+                { title: 'Seguro', desc: 'Seus dados protegidos com login.', icon: ShieldCheck },
+                { title: 'Multi-dispositivo', desc: 'Acesse de qualquer aparelho.', icon: Smartphone },
+                { title: 'Backup automático', desc: 'Nunca perca seus dados.', icon: DatabaseBackup },
               ].map(item => (
                 <div key={item.title} className="p-3.5 rounded-[20px] border border-border" style={{ background: 'hsla(220,40%,95%,0.03)' }}>
+                  <item.icon className="size-5 text-primary mb-2" strokeWidth={1.5} />
                   <strong className="block text-sm mb-1">{item.title}</strong>
                   <span className="text-muted-foreground text-xs leading-relaxed">{item.desc}</span>
                 </div>
               ))}
             </div>
             <div className="mt-4">
-              <button onClick={() => setScreen('landing')} className="glass-panel rounded-2xl px-4 py-3 font-bold cursor-pointer text-sm">Voltar</button>
+              <button onClick={() => setScreen('landing')} className="glass-panel rounded-2xl px-4 py-3 font-bold cursor-pointer text-sm flex items-center gap-1.5"><ArrowLeft className="size-4" strokeWidth={1.5} /> Voltar</button>
             </div>
           </div>
           <div className="absolute right-[-70px] bottom-[-70px] w-[220px] h-[220px] rounded-full opacity-25 pointer-events-none" style={{ background: 'radial-gradient(circle, hsl(260 60% 60%), transparent 72%)' }} />
@@ -100,7 +102,7 @@ export default function Auth() {
           <form onSubmit={handleSubmit} className="mt-5 grid gap-3">
             {mode === 'forgot' ? null : mode === 'signup' && (
               <div>
-                <label className="text-sm font-medium mb-1 block">Seu nome</label>
+                <label className="text-sm font-medium mb-1 flex items-center gap-1.5"><User className="size-3.5 text-muted-foreground" strokeWidth={1.5} /> Seu nome</label>
                 <input
                   value={userName}
                   onChange={e => setUserName(e.target.value)}
@@ -111,7 +113,7 @@ export default function Auth() {
               </div>
             )}
             <div>
-              <label className="text-sm font-medium mb-1 block">E-mail</label>
+              <label className="text-sm font-medium mb-1 flex items-center gap-1.5"><Mail className="size-3.5 text-muted-foreground" strokeWidth={1.5} /> E-mail</label>
               <input
                 type="email"
                 value={email}
@@ -123,7 +125,7 @@ export default function Auth() {
             </div>
             {mode !== 'forgot' && (
               <div>
-                <label className="text-sm font-medium mb-1 block">Senha</label>
+                <label className="text-sm font-medium mb-1 flex items-center gap-1.5"><Lock className="size-3.5 text-muted-foreground" strokeWidth={1.5} /> Senha</label>
                 <input
                   type="password"
                   value={password}
@@ -147,9 +149,14 @@ export default function Auth() {
             <button
               type="submit"
               disabled={loading}
-              className="brand-gradient border-none rounded-2xl px-4 py-3 font-bold cursor-pointer text-primary-foreground mt-2 disabled:opacity-50"
+              className="brand-gradient border-none rounded-2xl px-4 py-3 font-bold cursor-pointer text-primary-foreground mt-2 disabled:opacity-50 flex items-center justify-center gap-2"
             >
-              {loading ? 'Aguarde...' : mode === 'login' ? 'Entrar' : mode === 'signup' ? 'Criar conta' : 'Enviar link de recuperação'}
+              {loading ? 'Aguarde...' : (
+                <>
+                  {mode === 'login' ? <LogIn className="size-4" strokeWidth={1.5} /> : mode === 'signup' ? <UserPlus className="size-4" strokeWidth={1.5} /> : <Send className="size-4" strokeWidth={1.5} />}
+                  {mode === 'login' ? 'Entrar' : mode === 'signup' ? 'Criar conta' : 'Enviar link de recuperação'}
+                </>
+              )}
             </button>
           </form>
           <div className="relative my-5">
