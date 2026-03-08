@@ -39,8 +39,13 @@ export default function FixasView() {
   return (
     <div>
       <div className="glass-panel p-4 mb-4">
-        <h3 className="font-bold mb-1">Nova conta fixa</h3>
-        <p className="text-muted-foreground text-sm mb-3">Cadastre uma vez e use todo mês</p>
+        <div className="flex items-start gap-2.5 mb-1">
+          <PlusCircle className="size-5 text-muted-foreground mt-0.5 shrink-0" strokeWidth={1.5} />
+          <div>
+            <h3 className="font-bold">Nova conta fixa</h3>
+            <p className="text-muted-foreground text-sm mb-3">Cadastre uma vez e use todo mês</p>
+          </div>
+        </div>
         <form onSubmit={handleSubmit}>
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3">
             <div>
