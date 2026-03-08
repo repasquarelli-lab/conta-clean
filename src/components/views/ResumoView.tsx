@@ -210,12 +210,15 @@ export default function ResumoView() {
       {/* Month comparison */}
       {comparison.length > 0 && (
         <div className="glass-panel p-4 mb-4">
-          <div className="mb-3">
+        <div className="mb-3 flex items-start gap-2.5">
+          <ArrowUpRight className="size-5 text-muted-foreground mt-0.5 shrink-0" strokeWidth={1.5} />
+          <div>
             <h3 className="font-bold">Comparação com mês anterior</h3>
             <p className="text-muted-foreground text-sm">
               {monthLabel(currentMonth)} vs {monthLabel(prevMonthStr)} — por categoria
             </p>
           </div>
+        </div>
           <div className="flex flex-col gap-2">
             {comparison.map(c => {
               const increased = c.diff > 0;
