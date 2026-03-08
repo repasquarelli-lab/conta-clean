@@ -1,9 +1,9 @@
 import { useState } from 'react';
 import { useApp } from '@/contexts/AppContext';
-import { dueTodayBills, upcomingBills, overdueBills, todayISO, getMonthEntries, currency, formatDate } from '@/lib/store';
+import { dueTodayBills, upcomingBills, overdueBills, dueSoonBills, todayISO, getMonthEntries, currency, formatDate } from '@/lib/store';
 import BillItem from '../BillItem';
 import MonthNavigator from '../MonthNavigator';
-import { AlertTriangle, CalendarClock, Clock, CalendarDays, List, LayoutGrid, type LucideIcon } from 'lucide-react';
+import { AlertTriangle, CalendarClock, Clock, CalendarDays, List, LayoutGrid, Bell, type LucideIcon } from 'lucide-react';
 import { getCategoryIcon } from '@/lib/categoryIcons';
 import { motion } from 'framer-motion';
 
@@ -14,7 +14,8 @@ export default function AgendaView() {
   const isCurrentMonth = currentMonth === todayISO().slice(0, 7);
 
   const today = isCurrentMonth ? dueTodayBills(state) : [];
-  const week = isCurrentMonth ? upcomingBills(state, 7).filter(e => e.date !== todayISO()) : [];
+  const soon = isCurrentMonth ? dueSoonBills(state, 3) : [];
+  const week = isCurrentMonth ? upcomingBills(state, 7).filter(e => e.date !== todayISO() && !soon.some(s => s.id === e.id)) : [];
   const overdue = isCurrentMonth ? overdueBills(state) : [];
 
   const monthEntries = !isCurrentMonth
@@ -24,6 +25,7 @@ export default function AgendaView() {
   const sections: { title: string; subtitle: string; icon: LucideIcon; items: any[]; getLabel: (e: any) => string; variant: 'good' | 'warn' | 'bad'; emptyMsg: string }[] = isCurrentMonth
     ? [
         { title: 'Vence hoje', subtitle: 'Prioridade máxima', icon: Clock, items: today, getLabel: () => 'Hoje', variant: 'bad', emptyMsg: 'Nenhuma conta vence hoje.' },
+        { title: 'Próximos 3 dias', subtitle: 'Lembrete antecipado', icon: Bell, items: soon, getLabel: (e: any) => { const d = Math.ceil((new Date(e.date).getTime() - new Date(todayISO()).getTime()) / 86400000); return d === 1 ? 'Amanhã' : `Em ${d} dias`; }, variant: 'warn', emptyMsg: 'Nenhuma conta nos próximos 3 dias.' },
         { title: 'Próximos 7 dias', subtitle: 'Para você se organizar', icon: CalendarClock, items: week, getLabel: (e: any) => e.delta === 1 ? 'Amanhã' : `Em ${e.delta} dias`, variant: 'warn', emptyMsg: 'Nenhuma conta nesta semana.' },
         { title: 'Atrasadas', subtitle: 'Contas que já passaram do prazo', icon: AlertTriangle, items: overdue, getLabel: () => 'Atrasada', variant: 'bad', emptyMsg: 'Nenhuma conta atrasada.' },
       ]
