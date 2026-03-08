@@ -23,7 +23,7 @@ export default function MarketTicker() {
     try {
       const [currRes, cryptoRes, ibovRes, nasdaqRes] = await Promise.all([
         fetch('https://economia.awesomeapi.com.br/json/last/USD-BRL,EUR-BRL,GBP-BRL'),
-        fetch('https://api.coingecko.com/api/v3/simple/price?ids=bitcoin,ethereum&vs_currencies=brl&include_24hr_change=true'),
+        fetch('https://api.coingecko.com/api/v3/simple/price?ids=bitcoin&vs_currencies=brl&include_24hr_change=true'),
         fetch('https://economia.awesomeapi.com.br/json/last/IBOV').catch(() => null),
         fetch('https://economia.awesomeapi.com.br/json/last/NASD').catch(() => null),
       ]);
