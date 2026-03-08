@@ -102,7 +102,7 @@ export default function Auth() {
           <form onSubmit={handleSubmit} className="mt-5 grid gap-3">
             {mode === 'forgot' ? null : mode === 'signup' && (
               <div>
-                <label className="text-sm font-medium mb-1 block">Seu nome</label>
+                <label className="text-sm font-medium mb-1 flex items-center gap-1.5"><User className="size-3.5 text-muted-foreground" strokeWidth={1.5} /> Seu nome</label>
                 <input
                   value={userName}
                   onChange={e => setUserName(e.target.value)}
