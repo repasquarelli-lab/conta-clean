@@ -162,9 +162,12 @@ export default function DashboardView() {
 
           {/* Bar Chart */}
           <div className="glass-panel p-4">
-            <div className="mb-3">
-              <h3 className="font-bold">Comparativo por categoria</h3>
-              <p className="text-muted-foreground text-sm">Valores absolutos dos gastos</p>
+            <div className="mb-3 flex items-start gap-2.5">
+              <BarChart3 className="size-5 text-muted-foreground mt-0.5 shrink-0" strokeWidth={1.5} />
+              <div>
+                <h3 className="font-bold">Comparativo por categoria</h3>
+                <p className="text-muted-foreground text-sm">Valores absolutos dos gastos</p>
+              </div>
             </div>
             <div className="h-[220px]">
               <ResponsiveContainer width="100%" height="100%">
