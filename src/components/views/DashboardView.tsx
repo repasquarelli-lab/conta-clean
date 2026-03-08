@@ -316,20 +316,32 @@ export default function DashboardView() {
             </div>
           </div>
           <div className="grid grid-cols-2 gap-3">
-            <div className="p-3.5 rounded-[18px] bg-accent border border-border leading-relaxed text-sm">
-              <strong>{counts.paid}/{counts.total}</strong><br />contas pagas
-              <div className="progress-bar mt-2">
-                <div className="progress-bar-fill" style={{ width: `${progressPct}%` }} />
+            <div className="p-3.5 rounded-[18px] bg-accent border border-border leading-relaxed text-sm flex items-start gap-2">
+              <CheckCircle2 className="size-4 text-muted-foreground mt-0.5 shrink-0" strokeWidth={1.5} />
+              <div>
+                <strong>{counts.paid}/{counts.total}</strong><br />contas pagas
+                <div className="progress-bar mt-2">
+                  <div className="progress-bar-fill" style={{ width: `${progressPct}%` }} />
+                </div>
               </div>
             </div>
-            <div className="p-3.5 rounded-[18px] bg-accent border border-border leading-relaxed text-sm">
-              <strong>{fixedPct}%</strong><br />da renda vai para contas fixas
+            <div className="p-3.5 rounded-[18px] bg-accent border border-border leading-relaxed text-sm flex items-start gap-2">
+              <Percent className="size-4 text-muted-foreground mt-0.5 shrink-0" strokeWidth={1.5} />
+              <div>
+                <strong>{fixedPct}%</strong><br />da renda vai para contas fixas
+              </div>
             </div>
-            <div className="p-3.5 rounded-[18px] bg-accent border border-border leading-relaxed text-sm">
-              <strong>{top ? top[0] : '—'}</strong><br />maior categoria do mês
+            <div className="p-3.5 rounded-[18px] bg-accent border border-border leading-relaxed text-sm flex items-start gap-2">
+              <FolderOpen className="size-4 text-muted-foreground mt-0.5 shrink-0" strokeWidth={1.5} />
+              <div>
+                <strong>{top ? top[0] : '—'}</strong><br />maior categoria do mês
+              </div>
             </div>
-            <div className="p-3.5 rounded-[18px] bg-accent border border-border leading-relaxed text-sm">
-              <strong>{overdue.length}</strong><br />contas atrasadas
+            <div className="p-3.5 rounded-[18px] bg-accent border border-border leading-relaxed text-sm flex items-start gap-2">
+              <AlertCircle className="size-4 text-muted-foreground mt-0.5 shrink-0" strokeWidth={1.5} />
+              <div>
+                <strong>{overdue.length}</strong><br />contas atrasadas
+              </div>
             </div>
           </div>
           <div className="mt-3.5 text-xs text-muted-foreground">Resumo pensado para uso leigo: rápido de entender e com foco no cotidiano.</div>
