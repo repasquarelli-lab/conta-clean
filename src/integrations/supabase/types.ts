@@ -14,7 +14,126 @@ export type Database = {
   }
   public: {
     Tables: {
-      [_ in never]: never
+      budget_goals: {
+        Row: {
+          category: string
+          created_at: string
+          id: string
+          limit: number
+          user_id: string
+        }
+        Insert: {
+          category: string
+          created_at?: string
+          id?: string
+          limit?: number
+          user_id: string
+        }
+        Update: {
+          category?: string
+          created_at?: string
+          id?: string
+          limit?: number
+          user_id?: string
+        }
+        Relationships: []
+      }
+      entries: {
+        Row: {
+          category: string
+          created_at: string
+          date: string
+          description: string
+          id: string
+          paid: boolean
+          recurring: boolean
+          source_fixed: boolean
+          type: string
+          user_id: string
+          value: number
+        }
+        Insert: {
+          category?: string
+          created_at?: string
+          date?: string
+          description?: string
+          id?: string
+          paid?: boolean
+          recurring?: boolean
+          source_fixed?: boolean
+          type: string
+          user_id: string
+          value?: number
+        }
+        Update: {
+          category?: string
+          created_at?: string
+          date?: string
+          description?: string
+          id?: string
+          paid?: boolean
+          recurring?: boolean
+          source_fixed?: boolean
+          type?: string
+          user_id?: string
+          value?: number
+        }
+        Relationships: []
+      }
+      fixed_bills: {
+        Row: {
+          category: string
+          created_at: string
+          day: number
+          id: string
+          name: string
+          user_id: string
+          value: number
+        }
+        Insert: {
+          category?: string
+          created_at?: string
+          day?: number
+          id?: string
+          name: string
+          user_id: string
+          value?: number
+        }
+        Update: {
+          category?: string
+          created_at?: string
+          day?: number
+          id?: string
+          name?: string
+          user_id?: string
+          value?: number
+        }
+        Relationships: []
+      }
+      profiles: {
+        Row: {
+          brand_name: string
+          created_at: string
+          id: string
+          updated_at: string
+          user_name: string
+        }
+        Insert: {
+          brand_name?: string
+          created_at?: string
+          id: string
+          updated_at?: string
+          user_name?: string
+        }
+        Update: {
+          brand_name?: string
+          created_at?: string
+          id?: string
+          updated_at?: string
+          user_name?: string
+        }
+        Relationships: []
+      }
     }
     Views: {
       [_ in never]: never
