@@ -114,10 +114,13 @@ export default function DashboardView() {
       {categoryData.length > 0 && (
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 mt-4">
           {/* Pie Chart */}
-          <div className="glass-panel p-4">
-            <div className="mb-3">
-              <h3 className="font-bold">Gastos por categoria</h3>
-              <p className="text-muted-foreground text-sm">Onde seu dinheiro está indo</p>
+           <div className="glass-panel p-4">
+            <div className="mb-3 flex items-start gap-2.5">
+              <PieChartIcon className="size-5 text-muted-foreground mt-0.5 shrink-0" strokeWidth={1.5} />
+              <div>
+                <h3 className="font-bold">Gastos por categoria</h3>
+                <p className="text-muted-foreground text-sm">Onde seu dinheiro está indo</p>
+              </div>
             </div>
             <div className="flex flex-col sm:flex-row items-center gap-4">
               <div className="w-full sm:w-1/2 h-[200px]">
