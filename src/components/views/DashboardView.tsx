@@ -175,14 +175,14 @@ export default function DashboardView() {
           {/* Pie Chart */}
           <motion.div className="glass-panel p-3 sm:p-4" variants={fadeUp} transition={{ duration: 0.5 }}>
             <div className="mb-2 sm:mb-3 flex items-start gap-2">
-              <PieChartIcon className="size-5 text-muted-foreground mt-0.5 shrink-0" strokeWidth={1.5} />
+              <PieChartIcon className="size-4 sm:size-5 text-muted-foreground mt-0.5 shrink-0" strokeWidth={1.5} />
               <div>
-                <h3 className="font-bold">Gastos por categoria</h3>
-                <p className="text-muted-foreground text-sm">Onde seu dinheiro está indo</p>
+                <h3 className="font-bold text-sm sm:text-base">Gastos por categoria</h3>
+                <p className="text-muted-foreground text-xs sm:text-sm hidden sm:block">Onde seu dinheiro está indo</p>
               </div>
             </div>
-            <div className="flex flex-col sm:flex-row items-center gap-4">
-              <div className="w-full sm:w-1/2 h-[200px]">
+            <div className="flex flex-col sm:flex-row items-center gap-3 sm:gap-4">
+              <div className="w-full sm:w-1/2 h-[160px] sm:h-[200px]">
                 <ResponsiveContainer width="100%" height="100%">
                   <PieChart>
                     <Pie
