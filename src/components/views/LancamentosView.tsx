@@ -86,8 +86,13 @@ export default function LancamentosView() {
               <input name="value" type="number" step="0.01" min="0" placeholder="0,00" required className="w-full px-3 py-2.5 rounded-[14px] border border-border bg-input text-foreground text-sm outline-none placeholder:text-muted-foreground" />
             </div>
             <div>
-              <label className="text-xs font-medium mb-1 block">Data</label>
+              <label className="text-xs font-medium mb-1 block">
+                {entryType === 'income' ? '📅 Data do recebimento' : '📅 Data de vencimento'}
+              </label>
               <input name="date" type="date" defaultValue={todayISO()} required className="w-full px-3 py-2.5 rounded-[14px] border border-border bg-input text-foreground text-sm outline-none" />
+              <p className="text-[11px] text-muted-foreground mt-1">
+                {entryType === 'income' ? 'Quando você espera receber este valor' : 'Quando esta conta vence — usada nos alertas da agenda'}
+              </p>
             </div>
             <div>
               <label className="text-xs font-medium mb-1 block">Categoria</label>
