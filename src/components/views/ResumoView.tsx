@@ -94,7 +94,7 @@ function generateTips(state: any, month: string) {
   if (underControl.length > 0 && exceeded.length === 0) {
     tips.push({
       icon: CheckCircle,
-      color: 'text-emerald-400',
+      color: 'text-emerald-600 dark:text-emerald-400',
       title: 'Orçamento sob controle',
       text: `${underControl.length} categoria${underControl.length > 1 ? 's' : ''} está abaixo de 50% do limite — ótima disciplina financeira!`,
     });
