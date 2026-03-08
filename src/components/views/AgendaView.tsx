@@ -3,7 +3,7 @@ import { useApp } from '@/contexts/AppContext';
 import { dueTodayBills, upcomingBills, overdueBills, dueSoonBills, todayISO, getMonthEntries, currency, formatDate } from '@/lib/store';
 import BillItem from '../BillItem';
 import MonthNavigator from '../MonthNavigator';
-import { AlertTriangle, CalendarClock, Clock, CalendarDays, List, LayoutGrid, type LucideIcon } from 'lucide-react';
+import { AlertTriangle, CalendarClock, Clock, CalendarDays, List, LayoutGrid, Bell, type LucideIcon } from 'lucide-react';
 import { getCategoryIcon } from '@/lib/categoryIcons';
 import { motion } from 'framer-motion';
 
