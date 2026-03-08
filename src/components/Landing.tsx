@@ -11,7 +11,7 @@ export default function Landing() {
   const { setScreen } = useApp();
 
   return (
-    <section className="min-h-screen p-4 md:p-6 overflow-hidden">
+    <section className="min-h-screen p-4 md:p-6 overflow-hidden" style={{ paddingTop: 'max(1rem, env(safe-area-inset-top))' }}>
       <div className="max-w-[1280px] mx-auto">
         {/* Hero */}
         <div className="grid grid-cols-1 lg:grid-cols-[1.1fr_0.9fr] gap-5">
