@@ -64,7 +64,6 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
   const setState = useCallback((s: AppState) => {
     setStateRaw(s);
     saveState(s);
-    // Debounce cloud save
     if (saveTimerRef.current) clearTimeout(saveTimerRef.current);
     if (auth.user) {
       saveTimerRef.current = setTimeout(() => saveToCloud(s), 1500);
