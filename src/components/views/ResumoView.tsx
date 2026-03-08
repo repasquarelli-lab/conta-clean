@@ -250,7 +250,7 @@ export default function ResumoView() {
                     )}
                   </div>
                   {c.pct !== 0 && !isNew && !removed && (
-                    <span className={`text-[11px] font-semibold shrink-0 ${increased ? 'text-red-400' : 'text-emerald-400'}`}>
+                    <span className={`text-[11px] font-semibold shrink-0 ${increased ? 'text-red-600 dark:text-red-400' : 'text-emerald-600 dark:text-emerald-400'}`}>
                       {c.pct > 0 ? '+' : ''}{c.pct}%
                     </span>
                   )}
