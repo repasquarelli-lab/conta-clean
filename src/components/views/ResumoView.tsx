@@ -42,7 +42,7 @@ function generateTips(state: any, month: string) {
   } else if (fixedPct > 0) {
     tips.push({
       icon: ShieldCheck,
-      color: 'text-emerald-400',
+      color: 'text-emerald-600 dark:text-emerald-400',
       title: 'Fixas sob controle',
       text: `Suas contas fixas representam ${fixedPct}% da renda — dentro de uma faixa saudável.`,
     });
