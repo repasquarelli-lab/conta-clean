@@ -86,8 +86,13 @@ export default function LancamentosView() {
               <input name="value" type="number" step="0.01" min="0" placeholder="0,00" required className="w-full px-3 py-2.5 rounded-[14px] border border-border bg-input text-foreground text-sm outline-none placeholder:text-muted-foreground" />
             </div>
             <div>
-              <label className="text-xs font-medium mb-1 block">Data</label>
+              <label className="text-xs font-medium mb-1 block">
+                {entryType === 'income' ? '📅 Data do recebimento' : '📅 Data de vencimento'}
+              </label>
               <input name="date" type="date" defaultValue={todayISO()} required className="w-full px-3 py-2.5 rounded-[14px] border border-border bg-input text-foreground text-sm outline-none" />
+              <p className="text-[11px] text-muted-foreground mt-1">
+                {entryType === 'income' ? 'Quando você espera receber este valor' : 'Quando esta conta vence — usada nos alertas da agenda'}
+              </p>
             </div>
             <div>
               <label className="text-xs font-medium mb-1 block">Categoria</label>
@@ -150,7 +155,7 @@ export default function LancamentosView() {
               <table className="w-full border-collapse min-w-[760px]" style={{ background: 'hsl(var(--accent))' }}>
                 <thead>
                   <tr>
-                    {['Tipo', 'Descrição', 'Categoria', 'Data', 'Valor', 'Situação', 'Ações'].map(h => (
+                    {['Tipo', 'Descrição', 'Categoria', 'Venc./Receb.', 'Valor', 'Situação', 'Ações'].map(h => (
                       <th key={h} className="p-3 border-b border-border text-left text-sm font-bold text-muted-foreground" style={{ background: 'hsla(220,40%,95%,0.02)' }}>{h}</th>
                     ))}
                   </tr>
@@ -203,7 +208,7 @@ export default function LancamentosView() {
                         </div>
                         <div className="min-w-0">
                           <p className="text-sm font-semibold truncate">{e.desc}</p>
-                          <p className="text-[11px] text-muted-foreground">{e.category} · {formatDate(e.date)}</p>
+                          <p className="text-[11px] text-muted-foreground">{e.category} · {e.type === 'income' ? 'Receb.' : 'Venc.'} {formatDate(e.date)}</p>
                         </div>
                       </div>
                       <span className={e.paid ? 'badge-good' : 'badge-warn'}>
@@ -264,7 +269,7 @@ export default function LancamentosView() {
                       <span className={`text-lg font-black ${e.type === 'income' ? 'text-emerald-600 dark:text-emerald-400' : 'text-red-600 dark:text-red-400'}`}>
                         {e.type === 'income' ? '+' : '-'} {currency(e.value)}
                       </span>
-                      <p className="text-[11px] text-muted-foreground mt-0.5">{formatDate(e.date)}</p>
+                      <p className="text-[11px] text-muted-foreground mt-0.5">{e.type === 'income' ? '📅 Receb.' : '📅 Venc.'} {formatDate(e.date)}</p>
                     </div>
                     <div className="flex gap-1.5">
                       <button onClick={() => togglePaid(e.id)} className={`${e.paid ? 'badge-warn' : 'badge-good'} cursor-pointer text-[11px] font-bold flex items-center gap-1 active:scale-95 transition-transform`}>
