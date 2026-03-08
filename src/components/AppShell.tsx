@@ -146,8 +146,8 @@ export default function AppShell() {
               ))}
             </nav>
             <div className="border-t border-border pt-3 flex flex-wrap gap-2">
-              <button onClick={() => { setScreen('landing'); setSidebarOpen(false); }} className="glass-panel rounded-xl px-3 py-2 font-bold cursor-pointer text-xs flex items-center gap-2">
-                <Home className="w-3.5 h-3.5" /> Tela inicial
+              <button onClick={() => { logout(); setSidebarOpen(false); }} className="glass-panel rounded-xl px-3 py-2 font-bold cursor-pointer text-xs flex items-center gap-2">
+                <Home className="w-3.5 h-3.5" /> Sair
               </button>
               <button onClick={() => { reloadDemo(); setSidebarOpen(false); }} className="glass-panel rounded-xl px-3 py-2 font-bold cursor-pointer text-xs">Recarregar demo</button>
               <button onClick={exportBackup} className="glass-panel rounded-xl px-3 py-2 font-bold cursor-pointer text-xs">Exportar</button>
