@@ -35,7 +35,7 @@ function generateTips(state: any, month: string) {
   if (fixedPct > 70) {
     tips.push({
       icon: AlertTriangle,
-      color: 'text-yellow-400',
+      color: 'text-yellow-600 dark:text-yellow-400',
       title: 'Contas fixas pesando',
       text: `${fixedPct}% da sua renda vai para contas fixas. O ideal é manter abaixo de 60%. Tente renegociar algum contrato.`,
     });
