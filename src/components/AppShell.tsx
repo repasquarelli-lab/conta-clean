@@ -32,12 +32,23 @@ const BOTTOM_TABS = VIEWS.filter(v => v.id !== 'config' && v.id !== 'admin');
 export default function AppShell() {
   const { state, currentView, setCurrentView, setScreen, reloadDemo, logout, onAuthSuccess } = useApp();
   const userEmail = onAuthSuccess.user?.email || '';
+  const userId = onAuthSuccess.user?.id || '';
   const { theme, toggleTheme } = useTheme();
+  const [isAdmin, setIsAdmin] = useState(false);
   const meta = VIEWS.find(v => v.id === currentView)!;
   const [sidebarOpen, setSidebarOpen] = useState(false);
   const prevViewRef = useRef(currentView);
   const direction = VIEW_ORDER.indexOf(currentView) >= VIEW_ORDER.indexOf(prevViewRef.current) ? 1 : -1;
   prevViewRef.current = currentView;
+
+  // Check admin role
+  useEffect(() => {
+    if (!userId) return;
+    supabase.from('user_roles').select('role').eq('user_id', userId).eq('role', 'admin').maybeSingle()
+      .then(({ data }) => setIsAdmin(!!data));
+  }, [userId]);
+
+  const visibleViews = VIEWS.filter(v => v.id !== 'admin' || isAdmin);
 
   useEffect(() => {
     const overdue = overdueBills(state);
