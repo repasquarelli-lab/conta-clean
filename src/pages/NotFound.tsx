@@ -12,7 +12,7 @@ const NotFound = () => {
   return (
     <section className="min-h-screen grid place-items-center p-4">
       <div className="glass-panel p-8 max-w-md w-full text-center">
-        <div className="w-14 h-14 rounded-2xl grid place-items-center brand-gradient font-black tracking-wide text-primary-foreground text-lg mx-auto mb-5 shadow-lg">CC</div>
+        <img src="/favicon.png" alt="Conta Clara" className="w-14 h-14 rounded-2xl mx-auto mb-5 shadow-lg" />
         <h1 className="text-5xl font-black mb-2 bg-clip-text text-transparent" style={{ backgroundImage: 'var(--gradient-brand)' }}>404</h1>
         <p className="text-muted-foreground mb-6">Página não encontrada. Vamos voltar ao início?</p>
         <button

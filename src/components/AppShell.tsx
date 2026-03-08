@@ -125,7 +125,7 @@ export default function AppShell() {
       {/* Mobile Header */}
       <header className="lg:hidden flex items-center justify-between px-4 py-3 border-b border-border sticky top-0 z-40 bg-background/95 backdrop-blur-xl" style={{ paddingTop: 'max(0.75rem, env(safe-area-inset-top))' }}>
         <div className="flex items-center gap-3">
-          <div className="w-9 h-9 rounded-xl grid place-items-center brand-gradient font-black tracking-wide text-primary-foreground text-[10px] shadow-md">CC</div>
+          <img src="/favicon.png" alt="Conta Clara" className="w-9 h-9 rounded-xl shadow-md" />
           <div>
             <h1 className="text-sm font-bold leading-tight">{meta.shortName || 'Conta Clara'}</h1>
             <p className="text-[10px] text-muted-foreground">{state.userName ? `Olá, ${state.userName}` : 'Finanças'}</p>
@@ -189,7 +189,7 @@ export default function AppShell() {
       {/* Desktop Sidebar */}
       <aside className="hidden lg:flex lg:flex-col p-5 px-4 border-r border-border sticky top-0 h-screen bg-background/90 backdrop-blur-xl">
         <div className="flex gap-3 items-center pb-5 px-2">
-          <div className="w-11 h-11 rounded-2xl grid place-items-center brand-gradient font-black tracking-wide text-primary-foreground text-xs shadow-lg">CC</div>
+          <img src="/favicon.png" alt="Conta Clara" className="w-11 h-11 rounded-2xl shadow-lg" />
           <div>
             <h1 className="text-sm font-bold">Conta Clara</h1>
             <p className="text-[11px] text-muted-foreground mt-0.5">{state.userName ? `Olá, ${state.userName}` : 'Seu controle financeiro'}</p>

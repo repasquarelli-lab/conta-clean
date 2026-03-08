@@ -56,7 +56,7 @@ export default function Auth() {
         <div className="glass-panel p-7 relative overflow-hidden">
           <div className="relative z-10">
             <div className="flex items-center gap-3">
-              <div className="w-12 h-12 rounded-2xl grid place-items-center brand-gradient font-black tracking-wide text-primary-foreground">CC</div>
+              <img src="/favicon.png" alt="Conta Clara" className="w-12 h-12 rounded-2xl" />
               <div>
                 <h1 className="text-base font-bold">Conta Clara</h1>
                 <p className="text-sm text-muted-foreground mt-0.5">Simples de entender. Simples de usar.</p>

@@ -24,7 +24,7 @@ export default function Landing() {
           >
             <div className="flex justify-between gap-3 items-center flex-wrap relative z-10">
               <div className="flex items-center gap-3">
-                <div className="w-12 h-12 rounded-2xl grid place-items-center brand-gradient font-black tracking-wide text-primary-foreground shadow-lg">CC</div>
+                <img src="/favicon.png" alt="Conta Clara" className="w-12 h-12 rounded-2xl shadow-lg" />
                 <div>
                   <h1 className="text-base font-bold">Conta Clara</h1>
                   <p className="text-sm text-muted-foreground mt-0.5">Finanças pessoais simplificadas</p>
