@@ -85,7 +85,7 @@ function generateTips(state: any, month: string) {
   if (nearLimit.length > 0) {
     tips.push({
       icon: Lightbulb,
-      color: 'text-yellow-400',
+      color: 'text-yellow-600 dark:text-yellow-400',
       title: `${nearLimit.length} meta${nearLimit.length > 1 ? 's' : ''} quase no limite`,
       text: nearLimit.map(b => `"${b.category}" está em ${b.pct}%`).join(', ') + '. Cuidado para não ultrapassar até o fim do mês.',
     });
