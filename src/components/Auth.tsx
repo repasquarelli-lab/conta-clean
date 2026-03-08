@@ -5,7 +5,7 @@ import { lovable } from '@/integrations/lovable/index';
 
 export default function Auth() {
   const { setScreen, onAuthSuccess } = useApp();
-  const [mode, setMode] = useState<'login' | 'signup'>('login');
+  const [mode, setMode] = useState<'login' | 'signup' | 'forgot'>('login');
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [userName, setUserName] = useState('');
@@ -16,6 +16,16 @@ export default function Auth() {
     setLoading(true);
 
     try {
+      if (mode === 'forgot') {
+        const { error } = await onAuthSuccess.resetPassword(email);
+        if (error) {
+          toast.error(error.message);
+        } else {
+          toast.success('E-mail de recuperação enviado! Verifique sua caixa de entrada.');
+          setMode('login');
+        }
+        return;
+      }
       if (mode === 'signup') {
         const { error } = await onAuthSuccess.signUp(email, password, userName);
         if (error) {
@@ -78,15 +88,17 @@ export default function Auth() {
         {/* Auth Form */}
         <div className="glass-panel p-7">
           <h2 className="text-xl font-bold mb-2">
-            {mode === 'login' ? 'Entrar na sua conta' : 'Criar conta'}
+            {mode === 'login' ? 'Entrar na sua conta' : mode === 'signup' ? 'Criar conta' : 'Recuperar senha'}
           </h2>
           <p className="text-muted-foreground text-sm">
             {mode === 'login'
               ? 'Acesse seus dados financeiros salvos na nuvem.'
-              : 'Cadastre-se para salvar seus dados com segurança.'}
+              : mode === 'signup'
+              ? 'Cadastre-se para salvar seus dados com segurança.'
+              : 'Informe seu e-mail para receber um link de redefinição.'}
           </p>
           <form onSubmit={handleSubmit} className="mt-5 grid gap-3">
-            {mode === 'signup' && (
+            {mode === 'forgot' ? null : mode === 'signup' && (
               <div>
                 <label className="text-sm font-medium mb-1 block">Seu nome</label>
                 <input
@@ -109,24 +121,35 @@ export default function Auth() {
                 className="w-full px-3 py-3 rounded-[14px] border border-border bg-input text-foreground outline-none placeholder:text-muted-foreground text-sm"
               />
             </div>
-            <div>
-              <label className="text-sm font-medium mb-1 block">Senha</label>
-              <input
-                type="password"
-                value={password}
-                onChange={e => setPassword(e.target.value)}
-                placeholder="Mínimo 6 caracteres"
-                required
-                minLength={6}
-                className="w-full px-3 py-3 rounded-[14px] border border-border bg-input text-foreground outline-none placeholder:text-muted-foreground text-sm"
-              />
-            </div>
+            {mode !== 'forgot' && (
+              <div>
+                <label className="text-sm font-medium mb-1 block">Senha</label>
+                <input
+                  type="password"
+                  value={password}
+                  onChange={e => setPassword(e.target.value)}
+                  placeholder="Mínimo 6 caracteres"
+                  required
+                  minLength={6}
+                  className="w-full px-3 py-3 rounded-[14px] border border-border bg-input text-foreground outline-none placeholder:text-muted-foreground text-sm"
+                />
+              </div>
+            )}
+            {mode === 'login' && (
+              <button
+                type="button"
+                onClick={() => setMode('forgot')}
+                className="text-xs text-muted-foreground hover:text-foreground cursor-pointer bg-transparent border-none underline text-right -mt-1"
+              >
+                Esqueci minha senha
+              </button>
+            )}
             <button
               type="submit"
               disabled={loading}
               className="brand-gradient border-none rounded-2xl px-4 py-3 font-bold cursor-pointer text-primary-foreground mt-2 disabled:opacity-50"
             >
-              {loading ? 'Aguarde...' : mode === 'login' ? 'Entrar' : 'Criar conta'}
+              {loading ? 'Aguarde...' : mode === 'login' ? 'Entrar' : mode === 'signup' ? 'Criar conta' : 'Enviar link de recuperação'}
             </button>
           </form>
           <div className="relative my-5">
@@ -151,12 +174,21 @@ export default function Auth() {
             Entrar com Google
           </button>
           <div className="mt-4 text-center">
-            <button
-              onClick={() => setMode(mode === 'login' ? 'signup' : 'login')}
-              className="text-sm text-muted-foreground hover:text-foreground cursor-pointer bg-transparent border-none underline"
-            >
-              {mode === 'login' ? 'Não tem conta? Cadastre-se' : 'Já tem conta? Entrar'}
-            </button>
+            {mode === 'forgot' ? (
+              <button
+                onClick={() => setMode('login')}
+                className="text-sm text-muted-foreground hover:text-foreground cursor-pointer bg-transparent border-none underline"
+              >
+                Voltar ao login
+              </button>
+            ) : (
+              <button
+                onClick={() => setMode(mode === 'login' ? 'signup' : 'login')}
+                className="text-sm text-muted-foreground hover:text-foreground cursor-pointer bg-transparent border-none underline"
+              >
+                {mode === 'login' ? 'Não tem conta? Cadastre-se' : 'Já tem conta? Entrar'}
+              </button>
+            )}
           </div>
         </div>
       </div>
