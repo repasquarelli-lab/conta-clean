@@ -65,28 +65,23 @@ export default function MarketTicker() {
         });
       }
 
-      // Indices
-      const ibovKey = ibov ? Object.keys(ibov)[0] : null;
-      if (ibovKey && ibov[ibovKey]) {
-        const d = ibov[ibovKey];
-        items.push({
-          name: 'IBOVESPA',
-          value: Number(d.bid).toLocaleString('pt-BR', { maximumFractionDigits: 0 }),
-          change: Number(d.pctChange || 0),
-          icon: <BarChart3 className="w-4 h-4" />,
-          extra: { high: Number(d.high).toLocaleString('pt-BR', { maximumFractionDigits: 0 }), low: Number(d.low).toLocaleString('pt-BR', { maximumFractionDigits: 0 }) },
-        });
-      }
-      const nasdKey = nasdaq ? Object.keys(nasdaq)[0] : null;
-      if (nasdKey && nasdaq[nasdKey]) {
-        const d = nasdaq[nasdKey];
-        items.push({
-          name: 'NASDAQ',
-          value: Number(d.bid).toLocaleString('pt-BR', { maximumFractionDigits: 0 }),
-          change: Number(d.pctChange || 0),
-          icon: <BarChart3 className="w-4 h-4" />,
-          extra: { high: Number(d.high).toLocaleString('pt-BR', { maximumFractionDigits: 0 }), low: Number(d.low).toLocaleString('pt-BR', { maximumFractionDigits: 0 }) },
-        });
+      // Indices from brapi
+      if (indices?.results) {
+        for (const idx of indices.results) {
+          const name = idx.symbol === '^BVSP' ? 'IBOVESPA' : idx.symbol === '^IXIC' ? 'NASDAQ' : idx.symbol;
+          if (idx.regularMarketPrice) {
+            items.push({
+              name,
+              value: Number(idx.regularMarketPrice).toLocaleString('pt-BR', { maximumFractionDigits: 0 }),
+              change: Number((idx.regularMarketChangePercent ?? 0).toFixed(2)),
+              icon: <BarChart3 className="w-4 h-4" />,
+              extra: {
+                high: Number(idx.regularMarketDayHigh || 0).toLocaleString('pt-BR', { maximumFractionDigits: 0 }),
+                low: Number(idx.regularMarketDayLow || 0).toLocaleString('pt-BR', { maximumFractionDigits: 0 }),
+              },
+            });
+          }
+        }
       }
 
       // Crypto
