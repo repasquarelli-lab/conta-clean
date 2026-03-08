@@ -3,7 +3,7 @@ import { monthMetrics, paidCount, topCategory, currency, budgetProgress, getMont
 import MonthNavigator from '../MonthNavigator';
 import { Lightbulb, TrendingUp, TrendingDown, AlertTriangle, CheckCircle, Target, ShieldCheck, ArrowUpRight, ArrowDownRight, Minus, DollarSign, CreditCard, HelpCircle, PiggyBank, BarChart3 } from 'lucide-react';
 import { getCategoryIcon } from '@/lib/categoryIcons';
-import { BarChart, Bar, XAxis, YAxis, Tooltip, ResponsiveContainer, Cell } from 'recharts';
+import { BarChart, Bar, XAxis, YAxis, Tooltip, ResponsiveContainer, Cell, PieChart, Pie } from 'recharts';
 
 function generateTips(state: any, month: string) {
   const m = monthMetrics(state, month);
@@ -253,6 +253,60 @@ export default function ResumoView() {
                 </Bar>
               </BarChart>
             </ResponsiveContainer>
+          </div>
+        </div>
+      )}
+
+      {/* Category Donut Chart */}
+      {categoryData.length > 0 && (
+        <div className="glass-panel p-4 mb-4">
+          <div className="mb-3 flex items-start gap-2.5">
+            <Target className="size-5 text-muted-foreground mt-0.5 shrink-0" strokeWidth={1.5} />
+            <div>
+              <h3 className="font-bold">Proporção por categoria</h3>
+              <p className="text-muted-foreground text-sm">Distribuição percentual das despesas do mês</p>
+            </div>
+          </div>
+          <div className="flex flex-col lg:flex-row items-center gap-4">
+            <div className="h-64 w-64 shrink-0">
+              <ResponsiveContainer width="100%" height="100%">
+                <PieChart>
+                  <Pie
+                    data={categoryData}
+                    dataKey="value"
+                    nameKey="name"
+                    cx="50%"
+                    cy="50%"
+                    innerRadius={60}
+                    outerRadius={100}
+                    paddingAngle={3}
+                    strokeWidth={0}
+                  >
+                    {categoryData.map((_, i) => (
+                      <Cell key={i} fill={BAR_COLORS[i % BAR_COLORS.length]} />
+                    ))}
+                  </Pie>
+                  <Tooltip
+                    formatter={(value: number) => [currency(value), 'Gasto']}
+                    contentStyle={{ background: 'hsl(var(--card))', border: '1px solid hsl(var(--border))', borderRadius: '12px', fontSize: '13px' }}
+                    labelStyle={{ color: 'hsl(var(--foreground))', fontWeight: 'bold' }}
+                  />
+                </PieChart>
+              </ResponsiveContainer>
+            </div>
+            <div className="flex flex-wrap gap-2 justify-center lg:justify-start flex-1">
+              {categoryData.map((cat, i) => {
+                const total = categoryData.reduce((s, c) => s + c.value, 0);
+                const pct = total > 0 ? Math.round((cat.value / total) * 100) : 0;
+                return (
+                  <div key={cat.name} className="flex items-center gap-2 px-3 py-2 rounded-xl bg-accent border border-border text-sm">
+                    <span className="w-3 h-3 rounded-full shrink-0" style={{ backgroundColor: BAR_COLORS[i % BAR_COLORS.length] }} />
+                    <span className="font-medium">{cat.name}</span>
+                    <span className="text-muted-foreground">{pct}%</span>
+                  </div>
+                );
+              })}
+            </div>
           </div>
         </div>
       )}
