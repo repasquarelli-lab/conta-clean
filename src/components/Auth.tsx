@@ -5,7 +5,7 @@ import { lovable } from '@/integrations/lovable/index';
 
 export default function Auth() {
   const { setScreen, onAuthSuccess } = useApp();
-  const [mode, setMode] = useState<'login' | 'signup'>('login');
+  const [mode, setMode] = useState<'login' | 'signup' | 'forgot'>('login');
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [userName, setUserName] = useState('');
