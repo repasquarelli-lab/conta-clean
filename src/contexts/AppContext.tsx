@@ -2,6 +2,7 @@ import React, { createContext, useContext, useState, useCallback, useEffect, use
 import { AppState, loadState, saveState, makeDemoData, ensureMonthFixedBills, todayISO } from '@/lib/store';
 import { useAuth } from '@/hooks/useAuth';
 import { useCloudSync } from '@/hooks/useCloudSync';
+import { useNotifications } from '@/hooks/useNotifications';
 import { toast } from 'sonner';
 
 type Screen = 'landing' | 'auth' | 'app';
@@ -94,6 +95,9 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
     setScreen('landing');
     setCurrentView('dashboard');
   }, [auth]);
+
+  // Push notifications for due/overdue bills
+  useNotifications(state, !!auth.user);
 
   return (
     <AppContext.Provider value={{
