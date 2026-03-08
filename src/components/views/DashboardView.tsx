@@ -402,15 +402,15 @@ export default function DashboardView() {
       </motion.div>
 
       {/* Two columns */}
-      <motion.div className="grid grid-cols-1 lg:grid-cols-[1.12fr_0.88fr] gap-4 mt-4" variants={staggerContainer}>
+      <motion.div className="grid grid-cols-1 lg:grid-cols-[1.12fr_0.88fr] gap-3 sm:gap-4 mt-3 sm:mt-4" variants={staggerContainer}>
         {/* Upcoming bills */}
-        <motion.div className="glass-panel p-4" variants={fadeUp} transition={{ duration: 0.5 }}>
-          <div className="flex justify-between items-center mb-3">
-            <div className="flex items-start gap-2.5">
-              <CalendarClock className="size-5 text-muted-foreground mt-0.5 shrink-0" strokeWidth={1.5} />
+        <motion.div className="glass-panel p-3 sm:p-4" variants={fadeUp} transition={{ duration: 0.5 }}>
+          <div className="flex justify-between items-center mb-2 sm:mb-3">
+            <div className="flex items-start gap-2">
+              <CalendarClock className="size-4 sm:size-5 text-muted-foreground mt-0.5 shrink-0" strokeWidth={1.5} />
               <div>
-                <h3 className="font-bold">Próximas contas</h3>
-                <p className="text-muted-foreground text-sm">O que precisa de atenção agora</p>
+                <h3 className="font-bold text-sm sm:text-base">Próximas contas</h3>
+                <p className="text-muted-foreground text-xs sm:text-sm hidden sm:block">O que precisa de atenção agora</p>
               </div>
             </div>
           </div>
