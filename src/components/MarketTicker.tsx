@@ -101,14 +101,6 @@ export default function MarketTicker() {
           icon: <Bitcoin className="w-4 h-4" />,
         });
       }
-      if (crypto.ethereum) {
-        items.push({
-          name: 'Ethereum',
-          value: `R$ ${Number(crypto.ethereum.brl).toLocaleString('pt-BR', { maximumFractionDigits: 0 })}`,
-          change: Number((crypto.ethereum.brl_24h_change ?? 0).toFixed(2)),
-          icon: <span className="text-sm font-bold">Ξ</span>,
-        });
-      }
 
       setData(items);
       setLastUpdate(new Date().toLocaleTimeString('pt-BR', { hour: '2-digit', minute: '2-digit' }));
