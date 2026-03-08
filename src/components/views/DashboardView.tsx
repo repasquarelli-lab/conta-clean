@@ -97,7 +97,7 @@ export default function DashboardView() {
     </motion.div>
 
       {/* Month Navigator */}
-      <div className="mb-4 flex justify-center sm:justify-start">
+      <motion.div className="mb-4 flex justify-center sm:justify-start" variants={fadeUp} initial="hidden" animate="visible" transition={{ duration: 0.4, delay: 0.1 }}>
         <MonthNavigator month={currentMonth} onChange={setCurrentMonth} />
       </div>
 
