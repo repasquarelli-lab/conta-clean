@@ -145,13 +145,17 @@ export default function DashboardView() {
                 </ResponsiveContainer>
               </div>
               <div className="flex flex-col gap-1.5 w-full sm:w-1/2">
-                {categoryData.map((cat, i) => (
-                  <div key={cat.name} className="flex items-center gap-2 text-sm">
-                    <div className="w-3 h-3 rounded-full shrink-0" style={{ background: CHART_COLORS[i % CHART_COLORS.length] }} />
-                    <span className="flex-1 truncate">{cat.name}</span>
-                    <span className="text-muted-foreground text-xs">{Math.round((cat.value / totalExpenses) * 100)}%</span>
-                  </div>
-                ))}
+                {categoryData.map((cat, i) => {
+                  const CatIcon = getCategoryIcon(cat.name);
+                  return (
+                    <div key={cat.name} className="flex items-center gap-2 text-sm">
+                      <div className="w-3 h-3 rounded-full shrink-0" style={{ background: CHART_COLORS[i % CHART_COLORS.length] }} />
+                      <CatIcon className="size-3.5 text-muted-foreground shrink-0" strokeWidth={1.5} />
+                      <span className="flex-1 truncate">{cat.name}</span>
+                      <span className="text-muted-foreground text-xs">{Math.round((cat.value / totalExpenses) * 100)}%</span>
+                    </div>
+                  );
+                })}
               </div>
             </div>
           </div>
