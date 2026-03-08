@@ -208,7 +208,7 @@ export default function LancamentosView() {
                         </div>
                         <div className="min-w-0">
                           <p className="text-sm font-semibold truncate">{e.desc}</p>
-                          <p className="text-[11px] text-muted-foreground">{e.category} · {formatDate(e.date)}</p>
+                          <p className="text-[11px] text-muted-foreground">{e.category} · {e.type === 'income' ? 'Receb.' : 'Venc.'} {formatDate(e.date)}</p>
                         </div>
                       </div>
                       <span className={e.paid ? 'badge-good' : 'badge-warn'}>
