@@ -149,40 +149,40 @@ export default function DashboardView() {
       </motion.div>
 
       {/* Metrics */}
-      <motion.div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-3" variants={staggerContainer}>
+      <motion.div className="grid grid-cols-2 gap-2 sm:gap-3 md:grid-cols-3 lg:grid-cols-5" variants={staggerContainer}>
         {([
           { label: 'Entrou no mês', value: currency(m.incomes), sub: 'Receitas registradas', icon: TrendingUp, accent: 'text-emerald-600 dark:text-emerald-400' },
           { label: 'Saiu no mês', value: currency(m.expenses), sub: 'Despesas do mês', icon: TrendingDown, accent: 'text-red-500 dark:text-red-400' },
           { label: 'Em aberto', value: currency(m.open), sub: 'Contas não pagas', icon: AlertCircle, accent: 'text-yellow-600 dark:text-yellow-400' },
           { label: 'Saldo do mês', value: currency(m.balance), sub: savingsTone, icon: Wallet, accent: m.balance >= 0 ? 'text-emerald-600 dark:text-emerald-400' : 'text-red-500 dark:text-red-400' },
           { label: 'Vence hoje', value: String(today.length), sub: 'Contas com vencimento hoje', icon: Clock, accent: today.length > 0 ? 'text-red-500 dark:text-red-400' : 'text-muted-foreground' },
-        ] as { label: string; value: string; sub: string; icon: LucideIcon; accent: string }[]).map(metric => (
-          <motion.div key={metric.label} className="glass-panel p-4 transition-all hover:border-primary/15" variants={fadeUp} transition={{ duration: 0.35 }}>
-            <div className="flex items-center gap-2 mb-2">
-              <div className="w-8 h-8 rounded-xl grid place-items-center bg-accent border border-border">
-                <metric.icon className={`size-4 shrink-0 ${metric.accent}`} strokeWidth={1.5} />
+        ] as { label: string; value: string; sub: string; icon: LucideIcon; accent: string }[]).map((metric, idx) => (
+          <motion.div key={metric.label} className={`glass-panel p-3 sm:p-4 transition-all hover:border-primary/15 ${idx === 4 ? 'col-span-2 md:col-span-1' : ''}`} variants={fadeUp} transition={{ duration: 0.35 }}>
+            <div className="flex items-center gap-2 mb-1.5 sm:mb-2">
+              <div className="w-7 h-7 sm:w-8 sm:h-8 rounded-lg sm:rounded-xl grid place-items-center bg-accent border border-border">
+                <metric.icon className={`size-3.5 sm:size-4 shrink-0 ${metric.accent}`} strokeWidth={1.5} />
               </div>
             </div>
-            <p className="text-xl sm:text-2xl font-extrabold tracking-tight">{metric.value}</p>
-            <h3 className="text-muted-foreground text-xs font-medium mt-1">{metric.label}</h3>
+            <p className="text-lg sm:text-2xl font-extrabold tracking-tight leading-tight">{metric.value}</p>
+            <h3 className="text-muted-foreground text-[10px] sm:text-xs font-medium mt-0.5 sm:mt-1">{metric.label}</h3>
           </motion.div>
         ))}
       </motion.div>
 
       {/* Charts */}
       {categoryData.length > 0 && (
-        <motion.div className="grid grid-cols-1 lg:grid-cols-2 gap-4 mt-4" variants={staggerContainer}>
+        <motion.div className="grid grid-cols-1 lg:grid-cols-2 gap-3 sm:gap-4 mt-3 sm:mt-4" variants={staggerContainer}>
           {/* Pie Chart */}
-          <motion.div className="glass-panel p-4" variants={fadeUp} transition={{ duration: 0.5 }}>
-            <div className="mb-3 flex items-start gap-2.5">
-              <PieChartIcon className="size-5 text-muted-foreground mt-0.5 shrink-0" strokeWidth={1.5} />
+          <motion.div className="glass-panel p-3 sm:p-4" variants={fadeUp} transition={{ duration: 0.5 }}>
+            <div className="mb-2 sm:mb-3 flex items-start gap-2">
+              <PieChartIcon className="size-4 sm:size-5 text-muted-foreground mt-0.5 shrink-0" strokeWidth={1.5} />
               <div>
-                <h3 className="font-bold">Gastos por categoria</h3>
-                <p className="text-muted-foreground text-sm">Onde seu dinheiro está indo</p>
+                <h3 className="font-bold text-sm sm:text-base">Gastos por categoria</h3>
+                <p className="text-muted-foreground text-xs sm:text-sm hidden sm:block">Onde seu dinheiro está indo</p>
               </div>
             </div>
-            <div className="flex flex-col sm:flex-row items-center gap-4">
-              <div className="w-full sm:w-1/2 h-[200px]">
+            <div className="flex flex-col sm:flex-row items-center gap-3 sm:gap-4">
+              <div className="w-full sm:w-1/2 h-[160px] sm:h-[200px]">
                 <ResponsiveContainer width="100%" height="100%">
                   <PieChart>
                     <Pie
@@ -220,15 +220,15 @@ export default function DashboardView() {
           </motion.div>
 
           {/* Bar Chart */}
-          <motion.div className="glass-panel p-4" variants={fadeUp} transition={{ duration: 0.5 }}>
-            <div className="mb-3 flex items-start gap-2.5">
-              <BarChart3 className="size-5 text-muted-foreground mt-0.5 shrink-0" strokeWidth={1.5} />
+          <motion.div className="glass-panel p-3 sm:p-4" variants={fadeUp} transition={{ duration: 0.5 }}>
+            <div className="mb-2 sm:mb-3 flex items-start gap-2">
+              <BarChart3 className="size-4 sm:size-5 text-muted-foreground mt-0.5 shrink-0" strokeWidth={1.5} />
               <div>
-                <h3 className="font-bold">Comparativo por categoria</h3>
-                <p className="text-muted-foreground text-sm">Valores absolutos dos gastos</p>
+                <h3 className="font-bold text-sm sm:text-base">Comparativo por categoria</h3>
+                <p className="text-muted-foreground text-xs sm:text-sm hidden sm:block">Valores absolutos dos gastos</p>
               </div>
             </div>
-            <div className="h-[220px]">
+            <div className="h-[180px] sm:h-[220px]">
               <ResponsiveContainer width="100%" height="100%">
                 <BarChart data={categoryData} layout="vertical" margin={{ left: 0, right: 10, top: 5, bottom: 5 }}>
                   <CartesianGrid strokeDasharray="3 3" stroke="hsl(var(--border))" horizontal={false} />
@@ -248,15 +248,15 @@ export default function DashboardView() {
       )}
 
       {/* Evolution Chart - 6 months */}
-      <motion.div className="glass-panel p-4 mt-4" variants={fadeUp} transition={{ duration: 0.5 }}>
-        <div className="mb-3 flex items-start gap-2.5">
-          <LineChart className="size-5 text-muted-foreground mt-0.5 shrink-0" strokeWidth={1.5} />
+      <motion.div className="glass-panel p-3 sm:p-4 mt-3 sm:mt-4" variants={fadeUp} transition={{ duration: 0.5 }}>
+        <div className="mb-2 sm:mb-3 flex items-start gap-2">
+          <LineChart className="size-4 sm:size-5 text-muted-foreground mt-0.5 shrink-0" strokeWidth={1.5} />
           <div>
-            <h3 className="font-bold">Evolução mensal</h3>
-            <p className="text-muted-foreground text-sm">Receitas × Despesas dos últimos 6 meses</p>
+            <h3 className="font-bold text-sm sm:text-base">Evolução mensal</h3>
+            <p className="text-muted-foreground text-xs sm:text-sm hidden sm:block">Receitas × Despesas dos últimos 6 meses</p>
           </div>
         </div>
-        <div className="h-[260px]">
+        <div className="h-[200px] sm:h-[260px]">
           <ResponsiveContainer width="100%" height="100%">
             <AreaChart data={evolutionData} margin={{ left: 0, right: 10, top: 5, bottom: 5 }}>
               <defs>
@@ -291,17 +291,17 @@ export default function DashboardView() {
 
       {/* Month Comparison */}
       {(comparison.categories.length > 0 || comparison.prv.expenses > 0) && (
-        <motion.div className="glass-panel p-4 mt-4" variants={fadeUp} transition={{ duration: 0.5 }}>
-          <div className="mb-3 flex items-start gap-2.5">
-            <ArrowUpRight className="size-5 text-muted-foreground mt-0.5 shrink-0" strokeWidth={1.5} />
+        <motion.div className="glass-panel p-3 sm:p-4 mt-3 sm:mt-4" variants={fadeUp} transition={{ duration: 0.5 }}>
+          <div className="mb-2 sm:mb-3 flex items-start gap-2">
+            <ArrowUpRight className="size-4 sm:size-5 text-muted-foreground mt-0.5 shrink-0" strokeWidth={1.5} />
             <div>
-              <h3 className="font-bold">Comparação com mês anterior</h3>
-              <p className="text-muted-foreground text-sm">{monthLabel(currentMonth)} vs {monthLabel(prevMonthStr)}</p>
+              <h3 className="font-bold text-sm sm:text-base">Comparação com mês anterior</h3>
+              <p className="text-muted-foreground text-xs sm:text-sm">{monthLabel(currentMonth)} vs {monthLabel(prevMonthStr)}</p>
             </div>
           </div>
 
           {/* Summary cards */}
-          <div className="grid grid-cols-3 gap-3 mb-4">
+          <div className="grid grid-cols-3 gap-2 sm:gap-3 mb-3 sm:mb-4">
             {([
               { label: 'Receitas', cur: comparison.cur.incomes, prev: comparison.prv.incomes, diff: comparison.incomeDiff, positive: true },
               { label: 'Despesas', cur: comparison.cur.expenses, prev: comparison.prv.expenses, diff: comparison.expenseDiff, positive: false },
@@ -310,10 +310,10 @@ export default function DashboardView() {
               const isGood = item.positive ? item.diff >= 0 : item.diff <= 0;
               const pct = item.prev !== 0 ? Math.round(Math.abs(item.diff / item.prev) * 100) : item.diff !== 0 ? 100 : 0;
               return (
-                <div key={item.label} className="p-3 rounded-2xl bg-accent border border-border text-center">
-                  <p className="text-xs text-muted-foreground mb-1">{item.label}</p>
-                  <p className="font-bold text-sm">{currency(item.cur)}</p>
-                  <div className={`flex items-center justify-center gap-1 mt-1 text-xs font-semibold ${isGood ? 'text-emerald-600 dark:text-emerald-400' : 'text-red-500 dark:text-red-400'}`}>
+                <div key={item.label} className="p-2 sm:p-3 rounded-xl sm:rounded-2xl bg-accent border border-border text-center">
+                  <p className="text-[10px] sm:text-xs text-muted-foreground mb-0.5 sm:mb-1">{item.label}</p>
+                  <p className="font-bold text-xs sm:text-sm">{currency(item.cur)}</p>
+                  <div className={`flex items-center justify-center gap-0.5 sm:gap-1 mt-0.5 sm:mt-1 text-[10px] sm:text-xs font-semibold ${isGood ? 'text-emerald-600 dark:text-emerald-400' : 'text-red-500 dark:text-red-400'}`}>
                     {item.diff > 0 ? <ArrowUpRight className="size-3" /> : item.diff < 0 ? <ArrowDownRight className="size-3" /> : <Minus className="size-3" />}
                     <span>{pct}%</span>
                   </div>
@@ -351,15 +351,15 @@ export default function DashboardView() {
 
       {/* Budget Goals */}
       {(state.budgetGoals?.length ?? 0) > 0 && (
-        <motion.div className="glass-panel p-4 mt-4" variants={fadeUp} transition={{ duration: 0.5 }}>
-          <div className="mb-3 flex items-start gap-2.5">
-            <Target className="size-5 text-muted-foreground mt-0.5 shrink-0" strokeWidth={1.5} />
+        <motion.div className="glass-panel p-3 sm:p-4 mt-3 sm:mt-4" variants={fadeUp} transition={{ duration: 0.5 }}>
+          <div className="mb-2 sm:mb-3 flex items-start gap-2">
+            <Target className="size-4 sm:size-5 text-muted-foreground mt-0.5 shrink-0" strokeWidth={1.5} />
             <div>
-              <h3 className="font-bold">Metas de orçamento</h3>
-              <p className="text-muted-foreground text-sm">Acompanhe seus limites por categoria</p>
+              <h3 className="font-bold text-sm sm:text-base">Metas de orçamento</h3>
+              <p className="text-muted-foreground text-xs sm:text-sm hidden sm:block">Acompanhe seus limites por categoria</p>
             </div>
           </div>
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3">
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-2 sm:gap-3">
             {budgetProgress(state, currentMonth).map(g => {
               const overBudget = g.pct > 100;
               const nearLimit = g.pct >= 80 && g.pct <= 100;
@@ -402,15 +402,15 @@ export default function DashboardView() {
       </motion.div>
 
       {/* Two columns */}
-      <motion.div className="grid grid-cols-1 lg:grid-cols-[1.12fr_0.88fr] gap-4 mt-4" variants={staggerContainer}>
+      <motion.div className="grid grid-cols-1 lg:grid-cols-[1.12fr_0.88fr] gap-3 sm:gap-4 mt-3 sm:mt-4" variants={staggerContainer}>
         {/* Upcoming bills */}
-        <motion.div className="glass-panel p-4" variants={fadeUp} transition={{ duration: 0.5 }}>
-          <div className="flex justify-between items-center mb-3">
-            <div className="flex items-start gap-2.5">
-              <CalendarClock className="size-5 text-muted-foreground mt-0.5 shrink-0" strokeWidth={1.5} />
+        <motion.div className="glass-panel p-3 sm:p-4" variants={fadeUp} transition={{ duration: 0.5 }}>
+          <div className="flex justify-between items-center mb-2 sm:mb-3">
+            <div className="flex items-start gap-2">
+              <CalendarClock className="size-4 sm:size-5 text-muted-foreground mt-0.5 shrink-0" strokeWidth={1.5} />
               <div>
-                <h3 className="font-bold">Próximas contas</h3>
-                <p className="text-muted-foreground text-sm">O que precisa de atenção agora</p>
+                <h3 className="font-bold text-sm sm:text-base">Próximas contas</h3>
+                <p className="text-muted-foreground text-xs sm:text-sm hidden sm:block">O que precisa de atenção agora</p>
               </div>
             </div>
           </div>
@@ -428,34 +428,34 @@ export default function DashboardView() {
         </motion.div>
 
         {/* Quick status */}
-        <motion.div className="glass-panel p-4" variants={fadeUp} transition={{ duration: 0.5 }}>
-          <div className="mb-3 flex items-start gap-2.5">
-            <Activity className="size-5 text-muted-foreground mt-0.5 shrink-0" strokeWidth={1.5} />
+        <motion.div className="glass-panel p-3 sm:p-4" variants={fadeUp} transition={{ duration: 0.5 }}>
+          <div className="mb-2 sm:mb-3 flex items-start gap-2">
+            <Activity className="size-4 sm:size-5 text-muted-foreground mt-0.5 shrink-0" strokeWidth={1.5} />
             <div>
-              <h3 className="font-bold">Situação rápida</h3>
-              <p className="text-muted-foreground text-sm">Leitura simples do seu mês</p>
+              <h3 className="font-bold text-sm sm:text-base">Situação rápida</h3>
+              <p className="text-muted-foreground text-xs sm:text-sm hidden sm:block">Leitura simples do seu mês</p>
             </div>
           </div>
-          <div className="grid grid-cols-2 gap-3">
-            <div className="p-3.5 rounded-[18px] bg-accent border border-border leading-relaxed text-sm flex items-start gap-2">
-              <CheckCircle2 className="size-4 text-muted-foreground mt-0.5 shrink-0" strokeWidth={1.5} />
+          <div className="grid grid-cols-2 gap-2 sm:gap-3">
+            <div className="p-2.5 sm:p-3.5 rounded-2xl bg-accent border border-border leading-relaxed text-xs sm:text-sm flex items-start gap-1.5 sm:gap-2">
+              <CheckCircle2 className="size-3.5 sm:size-4 text-muted-foreground mt-0.5 shrink-0" strokeWidth={1.5} />
               <div>
                 <strong>{counts.paid}/{counts.total}</strong><br />contas pagas
-                <div className="progress-bar mt-2">
+                <div className="progress-bar mt-1.5 sm:mt-2">
                   <div className="progress-bar-fill" style={{ width: `${progressPct}%` }} />
                 </div>
               </div>
             </div>
-            <div className="p-3.5 rounded-[18px] bg-accent border border-border leading-relaxed text-sm flex items-start gap-2">
-              <Percent className="size-4 text-muted-foreground mt-0.5 shrink-0" strokeWidth={1.5} />
+            <div className="p-2.5 sm:p-3.5 rounded-2xl bg-accent border border-border leading-relaxed text-xs sm:text-sm flex items-start gap-1.5 sm:gap-2">
+              <Percent className="size-3.5 sm:size-4 text-muted-foreground mt-0.5 shrink-0" strokeWidth={1.5} />
               <div>
-                <strong>{fixedPct}%</strong><br />da renda vai para contas fixas
+                <strong>{fixedPct}%</strong><br />da renda vai para fixas
               </div>
             </div>
-            <div className="p-3.5 rounded-[18px] bg-accent border border-border leading-relaxed text-sm flex items-start gap-2">
-              <AlertCircle className="size-4 text-muted-foreground mt-0.5 shrink-0" strokeWidth={1.5} />
+            <div className="p-2.5 sm:p-3.5 rounded-2xl bg-accent border border-border leading-relaxed text-xs sm:text-sm flex items-start gap-1.5 sm:gap-2">
+              <AlertCircle className="size-3.5 sm:size-4 text-muted-foreground mt-0.5 shrink-0" strokeWidth={1.5} />
               <div>
-                <strong>{overdue.length}</strong><br />contas atrasadas
+                <strong>{overdue.length}</strong><br />atrasadas
               </div>
             </div>
             {/* Mini donut chart */}
