@@ -92,7 +92,6 @@ export default function AppShell() {
       try {
         const parsed = JSON.parse(ev.target?.result as string);
         if (!parsed || !Array.isArray(parsed.entries) || !Array.isArray(parsed.fixedBills)) throw new Error('Formato inválido');
-        const { saveState } = require('@/lib/store');
         saveState(parsed);
         window.location.reload();
       } catch {
