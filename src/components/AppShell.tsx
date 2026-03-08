@@ -184,7 +184,12 @@ export default function AppShell() {
             </button>
           ))}
         </nav>
-        <div className="mt-4 p-3.5 rounded-[18px] bg-card border border-border flex items-center justify-between">
+        {/* User info */}
+        <div className="mt-4 p-3.5 rounded-[18px] bg-card border border-border">
+          <p className="text-sm font-semibold truncate">{state.userName || 'Usuário'}</p>
+          <p className="text-[11px] text-muted-foreground truncate mt-0.5">{userEmail}</p>
+        </div>
+        <div className="mt-2 p-3.5 rounded-[18px] bg-card border border-border flex items-center justify-between">
           <small className="text-muted-foreground leading-relaxed text-xs">Tema</small>
           <button onClick={toggleTheme} className="w-9 h-9 rounded-xl grid place-items-center bg-accent border border-border cursor-pointer" title={theme === 'dark' ? 'Modo claro' : 'Modo escuro'}>
             {theme === 'dark' ? <Sun className="w-4 h-4" /> : <Moon className="w-4 h-4" />}

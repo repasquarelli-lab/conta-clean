@@ -68,6 +68,12 @@ export default function ConfigView() {
       <div className="glass-panel p-4 mb-4">
         <h3 className="font-bold mb-1">Dados do usuário</h3>
         <p className="text-muted-foreground text-sm mb-3">Apenas o básico para personalização</p>
+        {userEmail && (
+          <div className="flex items-center gap-2 p-3 rounded-xl bg-accent border border-border mb-3">
+            <Mail className="w-4 h-4 text-muted-foreground shrink-0" />
+            <span className="text-sm text-foreground truncate">{userEmail}</span>
+          </div>
+        )}
         <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
           <div>
             <label className="text-xs font-medium mb-1 block">Nome</label>
