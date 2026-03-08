@@ -68,7 +68,7 @@ export default function FixasView() {
             </div>
           </div>
           <div className="mt-3">
-            <button type="submit" className="brand-gradient border-none rounded-2xl px-4 py-2.5 font-bold cursor-pointer text-sm text-primary-foreground">Salvar conta fixa</button>
+            <button type="submit" className="brand-gradient border-none rounded-2xl px-4 py-2.5 font-bold cursor-pointer text-sm text-primary-foreground flex items-center gap-1.5"><Save className="size-4" strokeWidth={1.5} /> Salvar conta fixa</button>
           </div>
         </form>
       </div>
