@@ -93,8 +93,13 @@ export default function ConfigView() {
 
       {/* Budget Goals */}
       <div className="glass-panel p-4 mb-4">
-        <h3 className="font-bold mb-1">Metas de orçamento</h3>
-        <p className="text-muted-foreground text-sm mb-3">Defina limites de gasto por categoria para controlar seu mês</p>
+        <div className="flex items-start gap-2.5 mb-3">
+          <Target className="size-5 text-muted-foreground mt-0.5 shrink-0" strokeWidth={1.5} />
+          <div>
+            <h3 className="font-bold">Metas de orçamento</h3>
+            <p className="text-muted-foreground text-sm">Defina limites de gasto por categoria para controlar seu mês</p>
+          </div>
+        </div>
 
         {goals.length > 0 && (
           <div className="flex flex-col gap-2 mb-4">
