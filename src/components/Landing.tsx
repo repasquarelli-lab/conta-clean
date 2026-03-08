@@ -48,7 +48,7 @@ export default function Landing() {
             <div className="flex gap-3 flex-wrap mt-7 relative z-10">
               <button
                 onClick={() => setScreen('auth')}
-                className="brand-gradient border-none rounded-2xl px-5 py-3.5 font-bold cursor-pointer text-primary-foreground shadow-lg hover:shadow-xl transition-shadow flex items-center gap-2"
+                className="brand-gradient border-none rounded-2xl px-5 py-3.5 font-bold cursor-pointer text-primary-foreground shadow-lg hover:shadow-xl active:scale-95 transition-all flex items-center gap-2"
               >
                 Começar agora <ArrowRight className="w-4 h-4" />
               </button>

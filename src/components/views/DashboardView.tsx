@@ -345,7 +345,7 @@ export default function DashboardView() {
               </div>
             </div>
           </div>
-          <div className="mt-3.5 text-xs text-muted-foreground">Resumo pensado para uso leigo: rápido de entender e com foco no cotidiano.</div>
+          <div className="mt-3.5 text-[11px] text-muted-foreground text-center opacity-70">Atualizado com base nos seus lançamentos deste mês.</div>
         </div>
       </div>
     </div>

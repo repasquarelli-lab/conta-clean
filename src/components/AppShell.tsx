@@ -123,54 +123,71 @@ export default function AppShell() {
   return (
     <div className="min-h-screen flex flex-col lg:grid lg:grid-cols-[280px_1fr]">
       {/* Mobile Header */}
-      <header className="lg:hidden flex items-center justify-between px-4 py-3 border-b border-border sticky top-0 z-40 bg-background/95 backdrop-blur-xl">
+      <header className="lg:hidden flex items-center justify-between px-4 py-3 border-b border-border sticky top-0 z-40 bg-background/95 backdrop-blur-xl" style={{ paddingTop: 'max(0.75rem, env(safe-area-inset-top))' }}>
         <div className="flex items-center gap-3">
           <div className="w-9 h-9 rounded-xl grid place-items-center brand-gradient font-black tracking-wide text-primary-foreground text-[10px] shadow-md">CC</div>
           <div>
-            <h1 className="text-sm font-bold leading-tight">Conta Clara</h1>
+            <h1 className="text-sm font-bold leading-tight">{meta.shortName || 'Conta Clara'}</h1>
             <p className="text-[10px] text-muted-foreground">{state.userName ? `Olá, ${state.userName}` : 'Finanças'}</p>
           </div>
         </div>
         <div className="flex items-center gap-2">
-          <button onClick={toggleTheme} className="w-10 h-10 rounded-xl grid place-items-center bg-card border border-border cursor-pointer" title={theme === 'dark' ? 'Modo claro' : 'Modo escuro'}>
+          <button onClick={toggleTheme} className="w-10 h-10 rounded-xl grid place-items-center bg-card border border-border cursor-pointer active:scale-95 transition-transform" title={theme === 'dark' ? 'Modo claro' : 'Modo escuro'}>
             {theme === 'dark' ? <Sun className="w-4.5 h-4.5" /> : <Moon className="w-4.5 h-4.5" />}
           </button>
-          <button onClick={() => setSidebarOpen(!sidebarOpen)} className="w-10 h-10 rounded-xl grid place-items-center bg-card border border-border cursor-pointer">
+          <button onClick={() => setSidebarOpen(!sidebarOpen)} className="w-10 h-10 rounded-xl grid place-items-center bg-card border border-border cursor-pointer active:scale-95 transition-transform">
             {sidebarOpen ? <X className="w-5 h-5" /> : <Menu className="w-5 h-5" />}
           </button>
         </div>
       </header>
 
       {/* Mobile Slide-down Menu */}
-      {sidebarOpen && (
-        <>
-          <div className="lg:hidden fixed inset-0 z-30 bg-background/60 backdrop-blur-sm" onClick={() => setSidebarOpen(false)} />
-          <div className="lg:hidden fixed top-[57px] left-0 right-0 z-40 border-b border-border p-4 animate-fade-in bg-background/98 backdrop-blur-2xl">
-            <nav className="flex flex-col gap-1.5 mb-3">
-              {visibleViews.map(v => (
-                <button
-                  key={v.id}
-                  onClick={() => navigateTo(v.id)}
-                  className={`w-full text-left px-3.5 py-3 rounded-xl border text-sm cursor-pointer transition-colors flex items-center gap-3 ${
-                    v.id === currentView ? 'bg-card border-border' : 'bg-transparent border-transparent'
-                  }`}
-                >
-                  <v.icon className="w-4 h-4 text-muted-foreground shrink-0" />
-                  {v.name}
+      <AnimatePresence>
+        {sidebarOpen && (
+          <>
+            <motion.div
+              className="lg:hidden fixed inset-0 z-30 bg-background/60 backdrop-blur-sm"
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              exit={{ opacity: 0 }}
+              onClick={() => setSidebarOpen(false)}
+            />
+            <motion.div
+              className="lg:hidden fixed top-[57px] left-0 right-0 z-40 border-b border-border p-4 bg-background/98 backdrop-blur-2xl"
+              initial={{ opacity: 0, y: -10 }}
+              animate={{ opacity: 1, y: 0 }}
+              exit={{ opacity: 0, y: -10 }}
+              transition={{ duration: 0.2, ease: 'easeOut' }}
+            >
+              <nav className="flex flex-col gap-1.5 mb-3">
+                {visibleViews.map(v => (
+                  <button
+                    key={v.id}
+                    onClick={() => navigateTo(v.id)}
+                    className={`w-full text-left px-3.5 py-3 rounded-xl border text-sm cursor-pointer transition-all active:scale-[0.98] flex items-center gap-3 ${
+                      v.id === currentView ? 'bg-card border-border shadow-sm' : 'bg-transparent border-transparent'
+                    }`}
+                  >
+                    <v.icon className="w-4 h-4 text-muted-foreground shrink-0" />
+                    <div>
+                      <span className="font-medium">{v.name}</span>
+                      <p className="text-[11px] text-muted-foreground mt-0.5">{v.subtitle}</p>
+                    </div>
+                  </button>
+                ))}
+              </nav>
+              <div className="border-t border-border pt-3 flex flex-wrap gap-2">
+                <button onClick={() => { logout(); setSidebarOpen(false); }} className="glass-panel rounded-xl px-3 py-2.5 font-bold cursor-pointer text-xs flex items-center gap-2 text-destructive active:scale-95 transition-transform">
+                  <LogOut className="w-3.5 h-3.5" /> Sair da conta
                 </button>
-              ))}
-            </nav>
-            <div className="border-t border-border pt-3 flex flex-wrap gap-2">
-              <button onClick={() => { logout(); setSidebarOpen(false); }} className="glass-panel rounded-xl px-3 py-2 font-bold cursor-pointer text-xs flex items-center gap-2 text-destructive">
-                <LogOut className="w-3.5 h-3.5" /> Sair da conta
-              </button>
-            </div>
-          </div>
-        </>
-      )}
+              </div>
+            </motion.div>
+          </>
+        )}
+      </AnimatePresence>
 
       {/* Desktop Sidebar */}
-      <aside className="hidden lg:block p-5 px-4 border-r border-border sticky top-0 h-screen bg-background/90 backdrop-blur-xl">
+      <aside className="hidden lg:flex lg:flex-col p-5 px-4 border-r border-border sticky top-0 h-screen bg-background/90 backdrop-blur-xl">
         <div className="flex gap-3 items-center pb-5 px-2">
           <div className="w-11 h-11 rounded-2xl grid place-items-center brand-gradient font-black tracking-wide text-primary-foreground text-xs shadow-lg">CC</div>
           <div>
@@ -178,39 +195,41 @@ export default function AppShell() {
             <p className="text-[11px] text-muted-foreground mt-0.5">{state.userName ? `Olá, ${state.userName}` : 'Seu controle financeiro'}</p>
           </div>
         </div>
-        <nav className="flex flex-col gap-2">
+        <nav className="flex flex-col gap-1.5 flex-1">
           {visibleViews.map(v => (
             <button
               key={v.id}
               onClick={() => setCurrentView(v.id)}
-              className={`w-full text-left px-3.5 py-3 rounded-[15px] border text-sm cursor-pointer transition-colors flex items-center gap-3 ${
-                v.id === currentView ? 'bg-card border-border' : 'bg-transparent border-transparent hover:bg-card hover:border-border'
+              className={`w-full text-left px-3.5 py-2.5 rounded-2xl border text-sm cursor-pointer transition-all flex items-center gap-3 ${
+                v.id === currentView ? 'bg-card border-border shadow-sm' : 'bg-transparent border-transparent hover:bg-card/50 hover:border-border/50'
               }`}
             >
-              <v.icon className="w-4 h-4 text-muted-foreground shrink-0" />
+              <v.icon className={`w-4 h-4 shrink-0 transition-colors ${v.id === currentView ? 'text-primary' : 'text-muted-foreground'}`} />
               {v.name}
             </button>
           ))}
         </nav>
         {/* User info */}
-        <div className="mt-4 p-3.5 rounded-[18px] bg-card border border-border">
-          <p className="text-sm font-semibold truncate">{state.userName || 'Usuário'}</p>
-          <p className="text-[11px] text-muted-foreground truncate mt-0.5">{userEmail}</p>
-        </div>
-        <div className="mt-2 p-3.5 rounded-[18px] bg-card border border-border flex items-center justify-between">
-          <small className="text-muted-foreground leading-relaxed text-xs">Tema</small>
-          <button onClick={toggleTheme} className="w-9 h-9 rounded-xl grid place-items-center bg-accent border border-border cursor-pointer" title={theme === 'dark' ? 'Modo claro' : 'Modo escuro'}>
-            {theme === 'dark' ? <Sun className="w-4 h-4" /> : <Moon className="w-4 h-4" />}
-          </button>
+        <div className="mt-auto space-y-2">
+          <div className="p-3.5 rounded-2xl bg-card border border-border">
+            <p className="text-sm font-semibold truncate">{state.userName || 'Usuário'}</p>
+            <p className="text-[11px] text-muted-foreground truncate mt-0.5">{userEmail}</p>
+          </div>
+          <div className="p-3 rounded-2xl bg-card border border-border flex items-center justify-between">
+            <small className="text-muted-foreground leading-relaxed text-xs">Tema</small>
+            <button onClick={toggleTheme} className="w-9 h-9 rounded-xl grid place-items-center bg-accent border border-border cursor-pointer hover:bg-muted transition-colors" title={theme === 'dark' ? 'Modo claro' : 'Modo escuro'}>
+              {theme === 'dark' ? <Sun className="w-4 h-4" /> : <Moon className="w-4 h-4" />}
+            </button>
+          </div>
         </div>
       </aside>
 
       {/* Main Content */}
-      <main className="flex-1 p-4 lg:p-6 pb-24 lg:pb-6">
+      <main className="flex-1 p-4 lg:p-6 pb-24 lg:pb-6 overflow-x-hidden">
         {/* Desktop header bar */}
-        <div className="glass-panel rounded-3xl p-4 lg:p-5 flex flex-col sm:flex-row justify-between gap-4 items-start sm:items-center mb-4">
+        <div className="glass-panel rounded-3xl p-4 lg:p-5 flex flex-col sm:flex-row justify-between gap-3 items-start sm:items-center mb-4">
           <div>
-            <h2 className="text-xl lg:text-2xl font-bold mb-1">{meta.name}</h2>
+            <h2 className="text-lg lg:text-2xl font-bold mb-0.5">{meta.name}</h2>
             <p className="text-muted-foreground text-sm hidden sm:block">{meta.subtitle}</p>
           </div>
           <div className="hidden lg:flex gap-2 items-center">
@@ -224,10 +243,10 @@ export default function AppShell() {
           <AnimatePresence mode="wait" initial={false}>
             <motion.div
               key={currentView}
-              initial={{ opacity: 0, x: direction * 60 }}
+              initial={{ opacity: 0, x: direction * 40 }}
               animate={{ opacity: 1, x: 0 }}
-              exit={{ opacity: 0, x: direction * -60 }}
-              transition={{ duration: 0.25, ease: 'easeInOut' }}
+              exit={{ opacity: 0, x: direction * -40 }}
+              transition={{ duration: 0.2, ease: 'easeOut' }}
             >
               {currentView === 'dashboard' && <DashboardView />}
               {currentView === 'lancamentos' && <LancamentosView />}
@@ -242,18 +261,18 @@ export default function AppShell() {
       </main>
 
       {/* Mobile Bottom Tab Bar */}
-      <nav className="lg:hidden fixed bottom-0 left-0 right-0 z-50 border-t border-border flex bg-background/95 backdrop-blur-2xl">
+      <nav className="lg:hidden fixed bottom-0 left-0 right-0 z-50 border-t border-border flex bg-background/95 backdrop-blur-2xl safe-bottom">
         {BOTTOM_TABS.map(v => {
           const isActive = v.id === currentView;
           return (
             <button
               key={v.id}
               onClick={() => setCurrentView(v.id)}
-              className={`flex-1 flex flex-col items-center gap-1 py-2.5 pt-3 cursor-pointer transition-colors border-none bg-transparent ${
+              className={`flex-1 flex flex-col items-center gap-0.5 py-2 pt-2.5 cursor-pointer transition-all active:scale-90 border-none bg-transparent ${
                 isActive ? 'text-primary' : 'text-muted-foreground'
               }`}
             >
-              <v.icon className={`w-5 h-5 ${isActive ? 'text-primary' : ''}`} />
+              <v.icon className={`w-5 h-5 transition-transform ${isActive ? 'text-primary scale-110' : ''}`} />
               <span className="text-[10px] font-semibold leading-tight">{v.shortName}</span>
               {isActive && <div className="w-5 h-0.5 rounded-full brand-gradient mt-0.5" />}
             </button>

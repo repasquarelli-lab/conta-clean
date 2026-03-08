@@ -116,9 +116,23 @@
   }
 
   body {
-    @apply bg-background text-foreground font-sans;
+    @apply bg-background text-foreground font-sans antialiased;
     font-family: 'Inter', system-ui, sans-serif;
     background: var(--gradient-bg);
+    -webkit-tap-highlight-color: transparent;
+  }
+
+  /* Focus visible for accessibility */
+  :focus-visible {
+    outline: 2px solid hsl(var(--ring));
+    outline-offset: 2px;
+    border-radius: 8px;
+  }
+
+  /* Better selection colors */
+  ::selection {
+    background: hsl(var(--primary) / 0.2);
+    color: hsl(var(--foreground));
   }
 }
 
@@ -208,5 +222,28 @@
     background: radial-gradient(circle, hsl(217 100% 72%), transparent 70%);
     opacity: 0.26;
     pointer-events: none;
+  }
+
+  /* Scrollbar hide utility */
+  .scrollbar-hide {
+    -ms-overflow-style: none;
+    scrollbar-width: none;
+  }
+  .scrollbar-hide::-webkit-scrollbar {
+    display: none;
+  }
+
+  /* Safe area for notched phones */
+  .safe-bottom {
+    padding-bottom: max(0.625rem, env(safe-area-inset-bottom));
+  }
+
+  /* Smooth input transitions */
+  input, select, textarea {
+    @apply transition-colors duration-200;
+  }
+  input:focus, select:focus, textarea:focus {
+    border-color: hsl(var(--ring)) !important;
+    box-shadow: 0 0 0 3px hsl(var(--ring) / 0.1);
   }
 }

@@ -4,6 +4,7 @@ import { getMonthEntries, currency, formatDate, todayISO, uid, categories, incom
 import MonthNavigator from '../MonthNavigator';
 import { PlusCircle, List, Search, Check, Undo2, Trash2, ArrowDownCircle, ArrowUpCircle, Save } from 'lucide-react';
 import { getCategoryIcon } from '@/lib/categoryIcons';
+import { motion } from 'framer-motion';
 
 export default function LancamentosView() {
   const { state, updateState, currentMonth, setCurrentMonth } = useApp();
