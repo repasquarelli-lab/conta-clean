@@ -148,15 +148,9 @@ export default function AppShell() {
               ))}
             </nav>
             <div className="border-t border-border pt-3 flex flex-wrap gap-2">
-              <button onClick={() => { logout(); setSidebarOpen(false); }} className="glass-panel rounded-xl px-3 py-2 font-bold cursor-pointer text-xs flex items-center gap-2">
-                <Home className="w-3.5 h-3.5" /> Sair
+              <button onClick={() => { logout(); setSidebarOpen(false); }} className="glass-panel rounded-xl px-3 py-2 font-bold cursor-pointer text-xs flex items-center gap-2 text-destructive">
+                <LogOut className="w-3.5 h-3.5" /> Sair da conta
               </button>
-              <button onClick={() => { reloadDemo(); setSidebarOpen(false); }} className="glass-panel rounded-xl px-3 py-2 font-bold cursor-pointer text-xs">Recarregar demo</button>
-              <button onClick={exportBackup} className="glass-panel rounded-xl px-3 py-2 font-bold cursor-pointer text-xs">Exportar</button>
-              <label className="glass-panel rounded-xl px-3 py-2 font-bold cursor-pointer text-xs">
-                Importar
-                <input type="file" accept="application/json" className="hidden" onChange={handleImport} />
-              </label>
             </div>
           </div>
         </>
