@@ -66,7 +66,7 @@ export default function ResetPassword() {
     <section className="min-h-screen grid place-items-center p-4">
       <div className="glass-panel p-7 max-w-md w-full">
         <div className="flex items-center gap-3 mb-5">
-          <div className="w-12 h-12 rounded-2xl grid place-items-center brand-gradient font-black tracking-wide text-primary-foreground">CC</div>
+          <img src="/favicon.png" alt="Conta Clara" className="w-12 h-12 rounded-2xl" />
           <div>
             <h1 className="text-base font-bold">Conta Clara Lite</h1>
             <p className="text-sm text-muted-foreground">Redefinir senha</p>

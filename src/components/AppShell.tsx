@@ -189,7 +189,7 @@ export default function AppShell() {
       {/* Desktop Sidebar */}
       <aside className="hidden lg:flex lg:flex-col p-5 px-4 border-r border-border sticky top-0 h-screen bg-background/90 backdrop-blur-xl">
         <div className="flex gap-3 items-center pb-5 px-2">
-          <div className="w-11 h-11 rounded-2xl grid place-items-center brand-gradient font-black tracking-wide text-primary-foreground text-xs shadow-lg">CC</div>
+          <img src="/favicon.png" alt="Conta Clara" className="w-11 h-11 rounded-2xl shadow-lg" />
           <div>
             <h1 className="text-sm font-bold">Conta Clara</h1>
             <p className="text-[11px] text-muted-foreground mt-0.5">{state.userName ? `Olá, ${state.userName}` : 'Seu controle financeiro'}</p>
