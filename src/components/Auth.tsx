@@ -121,24 +121,35 @@ export default function Auth() {
                 className="w-full px-3 py-3 rounded-[14px] border border-border bg-input text-foreground outline-none placeholder:text-muted-foreground text-sm"
               />
             </div>
-            <div>
-              <label className="text-sm font-medium mb-1 block">Senha</label>
-              <input
-                type="password"
-                value={password}
-                onChange={e => setPassword(e.target.value)}
-                placeholder="Mínimo 6 caracteres"
-                required
-                minLength={6}
-                className="w-full px-3 py-3 rounded-[14px] border border-border bg-input text-foreground outline-none placeholder:text-muted-foreground text-sm"
-              />
-            </div>
+            {mode !== 'forgot' && (
+              <div>
+                <label className="text-sm font-medium mb-1 block">Senha</label>
+                <input
+                  type="password"
+                  value={password}
+                  onChange={e => setPassword(e.target.value)}
+                  placeholder="Mínimo 6 caracteres"
+                  required
+                  minLength={6}
+                  className="w-full px-3 py-3 rounded-[14px] border border-border bg-input text-foreground outline-none placeholder:text-muted-foreground text-sm"
+                />
+              </div>
+            )}
+            {mode === 'login' && (
+              <button
+                type="button"
+                onClick={() => setMode('forgot')}
+                className="text-xs text-muted-foreground hover:text-foreground cursor-pointer bg-transparent border-none underline text-right -mt-1"
+              >
+                Esqueci minha senha
+              </button>
+            )}
             <button
               type="submit"
               disabled={loading}
               className="brand-gradient border-none rounded-2xl px-4 py-3 font-bold cursor-pointer text-primary-foreground mt-2 disabled:opacity-50"
             >
-              {loading ? 'Aguarde...' : mode === 'login' ? 'Entrar' : 'Criar conta'}
+              {loading ? 'Aguarde...' : mode === 'login' ? 'Entrar' : mode === 'signup' ? 'Criar conta' : 'Enviar link de recuperação'}
             </button>
           </form>
           <div className="relative my-5">
