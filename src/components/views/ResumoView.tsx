@@ -76,7 +76,7 @@ function generateTips(state: any, month: string) {
   if (exceeded.length > 0) {
     tips.push({
       icon: AlertTriangle,
-      color: 'text-red-400',
+      color: 'text-red-600 dark:text-red-400',
       title: `${exceeded.length} meta${exceeded.length > 1 ? 's' : ''} estourada${exceeded.length > 1 ? 's' : ''}`,
       text: exceeded.map(b => `"${b.category}" passou ${b.pct - 100}% do limite (${currency(b.spent)} de ${currency(b.limit)})`).join('. ') + '. Revise esses gastos com atenção.',
     });
