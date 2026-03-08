@@ -96,6 +96,9 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
     setCurrentView('dashboard');
   }, [auth]);
 
+  // Push notifications for due/overdue bills
+  useNotifications(state, !!auth.user);
+
   return (
     <AppContext.Provider value={{
       state, setState, screen, setScreen,
