@@ -18,14 +18,14 @@ export default function AgendaView() {
     ? getMonthEntries(state, currentMonth).filter(e => e.type === 'expense').sort((a, b) => a.date.localeCompare(b.date))
     : [];
 
-  const sections = isCurrentMonth
+  const sections: { title: string; subtitle: string; icon: LucideIcon; items: any[]; getLabel: (e: any) => string; variant: 'good' | 'warn' | 'bad'; emptyMsg: string }[] = isCurrentMonth
     ? [
-        { title: 'Vence hoje', subtitle: 'Prioridade máxima', items: today, getLabel: () => 'Hoje', variant: 'bad' as const, emptyMsg: 'Nenhuma conta vence hoje.' },
-        { title: 'Próximos 7 dias', subtitle: 'Para você se organizar', items: week, getLabel: (e: any) => e.delta === 1 ? 'Amanhã' : `Em ${e.delta} dias`, variant: 'warn' as const, emptyMsg: 'Nenhuma conta nesta semana.' },
-        { title: 'Atrasadas', subtitle: 'Contas que já passaram do prazo', items: overdue, getLabel: () => 'Atrasada', variant: 'bad' as const, emptyMsg: 'Nenhuma conta atrasada.' },
+        { title: 'Vence hoje', subtitle: 'Prioridade máxima', icon: Clock, items: today, getLabel: () => 'Hoje', variant: 'bad', emptyMsg: 'Nenhuma conta vence hoje.' },
+        { title: 'Próximos 7 dias', subtitle: 'Para você se organizar', icon: CalendarClock, items: week, getLabel: (e: any) => e.delta === 1 ? 'Amanhã' : `Em ${e.delta} dias`, variant: 'warn', emptyMsg: 'Nenhuma conta nesta semana.' },
+        { title: 'Atrasadas', subtitle: 'Contas que já passaram do prazo', icon: AlertTriangle, items: overdue, getLabel: () => 'Atrasada', variant: 'bad', emptyMsg: 'Nenhuma conta atrasada.' },
       ]
     : [
-        { title: 'Contas do mês', subtitle: 'Todas as despesas deste mês', items: monthEntries, getLabel: (e: any) => e.paid ? 'Pago' : 'Pendente', variant: 'warn' as const, emptyMsg: 'Nenhuma conta neste mês.' },
+        { title: 'Contas do mês', subtitle: 'Todas as despesas deste mês', icon: CalendarDays, items: monthEntries, getLabel: (e: any) => e.paid ? 'Pago' : 'Pendente', variant: 'warn', emptyMsg: 'Nenhuma conta neste mês.' },
       ];
 
   return (
