@@ -27,7 +27,7 @@ const VIEWS: { id: View; name: string; shortName: string; subtitle: string; icon
 const BOTTOM_TABS = VIEWS.filter(v => v.id !== 'config');
 
 export default function AppShell() {
-  const { state, currentView, setCurrentView, setScreen, reloadDemo } = useApp();
+  const { state, currentView, setCurrentView, setScreen, reloadDemo, logout } = useApp();
   const { theme, toggleTheme } = useTheme();
   const meta = VIEWS.find(v => v.id === currentView)!;
   const [sidebarOpen, setSidebarOpen] = useState(false);
@@ -146,8 +146,8 @@ export default function AppShell() {
               ))}
             </nav>
             <div className="border-t border-border pt-3 flex flex-wrap gap-2">
-              <button onClick={() => { setScreen('landing'); setSidebarOpen(false); }} className="glass-panel rounded-xl px-3 py-2 font-bold cursor-pointer text-xs flex items-center gap-2">
-                <Home className="w-3.5 h-3.5" /> Tela inicial
+              <button onClick={() => { logout(); setSidebarOpen(false); }} className="glass-panel rounded-xl px-3 py-2 font-bold cursor-pointer text-xs flex items-center gap-2">
+                <Home className="w-3.5 h-3.5" /> Sair
               </button>
               <button onClick={() => { reloadDemo(); setSidebarOpen(false); }} className="glass-panel rounded-xl px-3 py-2 font-bold cursor-pointer text-xs">Recarregar demo</button>
               <button onClick={exportBackup} className="glass-panel rounded-xl px-3 py-2 font-bold cursor-pointer text-xs">Exportar</button>
@@ -200,7 +200,7 @@ export default function AppShell() {
             <p className="text-muted-foreground text-sm hidden sm:block">{meta.subtitle}</p>
           </div>
           <div className="hidden lg:flex gap-2.5 flex-wrap">
-            <button onClick={() => setScreen('landing')} className="glass-panel rounded-2xl px-3 py-2.5 font-bold cursor-pointer text-xs">Tela inicial</button>
+            <button onClick={logout} className="glass-panel rounded-2xl px-3 py-2.5 font-bold cursor-pointer text-xs">Sair</button>
             <button onClick={reloadDemo} className="glass-panel rounded-2xl px-3 py-2.5 font-bold cursor-pointer text-xs">Recarregar demo</button>
             <button onClick={exportBackup} className="glass-panel rounded-2xl px-3 py-2.5 font-bold cursor-pointer text-xs">Exportar backup</button>
             <label className="glass-panel rounded-2xl px-3 py-2.5 font-bold cursor-pointer text-xs">
