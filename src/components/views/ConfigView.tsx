@@ -86,7 +86,7 @@ export default function ConfigView() {
             <input id="configUserName" defaultValue={state.userName || ''} placeholder="Seu nome" className="w-full px-3 py-2.5 rounded-[14px] border border-border bg-input text-foreground text-sm outline-none placeholder:text-muted-foreground" />
           </div>
           <div className="flex items-end">
-            <button onClick={saveName} className="brand-gradient border-none rounded-2xl px-4 py-2.5 font-bold cursor-pointer text-sm text-primary-foreground">Salvar nome</button>
+            <button onClick={saveName} className="brand-gradient border-none rounded-2xl px-4 py-2.5 font-bold cursor-pointer text-sm text-primary-foreground flex items-center gap-1.5"><Save className="size-4" strokeWidth={1.5} /> Salvar nome</button>
           </div>
         </div>
       </div>
