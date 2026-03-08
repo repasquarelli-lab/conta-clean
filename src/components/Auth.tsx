@@ -113,7 +113,7 @@ export default function Auth() {
               </div>
             )}
             <div>
-              <label className="text-sm font-medium mb-1 block">E-mail</label>
+              <label className="text-sm font-medium mb-1 flex items-center gap-1.5"><Mail className="size-3.5 text-muted-foreground" strokeWidth={1.5} /> E-mail</label>
               <input
                 type="email"
                 value={email}
