@@ -22,7 +22,6 @@ export function useNotifications(state: AppState, isAuthenticated: boolean) {
         icon: '/favicon.png',
         badge: '/favicon.png',
         tag,
-        renotify: true,
       });
     } catch {
       // Fallback for environments that don't support Notification constructor
