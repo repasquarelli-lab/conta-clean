@@ -289,6 +289,66 @@ export default function DashboardView() {
         </div>
       </motion.div>
 
+      {/* Month Comparison */}
+      {(comparison.categories.length > 0 || comparison.prv.expenses > 0) && (
+        <motion.div className="glass-panel p-4 mt-4" variants={fadeUp} transition={{ duration: 0.5 }}>
+          <div className="mb-3 flex items-start gap-2.5">
+            <ArrowUpRight className="size-5 text-muted-foreground mt-0.5 shrink-0" strokeWidth={1.5} />
+            <div>
+              <h3 className="font-bold">Comparação com mês anterior</h3>
+              <p className="text-muted-foreground text-sm">{monthLabel(currentMonth)} vs {monthLabel(prevMonthStr)}</p>
+            </div>
+          </div>
+
+          {/* Summary cards */}
+          <div className="grid grid-cols-3 gap-3 mb-4">
+            {([
+              { label: 'Receitas', cur: comparison.cur.incomes, prev: comparison.prv.incomes, diff: comparison.incomeDiff, positive: true },
+              { label: 'Despesas', cur: comparison.cur.expenses, prev: comparison.prv.expenses, diff: comparison.expenseDiff, positive: false },
+              { label: 'Saldo', cur: comparison.cur.balance, prev: comparison.prv.balance, diff: comparison.balanceDiff, positive: true },
+            ]).map(item => {
+              const isGood = item.positive ? item.diff >= 0 : item.diff <= 0;
+              const pct = item.prev !== 0 ? Math.round(Math.abs(item.diff / item.prev) * 100) : item.diff !== 0 ? 100 : 0;
+              return (
+                <div key={item.label} className="p-3 rounded-2xl bg-accent border border-border text-center">
+                  <p className="text-xs text-muted-foreground mb-1">{item.label}</p>
+                  <p className="font-bold text-sm">{currency(item.cur)}</p>
+                  <div className={`flex items-center justify-center gap-1 mt-1 text-xs font-semibold ${isGood ? 'text-emerald-600 dark:text-emerald-400' : 'text-red-500 dark:text-red-400'}`}>
+                    {item.diff > 0 ? <ArrowUpRight className="size-3" /> : item.diff < 0 ? <ArrowDownRight className="size-3" /> : <Minus className="size-3" />}
+                    <span>{pct}%</span>
+                  </div>
+                </div>
+              );
+            })}
+          </div>
+
+          {/* Category breakdown */}
+          <div className="flex flex-col gap-2">
+            {comparison.categories.slice(0, 5).map(c => {
+              const CatIcon = getCategoryIcon(c.cat);
+              const increased = c.diff > 0;
+              const decreased = c.diff < 0;
+              return (
+                <div key={c.cat} className="flex items-center gap-2.5 p-2.5 rounded-xl bg-accent/50 border border-border/50">
+                  <CatIcon className="size-4 text-muted-foreground shrink-0" strokeWidth={1.5} />
+                  <span className="text-sm font-medium flex-1 truncate">{c.cat}</span>
+                  {c.status && (
+                    <span className={`text-[10px] font-bold px-1.5 py-0.5 rounded ${c.status === 'NOVO' ? 'bg-primary/10 text-primary' : 'bg-muted text-muted-foreground'}`}>
+                      {c.status}
+                    </span>
+                  )}
+                  <span className="text-xs text-muted-foreground">{currency(c.curVal)}</span>
+                  <div className={`flex items-center gap-0.5 text-xs font-semibold min-w-[50px] justify-end ${increased ? 'text-red-500 dark:text-red-400' : decreased ? 'text-emerald-600 dark:text-emerald-400' : 'text-muted-foreground'}`}>
+                    {increased ? <ArrowUpRight className="size-3" /> : decreased ? <ArrowDownRight className="size-3" /> : <Minus className="size-3" />}
+                    <span>{c.status ? '—' : `${Math.abs(c.pct)}%`}</span>
+                  </div>
+                </div>
+              );
+            })}
+          </div>
+        </motion.div>
+      )}
+
       {/* Budget Goals */}
       {(state.budgetGoals?.length ?? 0) > 0 && (
         <motion.div className="glass-panel p-4 mt-4" variants={fadeUp} transition={{ duration: 0.5 }}>
