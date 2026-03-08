@@ -115,11 +115,16 @@
     @apply border-border;
   }
 
+  html {
+    transition: color 0.3s ease, background-color 0.3s ease, border-color 0.3s ease, box-shadow 0.3s ease, fill 0.3s ease, stroke 0.3s ease;
+  }
+
   body {
     @apply bg-background text-foreground font-sans antialiased;
     font-family: 'Inter', system-ui, sans-serif;
     background: var(--gradient-bg);
     -webkit-tap-highlight-color: transparent;
+    transition: background 0.4s ease, color 0.3s ease;
   }
 
   /* Focus visible for accessibility */
