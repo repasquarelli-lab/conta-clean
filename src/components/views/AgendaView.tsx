@@ -2,6 +2,7 @@ import { useApp } from '@/contexts/AppContext';
 import { dueTodayBills, upcomingBills, overdueBills, todayISO, getMonthEntries, daysDiff } from '@/lib/store';
 import BillItem from '../BillItem';
 import MonthNavigator from '../MonthNavigator';
+import { AlertTriangle, CalendarClock, Clock, CalendarDays, type LucideIcon } from 'lucide-react';
 
 export default function AgendaView() {
   const { state, currentMonth, setCurrentMonth } = useApp();
