@@ -21,19 +21,16 @@ export default function MarketTicker() {
   const fetchData = useCallback(async () => {
     setLoading(true);
     try {
-      const [currRes, cryptoRes, ibovRes, nasdaqRes] = await Promise.all([
+      const [currRes, cryptoRes, indicesRes] = await Promise.all([
         fetch('https://economia.awesomeapi.com.br/json/last/USD-BRL,EUR-BRL,GBP-BRL'),
         fetch('https://api.coingecko.com/api/v3/simple/price?ids=bitcoin&vs_currencies=brl&include_24hr_change=true'),
-        fetch('https://economia.awesomeapi.com.br/json/last/IBOV').catch(() => null),
-        fetch('https://economia.awesomeapi.com.br/json/last/NASD').catch(() => null),
+        fetch('https://brapi.dev/api/quote/%5EBVSP,%5EIXIC').catch(() => null),
       ]);
 
       const curr = await currRes.json();
       const crypto = await cryptoRes.json();
-      let ibov: any = null;
-      let nasdaq: any = null;
-      try { if (ibovRes) ibov = await ibovRes.json(); } catch {}
-      try { if (nasdaqRes) nasdaq = await nasdaqRes.json(); } catch {}
+      let indices: any = null;
+      try { if (indicesRes?.ok) indices = await indicesRes.json(); } catch {}
 
       const items: MarketItem[] = [];
 
