@@ -200,7 +200,7 @@ export default function AppShell() {
             <p className="text-muted-foreground text-sm hidden sm:block">{meta.subtitle}</p>
           </div>
           <div className="hidden lg:flex gap-2.5 flex-wrap">
-            <button onClick={() => setScreen('landing')} className="glass-panel rounded-2xl px-3 py-2.5 font-bold cursor-pointer text-xs">Tela inicial</button>
+            <button onClick={logout} className="glass-panel rounded-2xl px-3 py-2.5 font-bold cursor-pointer text-xs">Sair</button>
             <button onClick={reloadDemo} className="glass-panel rounded-2xl px-3 py-2.5 font-bold cursor-pointer text-xs">Recarregar demo</button>
             <button onClick={exportBackup} className="glass-panel rounded-2xl px-3 py-2.5 font-bold cursor-pointer text-xs">Exportar backup</button>
             <label className="glass-panel rounded-2xl px-3 py-2.5 font-bold cursor-pointer text-xs">
