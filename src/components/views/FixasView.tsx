@@ -1,5 +1,7 @@
 import { useApp } from '@/contexts/AppContext';
 import { uid, categories, currency, ensureMonthFixedBills } from '@/lib/store';
+import { PlusCircle, List, Save, Trash2 } from 'lucide-react';
+import { getCategoryIcon } from '@/lib/categoryIcons';
 
 export default function FixasView() {
   const { state, updateState, currentMonth, setCurrentMonth } = useApp();
