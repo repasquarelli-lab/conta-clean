@@ -162,8 +162,13 @@ export default function ConfigView() {
       </div>
 
       <div className="glass-panel p-4">
-        <h3 className="font-bold mb-1">Backup e limpeza</h3>
-        <p className="text-muted-foreground text-sm mb-3">Seus dados são sincronizados na nuvem automaticamente</p>
+        <div className="flex items-start gap-2.5 mb-3">
+          <Database className="size-5 text-muted-foreground mt-0.5 shrink-0" strokeWidth={1.5} />
+          <div>
+            <h3 className="font-bold">Backup e limpeza</h3>
+            <p className="text-muted-foreground text-sm">Seus dados são sincronizados na nuvem automaticamente</p>
+          </div>
+        </div>
         <div className="flex gap-2.5 flex-wrap">
           <button onClick={exportBackup} className="glass-panel rounded-2xl px-4 py-2.5 font-bold cursor-pointer text-sm">Exportar backup</button>
           <button onClick={reloadDemo} className="glass-panel rounded-2xl px-4 py-2.5 font-bold cursor-pointer text-sm">Carregar dados demo</button>
