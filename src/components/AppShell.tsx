@@ -235,6 +235,7 @@ export default function AppShell() {
               {currentView === 'agenda' && <AgendaView />}
               {currentView === 'resumo' && <ResumoView />}
               {currentView === 'config' && <ConfigView />}
+              {currentView === 'admin' && isAdmin && <AdminView />}
             </motion.div>
           </AnimatePresence>
         </div>
