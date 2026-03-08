@@ -74,11 +74,14 @@ export default function FixasView() {
       </div>
 
       <div className="glass-panel p-4">
-        <div className="flex justify-between items-center mb-3 flex-wrap gap-2">
-          <div>
-            <h3 className="font-bold">Lista de contas fixas</h3>
-            <p className="text-muted-foreground text-sm">O sistema usa essa base para montar os próximos meses</p>
-          </div>
+          <div className="flex justify-between items-center mb-3 flex-wrap gap-2">
+            <div className="flex items-start gap-2.5">
+              <List className="size-5 text-muted-foreground mt-0.5 shrink-0" strokeWidth={1.5} />
+              <div>
+                <h3 className="font-bold">Lista de contas fixas</h3>
+                <p className="text-muted-foreground text-sm">O sistema usa essa base para montar os próximos meses</p>
+              </div>
+            </div>
           <input type="month" value={currentMonth} onChange={e => setCurrentMonth(e.target.value)} className="px-3 py-2 rounded-[14px] border border-border bg-input text-foreground text-sm outline-none" />
         </div>
 
