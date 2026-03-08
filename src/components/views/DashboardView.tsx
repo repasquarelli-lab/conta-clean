@@ -291,17 +291,17 @@ export default function DashboardView() {
 
       {/* Month Comparison */}
       {(comparison.categories.length > 0 || comparison.prv.expenses > 0) && (
-        <motion.div className="glass-panel p-4 mt-4" variants={fadeUp} transition={{ duration: 0.5 }}>
-          <div className="mb-3 flex items-start gap-2.5">
-            <ArrowUpRight className="size-5 text-muted-foreground mt-0.5 shrink-0" strokeWidth={1.5} />
+        <motion.div className="glass-panel p-3 sm:p-4 mt-3 sm:mt-4" variants={fadeUp} transition={{ duration: 0.5 }}>
+          <div className="mb-2 sm:mb-3 flex items-start gap-2">
+            <ArrowUpRight className="size-4 sm:size-5 text-muted-foreground mt-0.5 shrink-0" strokeWidth={1.5} />
             <div>
-              <h3 className="font-bold">Comparação com mês anterior</h3>
-              <p className="text-muted-foreground text-sm">{monthLabel(currentMonth)} vs {monthLabel(prevMonthStr)}</p>
+              <h3 className="font-bold text-sm sm:text-base">Comparação com mês anterior</h3>
+              <p className="text-muted-foreground text-xs sm:text-sm">{monthLabel(currentMonth)} vs {monthLabel(prevMonthStr)}</p>
             </div>
           </div>
 
           {/* Summary cards */}
-          <div className="grid grid-cols-3 gap-3 mb-4">
+          <div className="grid grid-cols-3 gap-2 sm:gap-3 mb-3 sm:mb-4">
             {([
               { label: 'Receitas', cur: comparison.cur.incomes, prev: comparison.prv.incomes, diff: comparison.incomeDiff, positive: true },
               { label: 'Despesas', cur: comparison.cur.expenses, prev: comparison.prv.expenses, diff: comparison.expenseDiff, positive: false },
