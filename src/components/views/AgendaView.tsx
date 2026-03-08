@@ -36,9 +36,12 @@ export default function AgendaView() {
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-4">
         {sections.map(section => (
           <div key={section.title} className="glass-panel p-4">
-            <div className="mb-3">
-              <h3 className="font-bold">{section.title}</h3>
-              <p className="text-muted-foreground text-sm">{section.subtitle}</p>
+            <div className="mb-3 flex items-start gap-2.5">
+              <section.icon className="size-5 text-muted-foreground mt-0.5 shrink-0" strokeWidth={1.5} />
+              <div>
+                <h3 className="font-bold">{section.title}</h3>
+                <p className="text-muted-foreground text-sm">{section.subtitle}</p>
+              </div>
             </div>
             <div className="flex flex-col gap-2.5">
               {section.items.length === 0 ? (
