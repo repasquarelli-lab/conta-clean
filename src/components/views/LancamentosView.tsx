@@ -11,15 +11,21 @@ export default function LancamentosView() {
   const [entryType, setEntryType] = useState<'income' | 'expense'>('income');
   const [search, setSearch] = useState('');
   const [filterType, setFilterType] = useState('all');
-  const [viewMode, setViewMode] = useState<'list' | 'grid'>('list');
+  const [filterCategory, setFilterCategory] = useState('all');
+  const [filterStatus, setFilterStatus] = useState('all');
 
   const entries = getMonthEntries(state, currentMonth).sort((a, b) => a.date.localeCompare(b.date));
   const cats = entryType === 'income' ? incomeCategories : categories;
 
+  // Collect all unique categories from current month entries for filter
+  const allMonthCategories = [...new Set(entries.map(e => e.category))].sort();
+
   const filtered = entries.filter(e => {
     const okText = !search || e.desc.toLowerCase().includes(search.toLowerCase());
     const okType = filterType === 'all' || e.type === filterType;
-    return okText && okType;
+    const okCat = filterCategory === 'all' || e.category === filterCategory;
+    const okStatus = filterStatus === 'all' || (filterStatus === 'paid' ? e.paid : !e.paid);
+    return okText && okType && okCat && okStatus;
   });
 
   function handleSubmit(e: React.FormEvent<HTMLFormElement>) {
