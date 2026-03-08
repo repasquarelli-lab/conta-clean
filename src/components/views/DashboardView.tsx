@@ -149,22 +149,22 @@ export default function DashboardView() {
       </motion.div>
 
       {/* Metrics */}
-      <motion.div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-3" variants={staggerContainer}>
+      <motion.div className="grid grid-cols-2 gap-2 sm:gap-3 md:grid-cols-3 lg:grid-cols-5" variants={staggerContainer}>
         {([
           { label: 'Entrou no mês', value: currency(m.incomes), sub: 'Receitas registradas', icon: TrendingUp, accent: 'text-emerald-600 dark:text-emerald-400' },
           { label: 'Saiu no mês', value: currency(m.expenses), sub: 'Despesas do mês', icon: TrendingDown, accent: 'text-red-500 dark:text-red-400' },
           { label: 'Em aberto', value: currency(m.open), sub: 'Contas não pagas', icon: AlertCircle, accent: 'text-yellow-600 dark:text-yellow-400' },
           { label: 'Saldo do mês', value: currency(m.balance), sub: savingsTone, icon: Wallet, accent: m.balance >= 0 ? 'text-emerald-600 dark:text-emerald-400' : 'text-red-500 dark:text-red-400' },
           { label: 'Vence hoje', value: String(today.length), sub: 'Contas com vencimento hoje', icon: Clock, accent: today.length > 0 ? 'text-red-500 dark:text-red-400' : 'text-muted-foreground' },
-        ] as { label: string; value: string; sub: string; icon: LucideIcon; accent: string }[]).map(metric => (
-          <motion.div key={metric.label} className="glass-panel p-4 transition-all hover:border-primary/15" variants={fadeUp} transition={{ duration: 0.35 }}>
-            <div className="flex items-center gap-2 mb-2">
-              <div className="w-8 h-8 rounded-xl grid place-items-center bg-accent border border-border">
-                <metric.icon className={`size-4 shrink-0 ${metric.accent}`} strokeWidth={1.5} />
+        ] as { label: string; value: string; sub: string; icon: LucideIcon; accent: string }[]).map((metric, idx) => (
+          <motion.div key={metric.label} className={`glass-panel p-3 sm:p-4 transition-all hover:border-primary/15 ${idx === 4 ? 'col-span-2 md:col-span-1' : ''}`} variants={fadeUp} transition={{ duration: 0.35 }}>
+            <div className="flex items-center gap-2 mb-1.5 sm:mb-2">
+              <div className="w-7 h-7 sm:w-8 sm:h-8 rounded-lg sm:rounded-xl grid place-items-center bg-accent border border-border">
+                <metric.icon className={`size-3.5 sm:size-4 shrink-0 ${metric.accent}`} strokeWidth={1.5} />
               </div>
             </div>
-            <p className="text-xl sm:text-2xl font-extrabold tracking-tight">{metric.value}</p>
-            <h3 className="text-muted-foreground text-xs font-medium mt-1">{metric.label}</h3>
+            <p className="text-lg sm:text-2xl font-extrabold tracking-tight leading-tight">{metric.value}</p>
+            <h3 className="text-muted-foreground text-[10px] sm:text-xs font-medium mt-0.5 sm:mt-1">{metric.label}</h3>
           </motion.div>
         ))}
       </motion.div>
