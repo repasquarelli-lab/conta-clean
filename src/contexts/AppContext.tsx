@@ -2,6 +2,7 @@ import React, { createContext, useContext, useState, useCallback, useEffect, use
 import { AppState, loadState, saveState, makeDemoData, ensureMonthFixedBills, todayISO } from '@/lib/store';
 import { useAuth } from '@/hooks/useAuth';
 import { useCloudSync } from '@/hooks/useCloudSync';
+import { useNotifications } from '@/hooks/useNotifications';
 import { toast } from 'sonner';
 
 type Screen = 'landing' | 'auth' | 'app';
