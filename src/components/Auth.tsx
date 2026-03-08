@@ -174,12 +174,21 @@ export default function Auth() {
             Entrar com Google
           </button>
           <div className="mt-4 text-center">
-            <button
-              onClick={() => setMode(mode === 'login' ? 'signup' : 'login')}
-              className="text-sm text-muted-foreground hover:text-foreground cursor-pointer bg-transparent border-none underline"
-            >
-              {mode === 'login' ? 'Não tem conta? Cadastre-se' : 'Já tem conta? Entrar'}
-            </button>
+            {mode === 'forgot' ? (
+              <button
+                onClick={() => setMode('login')}
+                className="text-sm text-muted-foreground hover:text-foreground cursor-pointer bg-transparent border-none underline"
+              >
+                Voltar ao login
+              </button>
+            ) : (
+              <button
+                onClick={() => setMode(mode === 'login' ? 'signup' : 'login')}
+                className="text-sm text-muted-foreground hover:text-foreground cursor-pointer bg-transparent border-none underline"
+              >
+                {mode === 'login' ? 'Não tem conta? Cadastre-se' : 'Já tem conta? Entrar'}
+              </button>
+            )}
           </div>
         </div>
       </div>
