@@ -149,9 +149,14 @@ export default function Auth() {
             <button
               type="submit"
               disabled={loading}
-              className="brand-gradient border-none rounded-2xl px-4 py-3 font-bold cursor-pointer text-primary-foreground mt-2 disabled:opacity-50"
+              className="brand-gradient border-none rounded-2xl px-4 py-3 font-bold cursor-pointer text-primary-foreground mt-2 disabled:opacity-50 flex items-center justify-center gap-2"
             >
-              {loading ? 'Aguarde...' : mode === 'login' ? 'Entrar' : mode === 'signup' ? 'Criar conta' : 'Enviar link de recuperação'}
+              {loading ? 'Aguarde...' : (
+                <>
+                  {mode === 'login' ? <LogIn className="size-4" strokeWidth={1.5} /> : mode === 'signup' ? <UserPlus className="size-4" strokeWidth={1.5} /> : <Send className="size-4" strokeWidth={1.5} />}
+                  {mode === 'login' ? 'Entrar' : mode === 'signup' ? 'Criar conta' : 'Enviar link de recuperação'}
+                </>
+              )}
             </button>
           </form>
           <div className="relative my-5">
