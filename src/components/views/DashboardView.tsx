@@ -428,15 +428,15 @@ export default function DashboardView() {
         </motion.div>
 
         {/* Quick status */}
-        <motion.div className="glass-panel p-4" variants={fadeUp} transition={{ duration: 0.5 }}>
-          <div className="mb-3 flex items-start gap-2.5">
-            <Activity className="size-5 text-muted-foreground mt-0.5 shrink-0" strokeWidth={1.5} />
+        <motion.div className="glass-panel p-3 sm:p-4" variants={fadeUp} transition={{ duration: 0.5 }}>
+          <div className="mb-2 sm:mb-3 flex items-start gap-2">
+            <Activity className="size-4 sm:size-5 text-muted-foreground mt-0.5 shrink-0" strokeWidth={1.5} />
             <div>
-              <h3 className="font-bold">Situação rápida</h3>
-              <p className="text-muted-foreground text-sm">Leitura simples do seu mês</p>
+              <h3 className="font-bold text-sm sm:text-base">Situação rápida</h3>
+              <p className="text-muted-foreground text-xs sm:text-sm hidden sm:block">Leitura simples do seu mês</p>
             </div>
           </div>
-          <div className="grid grid-cols-2 gap-3">
+          <div className="grid grid-cols-2 gap-2 sm:gap-3">
             <div className="p-3.5 rounded-[18px] bg-accent border border-border leading-relaxed text-sm flex items-start gap-2">
               <CheckCircle2 className="size-4 text-muted-foreground mt-0.5 shrink-0" strokeWidth={1.5} />
               <div>
