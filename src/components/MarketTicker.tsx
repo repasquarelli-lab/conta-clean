@@ -1,6 +1,7 @@
 import { useState, useEffect, useCallback } from 'react';
 import { TrendingUp, TrendingDown, RefreshCw, DollarSign, Bitcoin, ChevronDown, ChevronUp, BarChart3 } from 'lucide-react';
 import { AnimatePresence, motion } from 'framer-motion';
+import { supabase } from '@/integrations/supabase/client';
 
 interface MarketItem {
   name: string;
