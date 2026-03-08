@@ -54,7 +54,7 @@ function generateTips(state: any, month: string) {
     if (topPct > 40) {
       tips.push({
         icon: Target,
-        color: 'text-yellow-400',
+        color: 'text-yellow-600 dark:text-yellow-400',
         title: `${top[0]} domina seus gastos`,
         text: `A categoria "${top[0]}" representa ${topPct}% de todas as despesas (${currency(top[1])}). Avalie se há como reduzir.`,
       });
