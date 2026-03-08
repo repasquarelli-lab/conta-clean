@@ -1,3 +1,4 @@
+import { useState } from 'react';
 import { useApp } from '@/contexts/AppContext';
 import { currency, monthMetrics, paidCount, upcomingBills, dueTodayBills, overdueBills, topCategory, getMonthEntries, ensureMonthFixedBills, AppState, budgetProgress } from '@/lib/store';
 import BillItem from '../BillItem';
@@ -117,6 +118,7 @@ function getMonthComparison(state: AppState, month: string) {
 
 export default function DashboardView() {
   const { state, currentMonth, setCurrentMonth } = useApp();
+  const [evolutionChart, setEvolutionChart] = useState<'area' | 'bar'>('area');
   
   ensureMonthFixedBills(state, currentMonth);
 
@@ -247,44 +249,80 @@ export default function DashboardView() {
         </motion.div>
       )}
 
-      {/* Evolution Chart - 6 months */}
+      {/* Evolution Chart - 6 months with toggle */}
       <motion.div className="glass-panel p-3 sm:p-4 mt-3 sm:mt-4" variants={fadeUp} transition={{ duration: 0.5 }}>
-        <div className="mb-2 sm:mb-3 flex items-start gap-2">
-          <LineChart className="size-4 sm:size-5 text-muted-foreground mt-0.5 shrink-0" strokeWidth={1.5} />
-          <div>
-            <h3 className="font-bold text-sm sm:text-base">Evolução mensal</h3>
-            <p className="text-muted-foreground text-xs sm:text-sm hidden sm:block">Receitas × Despesas dos últimos 6 meses</p>
+        <div className="mb-2 sm:mb-3 flex items-start justify-between">
+          <div className="flex items-start gap-2">
+            <LineChart className="size-4 sm:size-5 text-muted-foreground mt-0.5 shrink-0" strokeWidth={1.5} />
+            <div>
+              <h3 className="font-bold text-sm sm:text-base">Evolução mensal</h3>
+              <p className="text-muted-foreground text-xs sm:text-sm hidden sm:block">Receitas × Despesas dos últimos 6 meses</p>
+            </div>
+          </div>
+          <div className="flex gap-1 bg-accent rounded-lg p-0.5 border border-border">
+            <button
+              onClick={() => setEvolutionChart('area')}
+              className={`px-2 py-1 rounded-md text-[10px] sm:text-xs font-medium transition-all ${evolutionChart === 'area' ? 'bg-background shadow-sm text-foreground' : 'text-muted-foreground hover:text-foreground'}`}
+            >
+              Área
+            </button>
+            <button
+              onClick={() => setEvolutionChart('bar')}
+              className={`px-2 py-1 rounded-md text-[10px] sm:text-xs font-medium transition-all ${evolutionChart === 'bar' ? 'bg-background shadow-sm text-foreground' : 'text-muted-foreground hover:text-foreground'}`}
+            >
+              Barras
+            </button>
           </div>
         </div>
         <div className="h-[200px] sm:h-[260px]">
           <ResponsiveContainer width="100%" height="100%">
-            <AreaChart data={evolutionData} margin={{ left: 0, right: 10, top: 5, bottom: 5 }}>
-              <defs>
-                <linearGradient id="gradReceitas" x1="0" y1="0" x2="0" y2="1">
-                  <stop offset="5%" stopColor="hsl(142, 71%, 45%)" stopOpacity={0.3} />
-                  <stop offset="95%" stopColor="hsl(142, 71%, 45%)" stopOpacity={0} />
-                </linearGradient>
-                <linearGradient id="gradDespesas" x1="0" y1="0" x2="0" y2="1">
-                  <stop offset="5%" stopColor="hsl(0, 72%, 51%)" stopOpacity={0.3} />
-                  <stop offset="95%" stopColor="hsl(0, 72%, 51%)" stopOpacity={0} />
-                </linearGradient>
-              </defs>
-              <CartesianGrid strokeDasharray="3 3" stroke="hsl(var(--border))" vertical={false} />
-              <XAxis dataKey="month" tick={{ fill: 'hsl(var(--muted-foreground))', fontSize: 11 }} axisLine={false} tickLine={false} />
-              <YAxis tickFormatter={(v) => `R$${(v / 1000).toFixed(1)}k`} tick={{ fill: 'hsl(var(--muted-foreground))', fontSize: 11 }} axisLine={false} tickLine={false} width={65} />
-              <Tooltip
-                formatter={(value: number, name: string) => [currency(value), name === 'receitas' ? 'Receitas' : name === 'despesas' ? 'Despesas' : 'Saldo']}
-                contentStyle={{ background: 'hsl(var(--card))', border: '1px solid hsl(var(--border))', borderRadius: '12px', fontSize: '12px' }}
-                labelStyle={{ color: 'hsl(var(--foreground))', fontWeight: 'bold' }}
-                itemStyle={{ color: 'hsl(var(--foreground))' }}
-              />
-              <Legend
-                formatter={(value) => value === 'receitas' ? 'Receitas' : value === 'despesas' ? 'Despesas' : 'Saldo'}
-                wrapperStyle={{ fontSize: '12px' }}
-              />
-              <Area type="monotone" dataKey="receitas" stroke="hsl(142, 71%, 45%)" fill="url(#gradReceitas)" strokeWidth={2.5} dot={{ r: 4, fill: 'hsl(142, 71%, 45%)' }} />
-              <Area type="monotone" dataKey="despesas" stroke="hsl(0, 72%, 51%)" fill="url(#gradDespesas)" strokeWidth={2.5} dot={{ r: 4, fill: 'hsl(0, 72%, 51%)' }} />
-            </AreaChart>
+            {evolutionChart === 'area' ? (
+              <AreaChart data={evolutionData} margin={{ left: 0, right: 10, top: 5, bottom: 5 }}>
+                <defs>
+                  <linearGradient id="gradReceitas" x1="0" y1="0" x2="0" y2="1">
+                    <stop offset="5%" stopColor="hsl(142, 71%, 45%)" stopOpacity={0.3} />
+                    <stop offset="95%" stopColor="hsl(142, 71%, 45%)" stopOpacity={0} />
+                  </linearGradient>
+                  <linearGradient id="gradDespesas" x1="0" y1="0" x2="0" y2="1">
+                    <stop offset="5%" stopColor="hsl(0, 72%, 51%)" stopOpacity={0.3} />
+                    <stop offset="95%" stopColor="hsl(0, 72%, 51%)" stopOpacity={0} />
+                  </linearGradient>
+                </defs>
+                <CartesianGrid strokeDasharray="3 3" stroke="hsl(var(--border))" vertical={false} />
+                <XAxis dataKey="month" tick={{ fill: 'hsl(var(--muted-foreground))', fontSize: 11 }} axisLine={false} tickLine={false} />
+                <YAxis tickFormatter={(v) => `R$${(v / 1000).toFixed(1)}k`} tick={{ fill: 'hsl(var(--muted-foreground))', fontSize: 11 }} axisLine={false} tickLine={false} width={65} />
+                <Tooltip
+                  formatter={(value: number, name: string) => [currency(value), name === 'receitas' ? 'Receitas' : name === 'despesas' ? 'Despesas' : 'Saldo']}
+                  contentStyle={{ background: 'hsl(var(--card))', border: '1px solid hsl(var(--border))', borderRadius: '12px', fontSize: '12px' }}
+                  labelStyle={{ color: 'hsl(var(--foreground))', fontWeight: 'bold' }}
+                  itemStyle={{ color: 'hsl(var(--foreground))' }}
+                />
+                <Legend
+                  formatter={(value) => value === 'receitas' ? 'Receitas' : value === 'despesas' ? 'Despesas' : 'Saldo'}
+                  wrapperStyle={{ fontSize: '12px' }}
+                />
+                <Area type="monotone" dataKey="receitas" stroke="hsl(142, 71%, 45%)" fill="url(#gradReceitas)" strokeWidth={2.5} dot={{ r: 4, fill: 'hsl(142, 71%, 45%)' }} />
+                <Area type="monotone" dataKey="despesas" stroke="hsl(0, 72%, 51%)" fill="url(#gradDespesas)" strokeWidth={2.5} dot={{ r: 4, fill: 'hsl(0, 72%, 51%)' }} />
+              </AreaChart>
+            ) : (
+              <BarChart data={evolutionData} margin={{ left: 0, right: 10, top: 5, bottom: 5 }}>
+                <CartesianGrid strokeDasharray="3 3" stroke="hsl(var(--border))" vertical={false} />
+                <XAxis dataKey="month" tick={{ fill: 'hsl(var(--muted-foreground))', fontSize: 11 }} axisLine={false} tickLine={false} />
+                <YAxis tickFormatter={(v) => `R$${(v / 1000).toFixed(1)}k`} tick={{ fill: 'hsl(var(--muted-foreground))', fontSize: 11 }} axisLine={false} tickLine={false} width={65} />
+                <Tooltip
+                  formatter={(value: number, name: string) => [currency(value), name === 'receitas' ? 'Receitas' : 'Despesas']}
+                  contentStyle={{ background: 'hsl(var(--card))', border: '1px solid hsl(var(--border))', borderRadius: '12px', fontSize: '12px' }}
+                  labelStyle={{ color: 'hsl(var(--foreground))', fontWeight: 'bold' }}
+                  itemStyle={{ color: 'hsl(var(--foreground))' }}
+                />
+                <Legend
+                  formatter={(value) => value === 'receitas' ? 'Receitas' : 'Despesas'}
+                  wrapperStyle={{ fontSize: '12px' }}
+                />
+                <Bar dataKey="receitas" fill="hsl(142, 71%, 45%)" radius={[4, 4, 0, 0]} barSize={20} />
+                <Bar dataKey="despesas" fill="hsl(0, 72%, 51%)" radius={[4, 4, 0, 0]} barSize={20} />
+              </BarChart>
+            )}
           </ResponsiveContainer>
         </div>
       </motion.div>
