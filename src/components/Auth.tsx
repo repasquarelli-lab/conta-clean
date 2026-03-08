@@ -2,6 +2,7 @@ import { useState } from 'react';
 import { useApp } from '@/contexts/AppContext';
 import { toast } from 'sonner';
 import { lovable } from '@/integrations/lovable/index';
+import { Cloud, ShieldCheck, Smartphone, DatabaseBackup, ArrowLeft, Mail, Lock, User, LogIn, UserPlus, KeyRound, Send } from 'lucide-react';
 
 export default function Auth() {
   const { setScreen, onAuthSuccess } = useApp();
