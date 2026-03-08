@@ -174,7 +174,7 @@ export default function ConfigView() {
           <button onClick={reloadDemo} className="glass-panel rounded-2xl px-4 py-2.5 font-bold cursor-pointer text-sm flex items-center gap-1.5"><RefreshCw className="size-4" strokeWidth={1.5} /> Carregar dados demo</button>
           <button onClick={clearAll} className="badge-bad cursor-pointer px-4 py-2.5 rounded-2xl font-bold text-sm flex items-center gap-1.5"><AlertTriangle className="size-4" strokeWidth={1.5} /> Apagar tudo</button>
         </div>
-        <div className="mt-3.5 text-xs text-muted-foreground">Conta Clara v1.0 · Suas finanças, simples e seguras.</div>
+        <div className="mt-3.5 text-[11px] text-muted-foreground opacity-70">Conta Clara v1.0 · Suas finanças, simples e seguras.</div>
       </div>
     </div>
   );

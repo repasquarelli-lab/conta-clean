@@ -91,21 +91,22 @@ export default function DashboardView() {
       </div>
 
       {/* Metrics */}
-      <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-4">
+      <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-3">
         {([
-          { label: 'Entrou no mês', value: currency(m.incomes), sub: 'Receitas registradas', icon: TrendingUp },
-          { label: 'Saiu no mês', value: currency(m.expenses), sub: 'Todas as despesas do mês', icon: TrendingDown },
-          { label: 'Em aberto', value: currency(m.open), sub: 'Contas ainda não pagas', icon: AlertCircle },
-          { label: 'Saldo do mês', value: currency(m.balance), sub: savingsTone, icon: Wallet },
-          { label: 'Vence hoje', value: String(today.length), sub: 'Contas com vencimento hoje', icon: Clock },
-        ] as { label: string; value: string; sub: string; icon: LucideIcon }[]).map(metric => (
-          <div key={metric.label} className="glass-panel p-4">
-            <div className="flex items-center gap-2 mb-1.5">
-              <metric.icon className="size-4 text-muted-foreground shrink-0" strokeWidth={1.5} />
-              <h3 className="text-muted-foreground text-sm">{metric.label}</h3>
+          { label: 'Entrou no mês', value: currency(m.incomes), sub: 'Receitas registradas', icon: TrendingUp, accent: 'text-emerald-600 dark:text-emerald-400' },
+          { label: 'Saiu no mês', value: currency(m.expenses), sub: 'Despesas do mês', icon: TrendingDown, accent: 'text-red-500 dark:text-red-400' },
+          { label: 'Em aberto', value: currency(m.open), sub: 'Contas não pagas', icon: AlertCircle, accent: 'text-yellow-600 dark:text-yellow-400' },
+          { label: 'Saldo do mês', value: currency(m.balance), sub: savingsTone, icon: Wallet, accent: m.balance >= 0 ? 'text-emerald-600 dark:text-emerald-400' : 'text-red-500 dark:text-red-400' },
+          { label: 'Vence hoje', value: String(today.length), sub: 'Contas com vencimento hoje', icon: Clock, accent: today.length > 0 ? 'text-red-500 dark:text-red-400' : 'text-muted-foreground' },
+        ] as { label: string; value: string; sub: string; icon: LucideIcon; accent: string }[]).map(metric => (
+          <div key={metric.label} className="glass-panel p-4 transition-all hover:border-primary/15">
+            <div className="flex items-center gap-2 mb-2">
+              <div className="w-8 h-8 rounded-xl grid place-items-center bg-accent border border-border">
+                <metric.icon className={`size-4 shrink-0 ${metric.accent}`} strokeWidth={1.5} />
+              </div>
             </div>
-            <p className="text-2xl font-extrabold">{metric.value}</p>
-            <div className="text-xs text-muted-foreground mt-1">{metric.sub}</div>
+            <p className="text-xl sm:text-2xl font-extrabold tracking-tight">{metric.value}</p>
+            <h3 className="text-muted-foreground text-xs font-medium mt-1">{metric.label}</h3>
           </div>
         ))}
       </div>
@@ -344,7 +345,7 @@ export default function DashboardView() {
               </div>
             </div>
           </div>
-          <div className="mt-3.5 text-xs text-muted-foreground">Resumo pensado para uso leigo: rápido de entender e com foco no cotidiano.</div>
+          <div className="mt-3.5 text-[11px] text-muted-foreground text-center opacity-70">Atualizado com base nos seus lançamentos deste mês.</div>
         </div>
       </div>
     </div>
