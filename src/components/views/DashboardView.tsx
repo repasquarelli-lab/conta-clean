@@ -333,16 +333,60 @@ export default function DashboardView() {
               </div>
             </div>
             <div className="p-3.5 rounded-[18px] bg-accent border border-border leading-relaxed text-sm flex items-start gap-2">
-              <FolderOpen className="size-4 text-muted-foreground mt-0.5 shrink-0" strokeWidth={1.5} />
-              <div>
-                <strong>{top ? top[0] : '—'}</strong><br />maior categoria do mês
-              </div>
-            </div>
-            <div className="p-3.5 rounded-[18px] bg-accent border border-border leading-relaxed text-sm flex items-start gap-2">
               <AlertCircle className="size-4 text-muted-foreground mt-0.5 shrink-0" strokeWidth={1.5} />
               <div>
                 <strong>{overdue.length}</strong><br />contas atrasadas
               </div>
+            </div>
+            {/* Mini donut chart */}
+            <div className="col-span-2 p-3.5 rounded-[18px] bg-accent border border-border">
+              <div className="flex items-center gap-2 mb-2">
+                <PieChartIcon className="size-4 text-muted-foreground shrink-0" strokeWidth={1.5} />
+                <span className="text-sm font-semibold">Despesas por categoria</span>
+              </div>
+              {categoryData.length > 0 ? (
+                <div className="flex items-center gap-3">
+                  <div className="w-[90px] h-[90px] shrink-0">
+                    <ResponsiveContainer width="100%" height="100%">
+                      <PieChart>
+                        <Pie
+                          data={categoryData}
+                          cx="50%"
+                          cy="50%"
+                          innerRadius={25}
+                          outerRadius={40}
+                          paddingAngle={2}
+                          dataKey="value"
+                          stroke="none"
+                        >
+                          {categoryData.map((_, i) => (
+                            <Cell key={i} fill={CHART_COLORS[i % CHART_COLORS.length]} />
+                          ))}
+                        </Pie>
+                        <Tooltip content={<CustomTooltip />} />
+                      </PieChart>
+                    </ResponsiveContainer>
+                  </div>
+                  <div className="flex flex-col gap-1 flex-1 min-w-0">
+                    {categoryData.slice(0, 4).map((cat, i) => {
+                      const CatIcon = getCategoryIcon(cat.name);
+                      return (
+                        <div key={cat.name} className="flex items-center gap-1.5 text-xs">
+                          <div className="w-2 h-2 rounded-full shrink-0" style={{ background: CHART_COLORS[i % CHART_COLORS.length] }} />
+                          <CatIcon className="size-3 text-muted-foreground shrink-0" strokeWidth={1.5} />
+                          <span className="truncate flex-1">{cat.name}</span>
+                          <span className="text-muted-foreground font-medium">{Math.round((cat.value / totalExpenses) * 100)}%</span>
+                        </div>
+                      );
+                    })}
+                    {categoryData.length > 4 && (
+                      <span className="text-[10px] text-muted-foreground">+{categoryData.length - 4} mais</span>
+                    )}
+                  </div>
+                </div>
+              ) : (
+                <p className="text-xs text-muted-foreground text-center py-2">Sem despesas registradas</p>
+              )}
             </div>
           </div>
           <div className="mt-3.5 text-[11px] text-muted-foreground text-center opacity-70">Atualizado com base nos seus lançamentos deste mês.</div>
