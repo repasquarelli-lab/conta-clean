@@ -243,10 +243,10 @@ export default function AppShell() {
           <AnimatePresence mode="wait" initial={false}>
             <motion.div
               key={currentView}
-              initial={{ opacity: 0, x: direction * 40 }}
-              animate={{ opacity: 1, x: 0 }}
-              exit={{ opacity: 0, x: direction * -40 }}
-              transition={{ duration: 0.2, ease: 'easeOut' }}
+              initial={{ opacity: 0, x: direction * 50, scale: 0.98 }}
+              animate={{ opacity: 1, x: 0, scale: 1 }}
+              exit={{ opacity: 0, x: direction * -50, scale: 0.98 }}
+              transition={{ type: 'spring', stiffness: 300, damping: 30 }}
             >
               {currentView === 'dashboard' && <DashboardView />}
               {currentView === 'lancamentos' && <LancamentosView />}
