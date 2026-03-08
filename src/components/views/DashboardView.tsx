@@ -94,7 +94,7 @@ export default function DashboardView() {
       {/* Market Ticker */}
       <div className="mb-4">
         <MarketTicker />
-      </div>
+    </motion.div>
 
       {/* Month Navigator */}
       <div className="mb-4 flex justify-center sm:justify-start">
