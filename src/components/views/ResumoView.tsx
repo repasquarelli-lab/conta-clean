@@ -225,6 +225,38 @@ export default function ResumoView() {
         </div>
       </div>
 
+      {/* Category Bar Chart */}
+      {categoryData.length > 0 && (
+        <div className="glass-panel p-4 mb-4">
+          <div className="mb-3 flex items-start gap-2.5">
+            <BarChart3 className="size-5 text-muted-foreground mt-0.5 shrink-0" strokeWidth={1.5} />
+            <div>
+              <h3 className="font-bold">Despesas por categoria</h3>
+              <p className="text-muted-foreground text-sm">Visualize onde seu dinheiro está indo neste mês</p>
+            </div>
+          </div>
+          <div className="h-64 w-full">
+            <ResponsiveContainer width="100%" height="100%">
+              <BarChart data={categoryData} layout="vertical" margin={{ left: 8, right: 16, top: 4, bottom: 4 }}>
+                <XAxis type="number" tickFormatter={(v: number) => `R$${v}`} tick={{ fontSize: 11, fill: 'hsl(var(--muted-foreground))' }} axisLine={false} tickLine={false} />
+                <YAxis type="category" dataKey="name" width={90} tick={{ fontSize: 12, fill: 'hsl(var(--foreground))' }} axisLine={false} tickLine={false} />
+                <Tooltip
+                  formatter={(value: number) => [currency(value), 'Gasto']}
+                  contentStyle={{ background: 'hsl(var(--card))', border: '1px solid hsl(var(--border))', borderRadius: '12px', fontSize: '13px' }}
+                  labelStyle={{ color: 'hsl(var(--foreground))', fontWeight: 'bold' }}
+                  cursor={{ fill: 'hsl(var(--accent) / 0.5)' }}
+                />
+                <Bar dataKey="value" radius={[0, 8, 8, 0]} maxBarSize={32}>
+                  {categoryData.map((_, i) => (
+                    <Cell key={i} fill={BAR_COLORS[i % BAR_COLORS.length]} />
+                  ))}
+                </Bar>
+              </BarChart>
+            </ResponsiveContainer>
+          </div>
+        </div>
+      )}
+
       {/* Month comparison */}
       {comparison.length > 0 && (
         <div className="glass-panel p-4 mb-4">
