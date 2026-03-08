@@ -1,10 +1,13 @@
+import { useState } from 'react';
 import { useApp } from '@/contexts/AppContext';
 import { uid, categories, currency, ensureMonthFixedBills } from '@/lib/store';
-import { PlusCircle, List, Save, Trash2 } from 'lucide-react';
+import { PlusCircle, List, LayoutGrid, Save, Trash2, CalendarDays } from 'lucide-react';
 import { getCategoryIcon } from '@/lib/categoryIcons';
+import { motion } from 'framer-motion';
 
 export default function FixasView() {
   const { state, updateState, currentMonth, setCurrentMonth } = useApp();
+  const [viewMode, setViewMode] = useState<'list' | 'grid'>('list');
 
   function handleSubmit(e: React.FormEvent<HTMLFormElement>) {
     e.preventDefault();
@@ -74,43 +77,92 @@ export default function FixasView() {
       </div>
 
       <div className="glass-panel p-4">
-          <div className="flex justify-between items-center mb-3 flex-wrap gap-2">
-            <div className="flex items-start gap-2.5">
-              <List className="size-5 text-muted-foreground mt-0.5 shrink-0" strokeWidth={1.5} />
-              <div>
-                <h3 className="font-bold">Lista de contas fixas</h3>
-                <p className="text-muted-foreground text-sm">O sistema usa essa base para montar os próximos meses</p>
-              </div>
+        <div className="flex justify-between items-center mb-3 flex-wrap gap-2">
+          <div className="flex items-start gap-2.5">
+            <List className="size-5 text-muted-foreground mt-0.5 shrink-0" strokeWidth={1.5} />
+            <div>
+              <h3 className="font-bold">Lista de contas fixas</h3>
+              <p className="text-muted-foreground text-sm">O sistema usa essa base para montar os próximos meses</p>
             </div>
-          <input type="month" value={currentMonth} onChange={e => setCurrentMonth(e.target.value)} className="px-3 py-2 rounded-[14px] border border-border bg-input text-foreground text-sm outline-none" />
+          </div>
+          <div className="flex items-center gap-2">
+            <div className="flex gap-1 bg-accent rounded-xl p-1 border border-border">
+              <button onClick={() => setViewMode('list')} className={`p-1.5 rounded-lg cursor-pointer transition-colors ${viewMode === 'list' ? 'bg-background shadow-sm text-foreground' : 'text-muted-foreground hover:text-foreground'}`} title="Lista">
+                <List className="size-4" strokeWidth={1.5} />
+              </button>
+              <button onClick={() => setViewMode('grid')} className={`p-1.5 rounded-lg cursor-pointer transition-colors ${viewMode === 'grid' ? 'bg-background shadow-sm text-foreground' : 'text-muted-foreground hover:text-foreground'}`} title="Quadro">
+                <LayoutGrid className="size-4" strokeWidth={1.5} />
+              </button>
+            </div>
+            <input type="month" value={currentMonth} onChange={e => setCurrentMonth(e.target.value)} className="px-3 py-2 rounded-[14px] border border-border bg-input text-foreground text-sm outline-none" />
+          </div>
         </div>
 
-        <div className="overflow-auto border border-border rounded-2xl">
-          <table className="w-full border-collapse" style={{ background: 'hsl(var(--accent))' }}>
-            <thead>
-              <tr>
-                {['Conta', 'Categoria', 'Dia', 'Valor', 'Ações'].map(h => (
-                  <th key={h} className="p-3 border-b border-border text-left text-sm font-bold text-muted-foreground" style={{ background: 'hsla(220,40%,95%,0.02)' }}>{h}</th>
-                ))}
-              </tr>
-            </thead>
-            <tbody>
-              {state.fixedBills.length === 0 ? (
-                <tr><td colSpan={5} className="p-4 text-center text-muted-foreground text-sm">Nenhuma conta fixa cadastrada.</td></tr>
-              ) : state.fixedBills.map(f => (
-                <tr key={f.id} className="hover:bg-accent/50">
-                  <td className="p-3 border-b border-border text-sm">{f.name}</td>
-                  <td className="p-3 border-b border-border text-sm">{f.category}</td>
-                  <td className="p-3 border-b border-border text-sm">Dia {f.day}</td>
-                  <td className="p-3 border-b border-border text-sm">{currency(f.value)}</td>
-                  <td className="p-3 border-b border-border text-sm">
-                    <button onClick={() => removeFixed(f.id)} className="badge-bad cursor-pointer text-xs font-bold flex items-center gap-1"><Trash2 className="size-3" /> Excluir</button>
-                  </td>
+        {viewMode === 'list' ? (
+          <div className="overflow-auto border border-border rounded-2xl">
+            <table className="w-full border-collapse" style={{ background: 'hsl(var(--accent))' }}>
+              <thead>
+                <tr>
+                  {['Conta', 'Categoria', 'Dia', 'Valor', 'Ações'].map(h => (
+                    <th key={h} className="p-3 border-b border-border text-left text-sm font-bold text-muted-foreground" style={{ background: 'hsla(220,40%,95%,0.02)' }}>{h}</th>
+                  ))}
                 </tr>
-              ))}
-            </tbody>
-          </table>
-        </div>
+              </thead>
+              <tbody>
+                {state.fixedBills.length === 0 ? (
+                  <tr><td colSpan={5} className="p-4 text-center text-muted-foreground text-sm">Nenhuma conta fixa cadastrada.</td></tr>
+                ) : state.fixedBills.map(f => (
+                  <tr key={f.id} className="hover:bg-accent/50">
+                    <td className="p-3 border-b border-border text-sm">{f.name}</td>
+                    <td className="p-3 border-b border-border text-sm">{f.category}</td>
+                    <td className="p-3 border-b border-border text-sm">Dia {f.day}</td>
+                    <td className="p-3 border-b border-border text-sm">{currency(f.value)}</td>
+                    <td className="p-3 border-b border-border text-sm">
+                      <button onClick={() => removeFixed(f.id)} className="badge-bad cursor-pointer text-xs font-bold flex items-center gap-1"><Trash2 className="size-3" /> Excluir</button>
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
+        ) : (
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3">
+            {state.fixedBills.length === 0 ? (
+              <div className="col-span-full p-5 rounded-2xl border border-dashed border-border text-muted-foreground text-center text-sm">
+                Nenhuma conta fixa cadastrada.
+              </div>
+            ) : state.fixedBills.map(f => {
+              const CatIcon = getCategoryIcon(f.category);
+              return (
+                <motion.div
+                  key={f.id}
+                  initial={{ opacity: 0, scale: 0.95 }}
+                  animate={{ opacity: 1, scale: 1 }}
+                  className="p-4 rounded-2xl bg-accent border border-border flex flex-col gap-3 hover:shadow-md transition-shadow"
+                >
+                  <div className="flex items-center gap-2.5">
+                    <div className="w-10 h-10 rounded-xl grid place-items-center bg-card border border-border shrink-0">
+                      <CatIcon className="size-4 text-muted-foreground" strokeWidth={1.5} />
+                    </div>
+                    <div className="min-w-0 flex-1">
+                      <p className="text-sm font-bold truncate">{f.name}</p>
+                      <p className="text-[11px] text-muted-foreground">{f.category}</p>
+                    </div>
+                    <button onClick={() => removeFixed(f.id)} className="badge-bad cursor-pointer text-[11px] font-bold flex items-center gap-1 active:scale-95 transition-transform shrink-0">
+                      <Trash2 className="size-3" />
+                    </button>
+                  </div>
+                  <div className="flex items-center justify-between border-t border-border pt-3">
+                    <span className="text-lg font-black text-foreground">{currency(f.value)}</span>
+                    <span className="text-xs text-muted-foreground flex items-center gap-1">
+                      <CalendarDays className="size-3" strokeWidth={1.5} /> Dia {f.day}
+                    </span>
+                  </div>
+                </motion.div>
+              );
+            })}
+          </div>
+        )}
       </div>
     </div>
   );

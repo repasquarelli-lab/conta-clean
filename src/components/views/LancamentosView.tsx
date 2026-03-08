@@ -2,7 +2,7 @@ import { useState } from 'react';
 import { useApp } from '@/contexts/AppContext';
 import { getMonthEntries, currency, formatDate, todayISO, uid, categories, incomeCategories } from '@/lib/store';
 import MonthNavigator from '../MonthNavigator';
-import { PlusCircle, List, Search, Check, Undo2, Trash2, ArrowDownCircle, ArrowUpCircle, Save } from 'lucide-react';
+import { PlusCircle, List, LayoutGrid, Search, Check, Undo2, Trash2, ArrowDownCircle, ArrowUpCircle, Save } from 'lucide-react';
 import { getCategoryIcon } from '@/lib/categoryIcons';
 import { motion } from 'framer-motion';
 
@@ -11,6 +11,7 @@ export default function LancamentosView() {
   const [entryType, setEntryType] = useState<'income' | 'expense'>('income');
   const [search, setSearch] = useState('');
   const [filterType, setFilterType] = useState('all');
+  const [viewMode, setViewMode] = useState<'list' | 'grid'>('list');
 
   const entries = getMonthEntries(state, currentMonth).sort((a, b) => a.date.localeCompare(b.date));
   const cats = entryType === 'income' ? incomeCategories : categories;
@@ -116,10 +117,20 @@ export default function LancamentosView() {
       </div>
 
       <div className="glass-panel p-4">
-        <h3 className="font-bold mb-3 flex items-center gap-2">
-          <List className="size-5 text-muted-foreground" strokeWidth={1.5} />
-          Lançamentos do mês
-        </h3>
+        <div className="flex justify-between items-center mb-3 flex-wrap gap-2">
+          <h3 className="font-bold flex items-center gap-2">
+            <List className="size-5 text-muted-foreground" strokeWidth={1.5} />
+            Lançamentos do mês
+          </h3>
+          <div className="flex gap-1 bg-accent rounded-xl p-1 border border-border">
+            <button onClick={() => setViewMode('list')} className={`p-1.5 rounded-lg cursor-pointer transition-colors ${viewMode === 'list' ? 'bg-background shadow-sm text-foreground' : 'text-muted-foreground hover:text-foreground'}`} title="Visualização em lista">
+              <List className="size-4" strokeWidth={1.5} />
+            </button>
+            <button onClick={() => setViewMode('grid')} className={`p-1.5 rounded-lg cursor-pointer transition-colors ${viewMode === 'grid' ? 'bg-background shadow-sm text-foreground' : 'text-muted-foreground hover:text-foreground'}`} title="Visualização em quadro">
+              <LayoutGrid className="size-4" strokeWidth={1.5} />
+            </button>
+          </div>
+        </div>
         <div className="flex gap-2.5 flex-wrap mb-3">
           <div className="flex-1 min-w-[160px] relative">
             <Search className="size-4 text-muted-foreground absolute left-3 top-1/2 -translate-y-1/2" strokeWidth={1.5} />
@@ -132,88 +143,143 @@ export default function LancamentosView() {
           </select>
         </div>
 
-        {/* Desktop table */}
-        <div className="overflow-auto border border-border rounded-2xl hidden sm:block">
-          <table className="w-full border-collapse min-w-[760px]" style={{ background: 'hsl(var(--accent))' }}>
-            <thead>
-              <tr>
-                {['Tipo', 'Descrição', 'Categoria', 'Data', 'Valor', 'Situação', 'Ações'].map(h => (
-                  <th key={h} className="p-3 border-b border-border text-left text-sm font-bold text-muted-foreground" style={{ background: 'hsla(220,40%,95%,0.02)' }}>{h}</th>
-                ))}
-              </tr>
-            </thead>
-            <tbody>
+        {viewMode === 'list' ? (
+          <>
+            {/* Desktop table */}
+            <div className="overflow-auto border border-border rounded-2xl hidden sm:block">
+              <table className="w-full border-collapse min-w-[760px]" style={{ background: 'hsl(var(--accent))' }}>
+                <thead>
+                  <tr>
+                    {['Tipo', 'Descrição', 'Categoria', 'Data', 'Valor', 'Situação', 'Ações'].map(h => (
+                      <th key={h} className="p-3 border-b border-border text-left text-sm font-bold text-muted-foreground" style={{ background: 'hsla(220,40%,95%,0.02)' }}>{h}</th>
+                    ))}
+                  </tr>
+                </thead>
+                <tbody>
+                  {filtered.length === 0 ? (
+                    <tr><td colSpan={7} className="p-4 text-center text-muted-foreground text-sm border-b border-border">Nenhum lançamento encontrado.</td></tr>
+                  ) : filtered.map(e => (
+                    <tr key={e.id} className="hover:bg-accent/50">
+                      <td className="p-3 border-b border-border text-sm">{e.type === 'income' ? 'Receita' : 'Despesa'}</td>
+                      <td className="p-3 border-b border-border text-sm">{e.desc}</td>
+                      <td className="p-3 border-b border-border text-sm">{e.category}</td>
+                      <td className="p-3 border-b border-border text-sm">{formatDate(e.date)}</td>
+                      <td className="p-3 border-b border-border text-sm">{currency(e.value)}</td>
+                      <td className="p-3 border-b border-border text-sm">
+                        <span className={e.paid ? 'badge-good' : 'badge-warn'}>
+                          {e.type === 'income' ? (e.paid ? 'Recebido' : 'Pendente') : (e.paid ? 'Pago' : 'Pendente')}
+                        </span>
+                      </td>
+                      <td className="p-3 border-b border-border text-sm">
+                        <div className="flex gap-2 flex-wrap">
+                          <button onClick={() => togglePaid(e.id)} className={`${e.paid ? 'badge-warn' : 'badge-good'} cursor-pointer text-xs font-bold flex items-center gap-1`}>
+                            {e.paid ? <><Undo2 className="size-3" /> Pendente</> : <><Check className="size-3" /> Pago</>}
+                          </button>
+                          <button onClick={() => removeEntry(e.id)} className="badge-bad cursor-pointer text-xs font-bold flex items-center gap-1">
+                            <Trash2 className="size-3" /> Excluir
+                          </button>
+                        </div>
+                      </td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
+
+            {/* Mobile card list */}
+            <div className="flex flex-col gap-2 sm:hidden">
               {filtered.length === 0 ? (
-                <tr><td colSpan={7} className="p-4 text-center text-muted-foreground text-sm border-b border-border">Nenhum lançamento encontrado.</td></tr>
-              ) : filtered.map(e => (
-                <tr key={e.id} className="hover:bg-accent/50">
-                  <td className="p-3 border-b border-border text-sm">{e.type === 'income' ? 'Receita' : 'Despesa'}</td>
-                  <td className="p-3 border-b border-border text-sm">{e.desc}</td>
-                  <td className="p-3 border-b border-border text-sm">{e.category}</td>
-                  <td className="p-3 border-b border-border text-sm">{formatDate(e.date)}</td>
-                  <td className="p-3 border-b border-border text-sm">{currency(e.value)}</td>
-                  <td className="p-3 border-b border-border text-sm">
+                <div className="p-5 rounded-2xl border border-dashed border-border text-muted-foreground text-center text-sm">
+                  Nenhum lançamento encontrado.
+                </div>
+              ) : filtered.map(e => {
+                const CatIcon = getCategoryIcon(e.category);
+                return (
+                  <div key={e.id} className="p-3 rounded-2xl bg-accent border border-border">
+                    <div className="flex items-start justify-between gap-2 mb-2">
+                      <div className="flex items-center gap-2 min-w-0">
+                        <div className="w-8 h-8 rounded-xl grid place-items-center bg-card border border-border shrink-0">
+                          <CatIcon className="size-3.5 text-muted-foreground" strokeWidth={1.5} />
+                        </div>
+                        <div className="min-w-0">
+                          <p className="text-sm font-semibold truncate">{e.desc}</p>
+                          <p className="text-[11px] text-muted-foreground">{e.category} · {formatDate(e.date)}</p>
+                        </div>
+                      </div>
+                      <span className={e.paid ? 'badge-good' : 'badge-warn'}>
+                        {e.type === 'income' ? (e.paid ? 'Recebido' : 'Pendente') : (e.paid ? 'Pago' : 'Pendente')}
+                      </span>
+                    </div>
+                    <div className="flex items-center justify-between">
+                      <span className={`text-sm font-bold ${e.type === 'income' ? 'text-emerald-600 dark:text-emerald-400' : 'text-foreground'}`}>
+                        {e.type === 'income' ? '+' : '-'} {currency(e.value)}
+                      </span>
+                      <div className="flex gap-1.5">
+                        <button onClick={() => togglePaid(e.id)} className={`${e.paid ? 'badge-warn' : 'badge-good'} cursor-pointer text-[11px] font-bold flex items-center gap-1 active:scale-95 transition-transform`}>
+                          {e.paid ? <Undo2 className="size-3" /> : <Check className="size-3" />}
+                        </button>
+                        <button onClick={() => removeEntry(e.id)} className="badge-bad cursor-pointer text-[11px] font-bold flex items-center gap-1 active:scale-95 transition-transform">
+                          <Trash2 className="size-3" />
+                        </button>
+                      </div>
+                    </div>
+                  </div>
+                );
+              })}
+            </div>
+          </>
+        ) : (
+          /* Grid / Card view */
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3">
+            {filtered.length === 0 ? (
+              <div className="col-span-full p-5 rounded-2xl border border-dashed border-border text-muted-foreground text-center text-sm">
+                Nenhum lançamento encontrado.
+              </div>
+            ) : filtered.map(e => {
+              const CatIcon = getCategoryIcon(e.category);
+              return (
+                <motion.div
+                  key={e.id}
+                  initial={{ opacity: 0, scale: 0.95 }}
+                  animate={{ opacity: 1, scale: 1 }}
+                  className="p-4 rounded-2xl bg-accent border border-border flex flex-col gap-3 hover:shadow-md transition-shadow"
+                >
+                  <div className="flex items-center justify-between">
+                    <div className="flex items-center gap-2.5">
+                      <div className={`w-10 h-10 rounded-xl grid place-items-center border border-border shrink-0 ${e.type === 'income' ? 'bg-emerald-500/10' : 'bg-red-500/10'}`}>
+                        <CatIcon className={`size-4 ${e.type === 'income' ? 'text-emerald-600 dark:text-emerald-400' : 'text-red-600 dark:text-red-400'}`} strokeWidth={1.5} />
+                      </div>
+                      <div className="min-w-0">
+                        <p className="text-sm font-bold truncate">{e.desc}</p>
+                        <p className="text-[11px] text-muted-foreground">{e.category}</p>
+                      </div>
+                    </div>
                     <span className={e.paid ? 'badge-good' : 'badge-warn'}>
                       {e.type === 'income' ? (e.paid ? 'Recebido' : 'Pendente') : (e.paid ? 'Pago' : 'Pendente')}
                     </span>
-                  </td>
-                  <td className="p-3 border-b border-border text-sm">
-                    <div className="flex gap-2 flex-wrap">
-                      <button onClick={() => togglePaid(e.id)} className={`${e.paid ? 'badge-warn' : 'badge-good'} cursor-pointer text-xs font-bold flex items-center gap-1`}>
-                        {e.paid ? <><Undo2 className="size-3" /> Pendente</> : <><Check className="size-3" /> Pago</>}
-                      </button>
-                      <button onClick={() => removeEntry(e.id)} className="badge-bad cursor-pointer text-xs font-bold flex items-center gap-1">
-                        <Trash2 className="size-3" /> Excluir
-                      </button>
-                    </div>
-                  </td>
-                </tr>
-              ))}
-            </tbody>
-          </table>
-        </div>
+                  </div>
 
-        {/* Mobile card list */}
-        <div className="flex flex-col gap-2 sm:hidden">
-          {filtered.length === 0 ? (
-            <div className="p-5 rounded-2xl border border-dashed border-border text-muted-foreground text-center text-sm">
-              Nenhum lançamento encontrado.
-            </div>
-          ) : filtered.map(e => {
-            const CatIcon = getCategoryIcon(e.category);
-            return (
-              <div key={e.id} className="p-3 rounded-2xl bg-accent border border-border">
-                <div className="flex items-start justify-between gap-2 mb-2">
-                  <div className="flex items-center gap-2 min-w-0">
-                    <div className="w-8 h-8 rounded-xl grid place-items-center bg-card border border-border shrink-0">
-                      <CatIcon className="size-3.5 text-muted-foreground" strokeWidth={1.5} />
+                  <div className="flex items-center justify-between border-t border-border pt-3">
+                    <div>
+                      <span className={`text-lg font-black ${e.type === 'income' ? 'text-emerald-600 dark:text-emerald-400' : 'text-red-600 dark:text-red-400'}`}>
+                        {e.type === 'income' ? '+' : '-'} {currency(e.value)}
+                      </span>
+                      <p className="text-[11px] text-muted-foreground mt-0.5">{formatDate(e.date)}</p>
                     </div>
-                    <div className="min-w-0">
-                      <p className="text-sm font-semibold truncate">{e.desc}</p>
-                      <p className="text-[11px] text-muted-foreground">{e.category} · {formatDate(e.date)}</p>
+                    <div className="flex gap-1.5">
+                      <button onClick={() => togglePaid(e.id)} className={`${e.paid ? 'badge-warn' : 'badge-good'} cursor-pointer text-[11px] font-bold flex items-center gap-1 active:scale-95 transition-transform`}>
+                        {e.paid ? <Undo2 className="size-3" /> : <Check className="size-3" />}
+                      </button>
+                      <button onClick={() => removeEntry(e.id)} className="badge-bad cursor-pointer text-[11px] font-bold flex items-center gap-1 active:scale-95 transition-transform">
+                        <Trash2 className="size-3" />
+                      </button>
                     </div>
                   </div>
-                  <span className={e.paid ? 'badge-good' : 'badge-warn'}>
-                    {e.type === 'income' ? (e.paid ? 'Recebido' : 'Pendente') : (e.paid ? 'Pago' : 'Pendente')}
-                  </span>
-                </div>
-                <div className="flex items-center justify-between">
-                  <span className={`text-sm font-bold ${e.type === 'income' ? 'text-emerald-600 dark:text-emerald-400' : 'text-foreground'}`}>
-                    {e.type === 'income' ? '+' : '-'} {currency(e.value)}
-                  </span>
-                  <div className="flex gap-1.5">
-                    <button onClick={() => togglePaid(e.id)} className={`${e.paid ? 'badge-warn' : 'badge-good'} cursor-pointer text-[11px] font-bold flex items-center gap-1 active:scale-95 transition-transform`}>
-                      {e.paid ? <Undo2 className="size-3" /> : <Check className="size-3" />}
-                    </button>
-                    <button onClick={() => removeEntry(e.id)} className="badge-bad cursor-pointer text-[11px] font-bold flex items-center gap-1 active:scale-95 transition-transform">
-                      <Trash2 className="size-3" />
-                    </button>
-                  </div>
-                </div>
-              </div>
-            );
-          })}
-        </div>
+                </motion.div>
+              );
+            })}
+          </div>
+        )}
       </div>
     </div>
   );
