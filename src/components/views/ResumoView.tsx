@@ -3,7 +3,7 @@ import { monthMetrics, paidCount, topCategory, currency, budgetProgress, getMont
 import MonthNavigator from '../MonthNavigator';
 import { Lightbulb, TrendingUp, TrendingDown, AlertTriangle, CheckCircle, Target, ShieldCheck, ArrowUpRight, ArrowDownRight, Minus, DollarSign, CreditCard, HelpCircle, PiggyBank, BarChart3 } from 'lucide-react';
 import { getCategoryIcon } from '@/lib/categoryIcons';
-import { BarChart, Bar, XAxis, YAxis, Tooltip, ResponsiveContainer, Cell } from 'recharts';
+import { BarChart, Bar, XAxis, YAxis, Tooltip, ResponsiveContainer, Cell, PieChart, Pie } from 'recharts';
 
 function generateTips(state: any, month: string) {
   const m = monthMetrics(state, month);
