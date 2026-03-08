@@ -190,9 +190,12 @@ export default function DashboardView() {
 
       {/* Evolution Chart - 6 months */}
       <div className="glass-panel p-4 mt-4">
-        <div className="mb-3">
-          <h3 className="font-bold">Evolução mensal</h3>
-          <p className="text-muted-foreground text-sm">Receitas × Despesas dos últimos 6 meses</p>
+        <div className="mb-3 flex items-start gap-2.5">
+          <LineChart className="size-5 text-muted-foreground mt-0.5 shrink-0" strokeWidth={1.5} />
+          <div>
+            <h3 className="font-bold">Evolução mensal</h3>
+            <p className="text-muted-foreground text-sm">Receitas × Despesas dos últimos 6 meses</p>
+          </div>
         </div>
         <div className="h-[260px]">
           <ResponsiveContainer width="100%" height="100%">
