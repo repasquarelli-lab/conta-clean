@@ -195,6 +195,14 @@ export function dueTodayBills(state: AppState) {
   return state.entries.filter(e => e.type === 'expense' && !e.paid && e.date === today);
 }
 
+export function dueSoonBills(state: AppState, days = 3) {
+  const today = todayISO();
+  const future = new Date();
+  future.setDate(future.getDate() + days);
+  const futureISO = future.toISOString().slice(0, 10);
+  return state.entries.filter(e => e.type === 'expense' && !e.paid && e.date > today && e.date <= futureISO).sort((a, b) => a.date.localeCompare(b.date));
+}
+
 export function topCategory(state: AppState, month: string): [string, number] | null {
   const map: Record<string, number> = {};
   getMonthEntries(state, month).filter(e => e.type === 'expense').forEach(e => {

@@ -62,6 +62,18 @@ export function useNotifications(state: AppState, isAuthenticated: boolean) {
       }
     }
 
+    if (settings.dueSoonAlert) {
+      const dueSoon = dueSoonBills(appState, 3);
+      if (dueSoon.length > 0) {
+        const total = dueSoon.reduce((s, e) => s + e.value, 0);
+        sendNotification(
+          '🔔 Contas nos próximos 3 dias',
+          `${dueSoon.length} conta${dueSoon.length > 1 ? 's' : ''} vencendo em breve, totalizando R$ ${total.toFixed(2).replace('.', ',')}`,
+          'due-soon'
+        );
+      }
+    }
+
     localStorage.setItem(NOTIFICATION_KEY, today);
   }, [sendNotification]);
 
