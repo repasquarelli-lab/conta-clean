@@ -1,6 +1,7 @@
 import { useState, useEffect, useCallback } from 'react';
 import { TrendingUp, TrendingDown, RefreshCw, DollarSign, Bitcoin, ChevronDown, ChevronUp, BarChart3 } from 'lucide-react';
 import { AnimatePresence, motion } from 'framer-motion';
+import { supabase } from '@/integrations/supabase/client';
 
 interface MarketItem {
   name: string;
@@ -21,19 +22,18 @@ export default function MarketTicker() {
   const fetchData = useCallback(async () => {
     setLoading(true);
     try {
-      const [currRes, cryptoRes, ibovRes, nasdaqRes] = await Promise.all([
-        fetch('https://economia.awesomeapi.com.br/json/last/USD-BRL,EUR-BRL,GBP-BRL'),
-        fetch('https://api.coingecko.com/api/v3/simple/price?ids=bitcoin&vs_currencies=brl&include_24hr_change=true'),
-        fetch('https://economia.awesomeapi.com.br/json/last/IBOV').catch(() => null),
-        fetch('https://economia.awesomeapi.com.br/json/last/NASD').catch(() => null),
+      const [currRes, cryptoRes, indicesRes] = await Promise.all([
+        fetch('https://economia.awesomeapi.com.br/json/last/USD-BRL,EUR-BRL,GBP-BRL').catch(() => null),
+        fetch('https://api.coingecko.com/api/v3/simple/price?ids=bitcoin&vs_currencies=brl&include_24hr_change=true').catch(() => null),
+        supabase.functions.invoke('market-indices').catch(() => null),
       ]);
 
-      const curr = await currRes.json();
-      const crypto = await cryptoRes.json();
-      let ibov: any = null;
-      let nasdaq: any = null;
-      try { if (ibovRes) ibov = await ibovRes.json(); } catch {}
-      try { if (nasdaqRes) nasdaq = await nasdaqRes.json(); } catch {}
+      let curr: any = {};
+      let crypto: any = {};
+      let indices: any = null;
+      try { if (currRes?.ok) curr = await currRes.json(); } catch {}
+      try { if (cryptoRes?.ok) crypto = await cryptoRes.json(); } catch {}
+      try { if (indicesRes?.data) indices = indicesRes.data; } catch {}
 
       const items: MarketItem[] = [];
 
@@ -68,28 +68,24 @@ export default function MarketTicker() {
         });
       }
 
-      // Indices
-      const ibovKey = ibov ? Object.keys(ibov)[0] : null;
-      if (ibovKey && ibov[ibovKey]) {
-        const d = ibov[ibovKey];
-        items.push({
-          name: 'IBOVESPA',
-          value: Number(d.bid).toLocaleString('pt-BR', { maximumFractionDigits: 0 }),
-          change: Number(d.pctChange || 0),
-          icon: <BarChart3 className="w-4 h-4" />,
-          extra: { high: Number(d.high).toLocaleString('pt-BR', { maximumFractionDigits: 0 }), low: Number(d.low).toLocaleString('pt-BR', { maximumFractionDigits: 0 }) },
-        });
-      }
-      const nasdKey = nasdaq ? Object.keys(nasdaq)[0] : null;
-      if (nasdKey && nasdaq[nasdKey]) {
-        const d = nasdaq[nasdKey];
-        items.push({
-          name: 'NASDAQ',
-          value: Number(d.bid).toLocaleString('pt-BR', { maximumFractionDigits: 0 }),
-          change: Number(d.pctChange || 0),
-          icon: <BarChart3 className="w-4 h-4" />,
-          extra: { high: Number(d.high).toLocaleString('pt-BR', { maximumFractionDigits: 0 }), low: Number(d.low).toLocaleString('pt-BR', { maximumFractionDigits: 0 }) },
-        });
+      // Indices from edge function
+      if (indices) {
+        const indexMap: Record<string, string> = { '^BVSP': 'IBOVESPA', '^IXIC': 'NASDAQ' };
+        for (const [symbol, label] of Object.entries(indexMap)) {
+          const d = indices[symbol];
+          if (d?.price) {
+            items.push({
+              name: label,
+              value: Number(d.price).toLocaleString('pt-BR', { maximumFractionDigits: 0 }),
+              change: Number((d.change ?? 0).toFixed(2)),
+              icon: <BarChart3 className="w-4 h-4" />,
+              extra: {
+                high: d.high ? Number(d.high).toLocaleString('pt-BR', { maximumFractionDigits: 0 }) : undefined,
+                low: d.low ? Number(d.low).toLocaleString('pt-BR', { maximumFractionDigits: 0 }) : undefined,
+              },
+            });
+          }
+        }
       }
 
       // Crypto
