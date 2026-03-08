@@ -90,19 +90,19 @@ export default function DashboardView() {
   const evolutionData = getEvolutionData(state, currentMonth);
 
   return (
-    <div>
+    <motion.div initial="hidden" animate="visible" variants={staggerContainer}>
       {/* Market Ticker */}
-      <div className="mb-4">
+      <motion.div className="mb-4" variants={fadeUp} transition={{ duration: 0.4 }}>
         <MarketTicker />
-    </motion.div>
+      </motion.div>
 
       {/* Month Navigator */}
-      <motion.div className="mb-4 flex justify-center sm:justify-start" variants={fadeUp} initial="hidden" animate="visible" transition={{ duration: 0.4, delay: 0.1 }}>
+      <motion.div className="mb-4 flex justify-center sm:justify-start" variants={fadeUp} transition={{ duration: 0.4 }}>
         <MonthNavigator month={currentMonth} onChange={setCurrentMonth} />
-      </div>
+      </motion.div>
 
       {/* Metrics */}
-      <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-3">
+      <motion.div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-3" variants={staggerContainer}>
         {([
           { label: 'Entrou no mês', value: currency(m.incomes), sub: 'Receitas registradas', icon: TrendingUp, accent: 'text-emerald-600 dark:text-emerald-400' },
           { label: 'Saiu no mês', value: currency(m.expenses), sub: 'Despesas do mês', icon: TrendingDown, accent: 'text-red-500 dark:text-red-400' },
@@ -110,7 +110,7 @@ export default function DashboardView() {
           { label: 'Saldo do mês', value: currency(m.balance), sub: savingsTone, icon: Wallet, accent: m.balance >= 0 ? 'text-emerald-600 dark:text-emerald-400' : 'text-red-500 dark:text-red-400' },
           { label: 'Vence hoje', value: String(today.length), sub: 'Contas com vencimento hoje', icon: Clock, accent: today.length > 0 ? 'text-red-500 dark:text-red-400' : 'text-muted-foreground' },
         ] as { label: string; value: string; sub: string; icon: LucideIcon; accent: string }[]).map(metric => (
-          <div key={metric.label} className="glass-panel p-4 transition-all hover:border-primary/15">
+          <motion.div key={metric.label} className="glass-panel p-4 transition-all hover:border-primary/15" variants={fadeUp} transition={{ duration: 0.35 }}>
             <div className="flex items-center gap-2 mb-2">
               <div className="w-8 h-8 rounded-xl grid place-items-center bg-accent border border-border">
                 <metric.icon className={`size-4 shrink-0 ${metric.accent}`} strokeWidth={1.5} />
@@ -118,15 +118,15 @@ export default function DashboardView() {
             </div>
             <p className="text-xl sm:text-2xl font-extrabold tracking-tight">{metric.value}</p>
             <h3 className="text-muted-foreground text-xs font-medium mt-1">{metric.label}</h3>
-          </div>
+          </motion.div>
         ))}
-      </div>
+      </motion.div>
 
       {/* Charts */}
       {categoryData.length > 0 && (
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 mt-4">
+        <motion.div className="grid grid-cols-1 lg:grid-cols-2 gap-4 mt-4" variants={staggerContainer}>
           {/* Pie Chart */}
-           <div className="glass-panel p-4">
+          <motion.div className="glass-panel p-4" variants={fadeUp} transition={{ duration: 0.5 }}>
             <div className="mb-3 flex items-start gap-2.5">
               <PieChartIcon className="size-5 text-muted-foreground mt-0.5 shrink-0" strokeWidth={1.5} />
               <div>
@@ -170,10 +170,10 @@ export default function DashboardView() {
                 })}
               </div>
             </div>
-          </div>
+          </motion.div>
 
           {/* Bar Chart */}
-          <div className="glass-panel p-4">
+          <motion.div className="glass-panel p-4" variants={fadeUp} transition={{ duration: 0.5 }}>
             <div className="mb-3 flex items-start gap-2.5">
               <BarChart3 className="size-5 text-muted-foreground mt-0.5 shrink-0" strokeWidth={1.5} />
               <div>
@@ -196,12 +196,12 @@ export default function DashboardView() {
                 </BarChart>
               </ResponsiveContainer>
             </div>
-          </div>
-        </div>
+          </motion.div>
+        </motion.div>
       )}
 
       {/* Evolution Chart - 6 months */}
-      <div className="glass-panel p-4 mt-4">
+      <motion.div className="glass-panel p-4 mt-4" variants={fadeUp} transition={{ duration: 0.5 }}>
         <div className="mb-3 flex items-start gap-2.5">
           <LineChart className="size-5 text-muted-foreground mt-0.5 shrink-0" strokeWidth={1.5} />
           <div>
@@ -240,11 +240,11 @@ export default function DashboardView() {
             </AreaChart>
           </ResponsiveContainer>
         </div>
-      </div>
+      </motion.div>
 
       {/* Budget Goals */}
       {(state.budgetGoals?.length ?? 0) > 0 && (
-        <div className="glass-panel p-4 mt-4">
+        <motion.div className="glass-panel p-4 mt-4" variants={fadeUp} transition={{ duration: 0.5 }}>
           <div className="mb-3 flex items-start gap-2.5">
             <Target className="size-5 text-muted-foreground mt-0.5 shrink-0" strokeWidth={1.5} />
             <div>
@@ -286,16 +286,18 @@ export default function DashboardView() {
               );
             })}
           </div>
-        </div>
+        </motion.div>
       )}
 
       {/* AI Copilot */}
-      <AiTipsWidget />
+      <motion.div variants={fadeUp} transition={{ duration: 0.5 }}>
+        <AiTipsWidget />
+      </motion.div>
 
       {/* Two columns */}
-      <div className="grid grid-cols-1 lg:grid-cols-[1.12fr_0.88fr] gap-4 mt-4">
+      <motion.div className="grid grid-cols-1 lg:grid-cols-[1.12fr_0.88fr] gap-4 mt-4" variants={staggerContainer}>
         {/* Upcoming bills */}
-        <div className="glass-panel p-4">
+        <motion.div className="glass-panel p-4" variants={fadeUp} transition={{ duration: 0.5 }}>
           <div className="flex justify-between items-center mb-3">
             <div className="flex items-start gap-2.5">
               <CalendarClock className="size-5 text-muted-foreground mt-0.5 shrink-0" strokeWidth={1.5} />
@@ -316,10 +318,10 @@ export default function DashboardView() {
               </div>
             )}
           </div>
-        </div>
+        </motion.div>
 
         {/* Quick status */}
-        <div className="glass-panel p-4">
+        <motion.div className="glass-panel p-4" variants={fadeUp} transition={{ duration: 0.5 }}>
           <div className="mb-3 flex items-start gap-2.5">
             <Activity className="size-5 text-muted-foreground mt-0.5 shrink-0" strokeWidth={1.5} />
             <div>
@@ -401,8 +403,8 @@ export default function DashboardView() {
             </div>
           </div>
           <div className="mt-3.5 text-[11px] text-muted-foreground text-center opacity-70">Atualizado com base nos seus lançamentos deste mês.</div>
-        </div>
-      </div>
-    </div>
+        </motion.div>
+      </motion.div>
+    </motion.div>
   );
 }
