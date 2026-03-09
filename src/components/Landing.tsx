@@ -1,6 +1,7 @@
 import { useApp } from '@/contexts/AppContext';
 import { motion } from 'framer-motion';
 import { Shield, Zap, Smartphone, BarChart3, CalendarCheck, PiggyBank, ArrowRight, Sparkles } from 'lucide-react';
+import AppLogo from './AppLogo';
 
 const fadeUp = {
   hidden: { opacity: 0, y: 24 },
