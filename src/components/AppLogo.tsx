@@ -1,15 +1,17 @@
 import { motion } from 'framer-motion';
+import appIcon from '@/assets/app-icon.png';
 
 interface AppLogoProps {
-  size?: 'sm' | 'md' | 'lg';
+  size?: 'sm' | 'md' | 'lg' | 'xl';
   showText?: boolean;
   subtitle?: string;
 }
 
 const sizes = {
-  sm: { icon: 'w-8 h-8', ring: 'w-9 h-9', text: 'text-sm', sub: 'text-[10px]' },
-  md: { icon: 'w-10 h-10', ring: 'w-11 h-11', text: 'text-sm', sub: 'text-[11px]' },
-  lg: { icon: 'w-12 h-12', ring: 'w-14 h-14', text: 'text-base', sub: 'text-sm' },
+  sm: { icon: 'w-9 h-9', ring: 'w-10 h-10', text: 'text-sm', sub: 'text-[10px]' },
+  md: { icon: 'w-11 h-11', ring: 'w-12 h-12', text: 'text-base', sub: 'text-[11px]' },
+  lg: { icon: 'w-14 h-14', ring: 'w-16 h-16', text: 'text-lg', sub: 'text-sm' },
+  xl: { icon: 'w-20 h-20', ring: 'w-24 h-24', text: 'text-2xl', sub: 'text-base' },
 };
 
 export default function AppLogo({ size = 'md', showText = true, subtitle }: AppLogoProps) {
@@ -24,19 +26,19 @@ export default function AppLogo({ size = 'md', showText = true, subtitle }: AppL
         transition={{ type: 'spring', stiffness: 400, damping: 20 }}
       >
         {/* Glow ring */}
-        <div className="absolute inset-0 rounded-2xl bg-primary/20 blur-md" />
+        <div className="absolute inset-0 rounded-2xl bg-primary/25 blur-lg scale-110" />
         {/* Icon container */}
-        <div className={`relative ${s.icon} rounded-2xl bg-gradient-to-br from-primary to-primary/80 shadow-lg shadow-primary/25 flex items-center justify-center overflow-hidden border border-primary/30`}>
+        <div className={`relative ${s.icon} rounded-2xl shadow-lg shadow-primary/30 flex items-center justify-center overflow-hidden`}>
           <img
-            src="/favicon.png"
+            src={appIcon}
             alt="Conta Clara"
-            className="w-full h-full object-contain p-1 brightness-0 invert drop-shadow-sm"
+            className="w-full h-full object-cover rounded-2xl"
           />
         </div>
       </motion.div>
       {showText && (
         <div className="min-w-0">
-          <h1 className={`${s.text} font-bold leading-tight tracking-tight`}>Conta Clara</h1>
+          <h1 className={`${s.text} font-black leading-tight tracking-tight`}>Conta Clara</h1>
           {subtitle && (
             <p className={`${s.sub} text-muted-foreground mt-0.5 truncate`}>{subtitle}</p>
           )}

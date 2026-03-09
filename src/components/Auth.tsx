@@ -3,6 +3,7 @@ import { useApp } from '@/contexts/AppContext';
 import { toast } from 'sonner';
 import { lovable } from '@/integrations/lovable/index';
 import { Cloud, ShieldCheck, Smartphone, DatabaseBackup, ArrowLeft, Mail, Lock, User, LogIn, UserPlus, KeyRound, Send } from 'lucide-react';
+import AppLogo from './AppLogo';
 
 export default function Auth() {
   const { setScreen, onAuthSuccess } = useApp();
@@ -55,13 +56,7 @@ export default function Auth() {
         {/* Left Info */}
         <div className="glass-panel p-7 relative overflow-hidden">
           <div className="relative z-10">
-            <div className="flex items-center gap-3">
-              <img src="/favicon.png" alt="Conta Clara" className="w-12 h-12 rounded-2xl" />
-              <div>
-                <h1 className="text-base font-bold">Conta Clara</h1>
-                <p className="text-sm text-muted-foreground mt-0.5">Simples de entender. Simples de usar.</p>
-              </div>
-            </div>
+            <AppLogo size="lg" subtitle="Simples de entender. Simples de usar." />
             <h2 className="text-xl font-bold mt-5 mb-2">Seus dados salvos na nuvem.</h2>
             <p className="text-muted-foreground leading-relaxed text-sm">
               Crie sua conta para manter suas contas, lançamentos e metas sincronizados entre dispositivos. Tudo seguro e acessível de qualquer lugar.
