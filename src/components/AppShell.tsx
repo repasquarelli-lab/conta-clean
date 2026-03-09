@@ -289,6 +289,8 @@ export default function AppShell() {
           );
         })}
       </nav>
+      {/* Floating AI Copilot */}
+      <AiTipsWidget />
     </div>
   );
 }
