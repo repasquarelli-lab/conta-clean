@@ -434,10 +434,6 @@ export default function DashboardView() {
         </motion.div>
       )}
 
-      {/* AI Copilot */}
-      <motion.div variants={fadeUp} transition={{ duration: 0.5 }}>
-        <AiTipsWidget />
-      </motion.div>
 
       {/* Two columns */}
       <motion.div className="grid grid-cols-1 lg:grid-cols-[1.12fr_0.88fr] gap-3 sm:gap-4 mt-3 sm:mt-4" variants={staggerContainer}>
