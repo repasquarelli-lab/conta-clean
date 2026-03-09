@@ -5,6 +5,7 @@ import { LayoutDashboard, ArrowLeftRight, Pin, CalendarClock, FileText, Settings
 import { AnimatePresence, motion } from 'framer-motion';
 import { toast } from 'sonner';
 import AppLogo from './AppLogo';
+import AiTipsWidget from './AiTipsWidget';
 import { useTheme } from '@/hooks/use-theme';
 import { supabase } from '@/integrations/supabase/client';
 
@@ -288,6 +289,8 @@ export default function AppShell() {
           );
         })}
       </nav>
+      {/* Floating AI Copilot */}
+      <AiTipsWidget />
     </div>
   );
 }

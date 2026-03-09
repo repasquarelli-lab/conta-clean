@@ -5,7 +5,7 @@ import BillItem from '../BillItem';
 import { PieChart, Pie, Cell, ResponsiveContainer, Tooltip, BarChart, Bar, XAxis, YAxis, CartesianGrid, AreaChart, Area, Legend } from 'recharts';
 import MonthNavigator from '../MonthNavigator';
 import MarketTicker from '../MarketTicker';
-import AiTipsWidget from '../AiTipsWidget';
+
 import { TrendingUp, TrendingDown, Clock, Wallet, AlertCircle, PieChart as PieChartIcon, BarChart3, LineChart, Target, CalendarClock, Activity, CheckCircle2, Percent, ArrowUpRight, ArrowDownRight, Minus, type LucideIcon } from 'lucide-react';
 import { getCategoryIcon } from '@/lib/categoryIcons';
 import { motion } from 'framer-motion';
@@ -434,10 +434,6 @@ export default function DashboardView() {
         </motion.div>
       )}
 
-      {/* AI Copilot */}
-      <motion.div variants={fadeUp} transition={{ duration: 0.5 }}>
-        <AiTipsWidget />
-      </motion.div>
 
       {/* Two columns */}
       <motion.div className="grid grid-cols-1 lg:grid-cols-[1.12fr_0.88fr] gap-3 sm:gap-4 mt-3 sm:mt-4" variants={staggerContainer}>
