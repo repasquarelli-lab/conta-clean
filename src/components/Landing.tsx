@@ -25,11 +25,7 @@ export default function Landing() {
           >
             <div className="flex justify-between gap-3 items-center flex-wrap relative z-10">
               <div className="flex items-center gap-3">
-                <img src="/favicon.png" alt="Conta Clara" className="w-12 h-12 rounded-2xl shadow-lg" />
-                <div>
-                  <h1 className="text-base font-bold">Conta Clara</h1>
-                  <p className="text-sm text-muted-foreground mt-0.5">Finanças pessoais simplificadas</p>
-                </div>
+                <AppLogo size="lg" subtitle="Finanças pessoais simplificadas" />
               </div>
               <span className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full text-xs font-bold bg-primary/10 text-primary border border-primary/20">
                 <Sparkles className="w-3 h-3" /> Com inteligência artificial
