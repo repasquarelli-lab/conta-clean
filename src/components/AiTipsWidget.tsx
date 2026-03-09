@@ -235,8 +235,8 @@ export default function AiTipsWidget() {
             animate={{ opacity: 1, y: 0, scale: 1 }}
             exit={{ opacity: 0, y: 40, scale: 0.92 }}
             transition={{ type: 'spring', stiffness: 350, damping: 30 }}
-            className="fixed bottom-6 right-6 z-50 w-[calc(100vw-3rem)] max-w-md rounded-2xl border border-border bg-card shadow-2xl shadow-black/20 flex flex-col overflow-hidden"
-            style={{ maxHeight: 'calc(100vh - 6rem)' }}
+            className="fixed bottom-20 lg:bottom-6 right-4 lg:right-6 z-50 w-[calc(100vw-2rem)] lg:w-[calc(100vw-3rem)] max-w-md rounded-2xl border border-border bg-card shadow-2xl shadow-black/20 flex flex-col overflow-hidden"
+            style={{ maxHeight: 'calc(100vh - 8rem)' }}
           >
             {/* Header */}
             <div className="flex items-center justify-between px-4 py-3 border-b border-border bg-card/80 backdrop-blur-sm shrink-0">
