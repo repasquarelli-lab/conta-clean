@@ -4,6 +4,7 @@ import { saveState, overdueBills, dueTodayBills, currency, budgetProgress, today
 import { LayoutDashboard, ArrowLeftRight, Pin, CalendarClock, FileText, Settings, Menu, X, LogOut, Sun, Moon, Download, Upload, ShieldCheck } from 'lucide-react';
 import { AnimatePresence, motion } from 'framer-motion';
 import { toast } from 'sonner';
+import AppLogo from './AppLogo';
 import { useTheme } from '@/hooks/use-theme';
 import { supabase } from '@/integrations/supabase/client';
 
