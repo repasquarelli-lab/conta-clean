@@ -1,8 +1,9 @@
 import { useState } from 'react';
 import { useApp } from '@/contexts/AppContext';
 import { categories, currency, BudgetGoal, defaultNotificationSettings } from '@/lib/store';
-import { Plus, Trash2, Mail, User, Target, Download, RefreshCw, AlertTriangle, Save, Database, Bell, BellOff } from 'lucide-react';
+import { Plus, Trash2, Mail, User, Target, Download, RefreshCw, AlertTriangle, Save, Database, Bell, BellOff, Sun, Moon, Monitor } from 'lucide-react';
 import { getCategoryIcon } from '@/lib/categoryIcons';
+import { useTheme } from '@/hooks/use-theme';
 
 export default function ConfigView() {
   const { state, updateState, reloadDemo, onAuthSuccess } = useApp();
