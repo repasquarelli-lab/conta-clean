@@ -7,6 +7,7 @@ import { useTheme } from '@/hooks/use-theme';
 
 export default function ConfigView() {
   const { state, updateState, reloadDemo, onAuthSuccess } = useApp();
+  const { theme, toggleTheme } = useTheme();
   const userEmail = onAuthSuccess.user?.email || '';
   const [newCat, setNewCat] = useState('');
   const [newLimit, setNewLimit] = useState('');
