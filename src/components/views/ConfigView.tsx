@@ -99,32 +99,28 @@ export default function ConfigView() {
           <Sun className="size-5 text-muted-foreground mt-0.5 shrink-0" strokeWidth={1.5} />
           <div>
             <h3 className="font-bold">Aparência</h3>
-            <p className="text-muted-foreground text-sm">Escolha entre tema claro ou escuro</p>
+            <p className="text-muted-foreground text-sm">Escolha o tema do aplicativo</p>
           </div>
         </div>
         <div className="flex gap-2">
-          <button
-            onClick={() => theme !== 'light' && toggleTheme()}
-            className={`flex-1 flex items-center justify-center gap-2 p-3 rounded-xl border transition-all cursor-pointer ${
-              theme === 'light'
-                ? 'bg-primary/10 border-primary text-primary font-semibold'
-                : 'bg-accent border-border text-muted-foreground hover:border-primary/40'
-            }`}
-          >
-            <Sun className="size-4" strokeWidth={1.5} />
-            <span className="text-sm">Claro</span>
-          </button>
-          <button
-            onClick={() => theme !== 'dark' && toggleTheme()}
-            className={`flex-1 flex items-center justify-center gap-2 p-3 rounded-xl border transition-all cursor-pointer ${
-              theme === 'dark'
-                ? 'bg-primary/10 border-primary text-primary font-semibold'
-                : 'bg-accent border-border text-muted-foreground hover:border-primary/40'
-            }`}
-          >
-            <Moon className="size-4" strokeWidth={1.5} />
-            <span className="text-sm">Escuro</span>
-          </button>
+          {([
+            { value: 'light' as const, label: 'Claro', icon: Sun },
+            { value: 'dark' as const, label: 'Escuro', icon: Moon },
+            { value: 'system' as const, label: 'Sistema', icon: Monitor },
+          ]).map(opt => (
+            <button
+              key={opt.value}
+              onClick={() => setTheme(opt.value)}
+              className={`flex-1 flex items-center justify-center gap-2 p-3 rounded-xl border transition-all cursor-pointer ${
+                mode === opt.value
+                  ? 'bg-primary/10 border-primary text-primary font-semibold'
+                  : 'bg-accent border-border text-muted-foreground hover:border-primary/40'
+              }`}
+            >
+              <opt.icon className="size-4" strokeWidth={1.5} />
+              <span className="text-sm">{opt.label}</span>
+            </button>
+          ))}
         </div>
       </div>
 
