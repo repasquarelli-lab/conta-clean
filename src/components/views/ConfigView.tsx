@@ -93,7 +93,42 @@ export default function ConfigView() {
         </div>
       </div>
 
-      {/* Budget Goals */}
+      {/* Appearance / Theme */}
+      <div className="glass-panel p-4 mb-4">
+        <div className="flex items-start gap-2.5 mb-3">
+          <Sun className="size-5 text-muted-foreground mt-0.5 shrink-0" strokeWidth={1.5} />
+          <div>
+            <h3 className="font-bold">Aparência</h3>
+            <p className="text-muted-foreground text-sm">Escolha entre tema claro ou escuro</p>
+          </div>
+        </div>
+        <div className="flex gap-2">
+          <button
+            onClick={() => theme !== 'light' && toggleTheme()}
+            className={`flex-1 flex items-center justify-center gap-2 p-3 rounded-xl border transition-all cursor-pointer ${
+              theme === 'light'
+                ? 'bg-primary/10 border-primary text-primary font-semibold'
+                : 'bg-accent border-border text-muted-foreground hover:border-primary/40'
+            }`}
+          >
+            <Sun className="size-4" strokeWidth={1.5} />
+            <span className="text-sm">Claro</span>
+          </button>
+          <button
+            onClick={() => theme !== 'dark' && toggleTheme()}
+            className={`flex-1 flex items-center justify-center gap-2 p-3 rounded-xl border transition-all cursor-pointer ${
+              theme === 'dark'
+                ? 'bg-primary/10 border-primary text-primary font-semibold'
+                : 'bg-accent border-border text-muted-foreground hover:border-primary/40'
+            }`}
+          >
+            <Moon className="size-4" strokeWidth={1.5} />
+            <span className="text-sm">Escuro</span>
+          </button>
+        </div>
+      </div>
+
+
       <div className="glass-panel p-4 mb-4">
         <div className="flex items-start gap-2.5 mb-3">
           <Target className="size-5 text-muted-foreground mt-0.5 shrink-0" strokeWidth={1.5} />
