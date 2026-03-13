@@ -44,12 +44,26 @@ export interface AppState {
   entries: Entry[];
   budgetGoals?: BudgetGoal[];
   notificationSettings?: NotificationSettings;
+  customCategories?: string[];
+  customIncomeCategories?: string[];
 }
 
 const STORAGE_KEY = 'conta_clara_lite_v3';
 
-export const categories = ['Casa', 'Mercado', 'Saúde', 'Transporte', 'Beleza', 'Lazer', 'Filhos', 'Assinaturas', 'Outros'];
-export const incomeCategories = ['Salário', 'Aposentadoria', 'Comissão', 'Extra', 'Outros'];
+export const defaultCategories = ['Casa', 'Mercado', 'Saúde', 'Transporte', 'Beleza', 'Lazer', 'Filhos', 'Assinaturas', 'Outros'];
+export const defaultIncomeCategories = ['Salário', 'Aposentadoria', 'Comissão', 'Extra', 'Outros'];
+export const categories = defaultCategories;
+export const incomeCategories = defaultIncomeCategories;
+
+export function getAllCategories(state: AppState): string[] {
+  const custom = state.customCategories || [];
+  return [...new Set([...defaultCategories, ...custom])];
+}
+
+export function getAllIncomeCategories(state: AppState): string[] {
+  const custom = state.customIncomeCategories || [];
+  return [...new Set([...defaultIncomeCategories, ...custom])];
+}
 
 export function uid(): string {
   return Math.random().toString(36).slice(2, 10);

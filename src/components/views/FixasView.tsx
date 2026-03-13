@@ -1,13 +1,15 @@
 import { useState } from 'react';
 import { useApp } from '@/contexts/AppContext';
-import { uid, categories, currency, ensureMonthFixedBills } from '@/lib/store';
-import { PlusCircle, List, LayoutGrid, Save, Trash2, CalendarDays } from 'lucide-react';
+import { uid, getAllCategories, currency, ensureMonthFixedBills, FixedBill } from '@/lib/store';
+import { PlusCircle, List, LayoutGrid, Save, Trash2, CalendarDays, Pencil, X } from 'lucide-react';
 import { getCategoryIcon } from '@/lib/categoryIcons';
-import { motion } from 'framer-motion';
+import { motion, AnimatePresence } from 'framer-motion';
 
 export default function FixasView() {
   const { state, updateState, currentMonth, setCurrentMonth } = useApp();
   const [viewMode, setViewMode] = useState<'list' | 'grid'>('list');
+  const [editingBill, setEditingBill] = useState<FixedBill | null>(null);
+  const cats = getAllCategories(state);
 
   function handleSubmit(e: React.FormEvent<HTMLFormElement>) {
     e.preventDefault();
@@ -39,8 +41,86 @@ export default function FixasView() {
     });
   }
 
+  function startEdit(bill: FixedBill) {
+    setEditingBill({ ...bill });
+  }
+
+  function saveEdit() {
+    if (!editingBill) return;
+    updateState(prev => {
+      const oldBill = prev.fixedBills.find(f => f.id === editingBill.id);
+      return {
+        ...prev,
+        fixedBills: prev.fixedBills.map(f => f.id === editingBill.id ? editingBill : f),
+        // Update related entries
+        entries: prev.entries.map(e => {
+          if (e.sourceFixed && oldBill && e.desc === oldBill.name) {
+            return { ...e, desc: editingBill.name, value: editingBill.value, category: editingBill.category };
+          }
+          return e;
+        }),
+      };
+    });
+    setEditingBill(null);
+  }
+
   return (
     <div>
+      {/* Edit Modal */}
+      <AnimatePresence>
+        {editingBill && (
+          <motion.div
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            className="fixed inset-0 z-50 flex items-center justify-center p-4"
+            style={{ background: 'hsla(var(--background) / 0.8)', backdropFilter: 'blur(8px)' }}
+            onClick={() => setEditingBill(null)}
+          >
+            <motion.div
+              initial={{ opacity: 0, scale: 0.95, y: 20 }}
+              animate={{ opacity: 1, scale: 1, y: 0 }}
+              exit={{ opacity: 0, scale: 0.95, y: 20 }}
+              className="glass-panel p-5 w-full max-w-md rounded-2xl shadow-xl"
+              onClick={e => e.stopPropagation()}
+            >
+              <div className="flex items-center justify-between mb-4">
+                <h3 className="font-bold text-lg">Editar conta fixa</h3>
+                <button onClick={() => setEditingBill(null)} className="p-1.5 rounded-lg hover:bg-accent cursor-pointer transition-colors">
+                  <X className="size-5 text-muted-foreground" />
+                </button>
+              </div>
+              <div className="flex flex-col gap-3">
+                <div>
+                  <label className="text-xs font-medium mb-1 block">Nome</label>
+                  <input value={editingBill.name} onChange={e => setEditingBill({ ...editingBill, name: e.target.value })} className="w-full px-3 py-2.5 rounded-[14px] border border-border bg-input text-foreground text-sm outline-none" />
+                </div>
+                <div className="grid grid-cols-2 gap-3">
+                  <div>
+                    <label className="text-xs font-medium mb-1 block">Valor</label>
+                    <input type="number" step="0.01" min="0" value={editingBill.value} onChange={e => setEditingBill({ ...editingBill, value: Number(e.target.value) })} className="w-full px-3 py-2.5 rounded-[14px] border border-border bg-input text-foreground text-sm outline-none" />
+                  </div>
+                  <div>
+                    <label className="text-xs font-medium mb-1 block">Dia do vencimento</label>
+                    <input type="number" min="1" max="28" value={editingBill.day} onChange={e => setEditingBill({ ...editingBill, day: Number(e.target.value) })} className="w-full px-3 py-2.5 rounded-[14px] border border-border bg-input text-foreground text-sm outline-none" />
+                  </div>
+                </div>
+                <div>
+                  <label className="text-xs font-medium mb-1 block">Categoria</label>
+                  <select value={editingBill.category} onChange={e => setEditingBill({ ...editingBill, category: e.target.value })} className="w-full px-3 py-2.5 rounded-[14px] border border-border bg-input text-foreground text-sm outline-none">
+                    {cats.map(c => <option key={c} value={c}>{c}</option>)}
+                    {!cats.includes(editingBill.category) && <option value={editingBill.category}>{editingBill.category}</option>}
+                  </select>
+                </div>
+                <button onClick={saveEdit} className="brand-gradient border-none rounded-2xl px-4 py-2.5 font-bold cursor-pointer text-sm text-primary-foreground flex items-center justify-center gap-1.5 mt-1">
+                  <Save className="size-4" strokeWidth={1.5} /> Salvar alterações
+                </button>
+              </div>
+            </motion.div>
+          </motion.div>
+        )}
+      </AnimatePresence>
+
       <div className="glass-panel p-4 mb-4">
         <div className="flex items-start gap-2.5 mb-1">
           <PlusCircle className="size-5 text-muted-foreground mt-0.5 shrink-0" strokeWidth={1.5} />
@@ -66,7 +146,7 @@ export default function FixasView() {
             <div>
               <label className="text-xs font-medium mb-1 block">Categoria</label>
               <select name="category" className="w-full px-3 py-2.5 rounded-[14px] border border-border bg-input text-foreground text-sm outline-none">
-                {categories.map(c => <option key={c}>{c}</option>)}
+                {cats.map(c => <option key={c}>{c}</option>)}
               </select>
             </div>
           </div>
@@ -118,7 +198,12 @@ export default function FixasView() {
                     <td className="p-3 border-b border-border text-sm">Dia {f.day}</td>
                     <td className="p-3 border-b border-border text-sm">{currency(f.value)}</td>
                     <td className="p-3 border-b border-border text-sm">
-                      <button onClick={() => removeFixed(f.id)} className="badge-bad cursor-pointer text-xs font-bold flex items-center gap-1"><Trash2 className="size-3" /> Excluir</button>
+                      <div className="flex gap-2">
+                        <button onClick={() => startEdit(f)} className="badge-good cursor-pointer text-xs font-bold flex items-center gap-1">
+                          <Pencil className="size-3" /> Editar
+                        </button>
+                        <button onClick={() => removeFixed(f.id)} className="badge-bad cursor-pointer text-xs font-bold flex items-center gap-1"><Trash2 className="size-3" /> Excluir</button>
+                      </div>
                     </td>
                   </tr>
                 ))}
@@ -148,9 +233,14 @@ export default function FixasView() {
                       <p className="text-sm font-bold truncate">{f.name}</p>
                       <p className="text-[11px] text-muted-foreground">{f.category}</p>
                     </div>
-                    <button onClick={() => removeFixed(f.id)} className="badge-bad cursor-pointer text-[11px] font-bold flex items-center gap-1 active:scale-95 transition-transform shrink-0">
-                      <Trash2 className="size-3" />
-                    </button>
+                    <div className="flex gap-1.5 shrink-0">
+                      <button onClick={() => startEdit(f)} className="badge-good cursor-pointer text-[11px] font-bold flex items-center gap-1 active:scale-95 transition-transform">
+                        <Pencil className="size-3" />
+                      </button>
+                      <button onClick={() => removeFixed(f.id)} className="badge-bad cursor-pointer text-[11px] font-bold flex items-center gap-1 active:scale-95 transition-transform shrink-0">
+                        <Trash2 className="size-3" />
+                      </button>
+                    </div>
                   </div>
                   <div className="flex items-center justify-between border-t border-border pt-3">
                     <span className="text-lg font-black text-foreground">{currency(f.value)}</span>

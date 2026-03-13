@@ -1,10 +1,10 @@
 import { useState } from 'react';
 import { useApp } from '@/contexts/AppContext';
-import { getMonthEntries, currency, formatDate, todayISO, uid, categories, incomeCategories } from '@/lib/store';
+import { getMonthEntries, currency, formatDate, todayISO, uid, getAllCategories, getAllIncomeCategories, Entry } from '@/lib/store';
 import MonthNavigator from '../MonthNavigator';
-import { PlusCircle, List, LayoutGrid, Search, Check, Undo2, Trash2, ArrowDownCircle, ArrowUpCircle, Save } from 'lucide-react';
+import { PlusCircle, List, LayoutGrid, Search, Check, Undo2, Trash2, ArrowDownCircle, ArrowUpCircle, Save, Pencil, X } from 'lucide-react';
 import { getCategoryIcon } from '@/lib/categoryIcons';
-import { motion } from 'framer-motion';
+import { motion, AnimatePresence } from 'framer-motion';
 
 export default function LancamentosView() {
   const { state, updateState, currentMonth, setCurrentMonth } = useApp();
@@ -14,11 +14,13 @@ export default function LancamentosView() {
   const [filterCategory, setFilterCategory] = useState('all');
   const [filterStatus, setFilterStatus] = useState('all');
   const [viewMode, setViewMode] = useState<'list' | 'grid'>('list');
+  const [editingEntry, setEditingEntry] = useState<Entry | null>(null);
 
   const entries = getMonthEntries(state, currentMonth).sort((a, b) => a.date.localeCompare(b.date));
-  const cats = entryType === 'income' ? incomeCategories : categories;
+  const expenseCats = getAllCategories(state);
+  const incomeCats = getAllIncomeCategories(state);
+  const cats = entryType === 'income' ? incomeCats : expenseCats;
 
-  // Collect all unique categories from current month entries for filter
   const allMonthCategories = [...new Set(entries.map(e => e.category))].sort();
 
   const filtered = entries.filter(e => {
@@ -59,8 +61,100 @@ export default function LancamentosView() {
     updateState(prev => ({ ...prev, entries: prev.entries.filter(e => e.id !== id) }));
   }
 
+  function startEdit(entry: Entry) {
+    setEditingEntry({ ...entry });
+  }
+
+  function saveEdit() {
+    if (!editingEntry) return;
+    updateState(prev => ({
+      ...prev,
+      entries: prev.entries.map(e => e.id === editingEntry.id ? editingEntry : e),
+    }));
+    setEditingEntry(null);
+  }
+
+  const editCats = editingEntry
+    ? (editingEntry.type === 'income' ? incomeCats : expenseCats)
+    : [];
+
   return (
     <div>
+      {/* Edit Modal */}
+      <AnimatePresence>
+        {editingEntry && (
+          <motion.div
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            className="fixed inset-0 z-50 flex items-center justify-center p-4"
+            style={{ background: 'hsla(var(--background) / 0.8)', backdropFilter: 'blur(8px)' }}
+            onClick={() => setEditingEntry(null)}
+          >
+            <motion.div
+              initial={{ opacity: 0, scale: 0.95, y: 20 }}
+              animate={{ opacity: 1, scale: 1, y: 0 }}
+              exit={{ opacity: 0, scale: 0.95, y: 20 }}
+              className="glass-panel p-5 w-full max-w-md rounded-2xl shadow-xl"
+              onClick={e => e.stopPropagation()}
+            >
+              <div className="flex items-center justify-between mb-4">
+                <h3 className="font-bold text-lg">Editar lançamento</h3>
+                <button onClick={() => setEditingEntry(null)} className="p-1.5 rounded-lg hover:bg-accent cursor-pointer transition-colors">
+                  <X className="size-5 text-muted-foreground" />
+                </button>
+              </div>
+              <div className="flex flex-col gap-3">
+                <div>
+                  <label className="text-xs font-medium mb-1 block">Tipo</label>
+                  <div className="flex gap-2">
+                    <button type="button" onClick={() => setEditingEntry({ ...editingEntry, type: 'income' })} className={`flex-1 px-3 py-2.5 rounded-xl border text-sm cursor-pointer flex items-center justify-center gap-1.5 ${editingEntry.type === 'income' ? 'brand-gradient border-transparent text-primary-foreground font-bold' : 'bg-card border-border'}`}>
+                      <ArrowDownCircle className="size-4" strokeWidth={1.5} /> Receita
+                    </button>
+                    <button type="button" onClick={() => setEditingEntry({ ...editingEntry, type: 'expense' })} className={`flex-1 px-3 py-2.5 rounded-xl border text-sm cursor-pointer flex items-center justify-center gap-1.5 ${editingEntry.type === 'expense' ? 'brand-gradient border-transparent text-primary-foreground font-bold' : 'bg-card border-border'}`}>
+                      <ArrowUpCircle className="size-4" strokeWidth={1.5} /> Despesa
+                    </button>
+                  </div>
+                </div>
+                <div>
+                  <label className="text-xs font-medium mb-1 block">Descrição</label>
+                  <input value={editingEntry.desc} onChange={e => setEditingEntry({ ...editingEntry, desc: e.target.value })} className="w-full px-3 py-2.5 rounded-[14px] border border-border bg-input text-foreground text-sm outline-none" />
+                </div>
+                <div className="grid grid-cols-2 gap-3">
+                  <div>
+                    <label className="text-xs font-medium mb-1 block">Valor</label>
+                    <input type="number" step="0.01" min="0" value={editingEntry.value} onChange={e => setEditingEntry({ ...editingEntry, value: Number(e.target.value) })} className="w-full px-3 py-2.5 rounded-[14px] border border-border bg-input text-foreground text-sm outline-none" />
+                  </div>
+                  <div>
+                    <label className="text-xs font-medium mb-1 block">Data</label>
+                    <input type="date" value={editingEntry.date} onChange={e => setEditingEntry({ ...editingEntry, date: e.target.value })} className="w-full px-3 py-2.5 rounded-[14px] border border-border bg-input text-foreground text-sm outline-none" />
+                  </div>
+                </div>
+                <div className="grid grid-cols-2 gap-3">
+                  <div>
+                    <label className="text-xs font-medium mb-1 block">Categoria</label>
+                    <select value={editingEntry.category} onChange={e => setEditingEntry({ ...editingEntry, category: e.target.value })} className="w-full px-3 py-2.5 rounded-[14px] border border-border bg-input text-foreground text-sm outline-none">
+                      {editCats.map(c => <option key={c} value={c}>{c}</option>)}
+                      {!editCats.includes(editingEntry.category) && <option value={editingEntry.category}>{editingEntry.category}</option>}
+                    </select>
+                  </div>
+                  <div>
+                    <label className="text-xs font-medium mb-1 block">Status</label>
+                    <select value={editingEntry.paid ? 'true' : 'false'} onChange={e => setEditingEntry({ ...editingEntry, paid: e.target.value === 'true' })} className="w-full px-3 py-2.5 rounded-[14px] border border-border bg-input text-foreground text-sm outline-none">
+                      <option value="true">{editingEntry.type === 'income' ? 'Recebido' : 'Pago'}</option>
+                      <option value="false">Pendente</option>
+                    </select>
+                  </div>
+                </div>
+                <button onClick={saveEdit} className="brand-gradient border-none rounded-2xl px-4 py-2.5 font-bold cursor-pointer text-sm text-primary-foreground flex items-center justify-center gap-1.5 mt-1">
+                  <Save className="size-4" strokeWidth={1.5} /> Salvar alterações
+                </button>
+              </div>
+            </motion.div>
+          </motion.div>
+        )}
+      </AnimatePresence>
+
       <div className="glass-panel p-4 mb-4">
         <div className="flex justify-between items-center mb-3 flex-wrap gap-2">
           <div className="flex items-start gap-2.5">
@@ -193,6 +287,9 @@ export default function LancamentosView() {
                       </td>
                       <td className="p-3 border-b border-border text-sm">
                         <div className="flex gap-2 flex-wrap">
+                          <button onClick={() => startEdit(e)} className="badge-good cursor-pointer text-xs font-bold flex items-center gap-1">
+                            <Pencil className="size-3" /> Editar
+                          </button>
                           <button onClick={() => togglePaid(e.id)} className={`${e.paid ? 'badge-warn' : 'badge-good'} cursor-pointer text-xs font-bold flex items-center gap-1`}>
                             {e.paid ? <><Undo2 className="size-3" /> Pendente</> : <><Check className="size-3" /> Pago</>}
                           </button>
@@ -236,6 +333,9 @@ export default function LancamentosView() {
                         {e.type === 'income' ? '+' : '-'} {currency(e.value)}
                       </span>
                       <div className="flex gap-1.5">
+                        <button onClick={() => startEdit(e)} className="badge-good cursor-pointer text-[11px] font-bold flex items-center gap-1 active:scale-95 transition-transform">
+                          <Pencil className="size-3" />
+                        </button>
                         <button onClick={() => togglePaid(e.id)} className={`${e.paid ? 'badge-warn' : 'badge-good'} cursor-pointer text-[11px] font-bold flex items-center gap-1 active:scale-95 transition-transform`}>
                           {e.paid ? <Undo2 className="size-3" /> : <Check className="size-3" />}
                         </button>
@@ -288,6 +388,9 @@ export default function LancamentosView() {
                       <p className="text-[11px] text-muted-foreground mt-0.5">{e.type === 'income' ? '📅 Receb.' : '📅 Venc.'} {formatDate(e.date)}</p>
                     </div>
                     <div className="flex gap-1.5">
+                      <button onClick={() => startEdit(e)} className="badge-good cursor-pointer text-[11px] font-bold flex items-center gap-1 active:scale-95 transition-transform">
+                        <Pencil className="size-3" />
+                      </button>
                       <button onClick={() => togglePaid(e.id)} className={`${e.paid ? 'badge-warn' : 'badge-good'} cursor-pointer text-[11px] font-bold flex items-center gap-1 active:scale-95 transition-transform`}>
                         {e.paid ? <Undo2 className="size-3" /> : <Check className="size-3" />}
                       </button>

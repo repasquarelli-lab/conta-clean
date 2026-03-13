@@ -1,9 +1,11 @@
 import { useState } from 'react';
 import { useApp } from '@/contexts/AppContext';
-import { categories, currency, BudgetGoal, defaultNotificationSettings } from '@/lib/store';
-import { Plus, Trash2, Mail, User, Target, Download, RefreshCw, AlertTriangle, Save, Database, Bell, BellOff, Sun, Moon, Monitor } from 'lucide-react';
+import { getAllCategories, getAllIncomeCategories, defaultCategories, defaultIncomeCategories, currency, BudgetGoal, defaultNotificationSettings } from '@/lib/store';
+import { Plus, Trash2, Mail, User, Target, Download, RefreshCw, AlertTriangle, Save, Database, Bell, BellOff, Sun, Moon, Monitor, Tag, X } from 'lucide-react';
 import { getCategoryIcon } from '@/lib/categoryIcons';
 import { useTheme } from '@/hooks/use-theme';
+import { motion, AnimatePresence } from 'framer-motion';
+import { toast } from 'sonner';
 
 export default function ConfigView() {
   const { state, updateState, reloadDemo, onAuthSuccess } = useApp();
@@ -11,10 +13,14 @@ export default function ConfigView() {
   const userEmail = onAuthSuccess.user?.email || '';
   const [newCat, setNewCat] = useState('');
   const [newLimit, setNewLimit] = useState('');
+  const [newCustomCat, setNewCustomCat] = useState('');
+  const [newCustomIncomeCat, setNewCustomIncomeCat] = useState('');
 
+  const allCategories = getAllCategories(state);
+  const allIncomeCategories = getAllIncomeCategories(state);
   const goals = state.budgetGoals || [];
   const usedCategories = goals.map(g => g.category);
-  const availableCategories = categories.filter(c => !usedCategories.includes(c));
+  const availableCategories = allCategories.filter(c => !usedCategories.includes(c));
 
   function saveName() {
     const input = document.getElementById('configUserName') as HTMLInputElement;
@@ -49,6 +55,52 @@ export default function ConfigView() {
         g.category === category ? { ...g, limit } : g
       ),
     }));
+  }
+
+  function addCustomCategory() {
+    const name = newCustomCat.trim();
+    if (!name) return;
+    if (allCategories.includes(name)) {
+      toast.error('Essa categoria já existe!');
+      return;
+    }
+    updateState(prev => ({
+      ...prev,
+      customCategories: [...(prev.customCategories || []), name],
+    }));
+    setNewCustomCat('');
+    toast.success(`Categoria "${name}" criada!`);
+  }
+
+  function removeCustomCategory(name: string) {
+    updateState(prev => ({
+      ...prev,
+      customCategories: (prev.customCategories || []).filter(c => c !== name),
+    }));
+    toast.success(`Categoria "${name}" removida.`);
+  }
+
+  function addCustomIncomeCategory() {
+    const name = newCustomIncomeCat.trim();
+    if (!name) return;
+    if (allIncomeCategories.includes(name)) {
+      toast.error('Essa categoria já existe!');
+      return;
+    }
+    updateState(prev => ({
+      ...prev,
+      customIncomeCategories: [...(prev.customIncomeCategories || []), name],
+    }));
+    setNewCustomIncomeCat('');
+    toast.success(`Categoria de receita "${name}" criada!`);
+  }
+
+  function removeCustomIncomeCategory(name: string) {
+    updateState(prev => ({
+      ...prev,
+      customIncomeCategories: (prev.customIncomeCategories || []).filter(c => c !== name),
+    }));
+    toast.success(`Categoria "${name}" removida.`);
   }
 
   function exportBackup() {
@@ -124,6 +176,104 @@ export default function ConfigView() {
         </div>
       </div>
 
+      {/* Custom Categories */}
+      <div className="glass-panel p-4 mb-4">
+        <div className="flex items-start gap-2.5 mb-3">
+          <Tag className="size-5 text-muted-foreground mt-0.5 shrink-0" strokeWidth={1.5} />
+          <div>
+            <h3 className="font-bold">Categorias personalizadas</h3>
+            <p className="text-muted-foreground text-sm">Crie categorias além das padrões para organizar melhor</p>
+          </div>
+        </div>
+
+        {/* Expense categories */}
+        <div className="mb-4">
+          <h4 className="text-xs font-bold uppercase tracking-wider text-muted-foreground mb-2">Categorias de despesa</h4>
+          <div className="flex flex-wrap gap-1.5 mb-3">
+            {defaultCategories.map(c => {
+              const CatIcon = getCategoryIcon(c);
+              return (
+                <span key={c} className="flex items-center gap-1.5 px-2.5 py-1.5 rounded-lg bg-accent border border-border text-xs text-muted-foreground">
+                  <CatIcon className="size-3" strokeWidth={1.5} /> {c}
+                </span>
+              );
+            })}
+            <AnimatePresence>
+              {(state.customCategories || []).map(c => (
+                <motion.span
+                  key={c}
+                  initial={{ opacity: 0, scale: 0.8 }}
+                  animate={{ opacity: 1, scale: 1 }}
+                  exit={{ opacity: 0, scale: 0.8 }}
+                  className="flex items-center gap-1.5 px-2.5 py-1.5 rounded-lg bg-primary/10 border border-primary/30 text-xs text-primary font-medium"
+                >
+                  {c}
+                  <button onClick={() => removeCustomCategory(c)} className="hover:text-destructive cursor-pointer transition-colors">
+                    <X className="size-3" />
+                  </button>
+                </motion.span>
+              ))}
+            </AnimatePresence>
+          </div>
+          <div className="flex gap-2">
+            <input
+              value={newCustomCat}
+              onChange={e => setNewCustomCat(e.target.value)}
+              onKeyDown={e => e.key === 'Enter' && addCustomCategory()}
+              placeholder="Nome da nova categoria..."
+              className="flex-1 px-3 py-2.5 rounded-[14px] border border-border bg-input text-foreground text-sm outline-none placeholder:text-muted-foreground"
+              maxLength={30}
+            />
+            <button onClick={addCustomCategory} className="brand-gradient border-none rounded-2xl px-4 py-2.5 font-bold cursor-pointer text-sm text-primary-foreground flex items-center gap-1.5 shrink-0">
+              <Plus className="size-4" /> Adicionar
+            </button>
+          </div>
+        </div>
+
+        {/* Income categories */}
+        <div>
+          <h4 className="text-xs font-bold uppercase tracking-wider text-muted-foreground mb-2">Categorias de receita</h4>
+          <div className="flex flex-wrap gap-1.5 mb-3">
+            {defaultIncomeCategories.map(c => {
+              const CatIcon = getCategoryIcon(c);
+              return (
+                <span key={c} className="flex items-center gap-1.5 px-2.5 py-1.5 rounded-lg bg-accent border border-border text-xs text-muted-foreground">
+                  <CatIcon className="size-3" strokeWidth={1.5} /> {c}
+                </span>
+              );
+            })}
+            <AnimatePresence>
+              {(state.customIncomeCategories || []).map(c => (
+                <motion.span
+                  key={c}
+                  initial={{ opacity: 0, scale: 0.8 }}
+                  animate={{ opacity: 1, scale: 1 }}
+                  exit={{ opacity: 0, scale: 0.8 }}
+                  className="flex items-center gap-1.5 px-2.5 py-1.5 rounded-lg bg-primary/10 border border-primary/30 text-xs text-primary font-medium"
+                >
+                  {c}
+                  <button onClick={() => removeCustomIncomeCategory(c)} className="hover:text-destructive cursor-pointer transition-colors">
+                    <X className="size-3" />
+                  </button>
+                </motion.span>
+              ))}
+            </AnimatePresence>
+          </div>
+          <div className="flex gap-2">
+            <input
+              value={newCustomIncomeCat}
+              onChange={e => setNewCustomIncomeCat(e.target.value)}
+              onKeyDown={e => e.key === 'Enter' && addCustomIncomeCategory()}
+              placeholder="Nome da nova categoria..."
+              className="flex-1 px-3 py-2.5 rounded-[14px] border border-border bg-input text-foreground text-sm outline-none placeholder:text-muted-foreground"
+              maxLength={30}
+            />
+            <button onClick={addCustomIncomeCategory} className="brand-gradient border-none rounded-2xl px-4 py-2.5 font-bold cursor-pointer text-sm text-primary-foreground flex items-center gap-1.5 shrink-0">
+              <Plus className="size-4" /> Adicionar
+            </button>
+          </div>
+        </div>
+      </div>
 
       <div className="glass-panel p-4 mb-4">
         <div className="flex items-start gap-2.5 mb-3">
