@@ -44,6 +44,8 @@ export interface AppState {
   entries: Entry[];
   budgetGoals?: BudgetGoal[];
   notificationSettings?: NotificationSettings;
+  customCategories?: string[];
+  customIncomeCategories?: string[];
 }
 
 const STORAGE_KEY = 'conta_clara_lite_v3';
