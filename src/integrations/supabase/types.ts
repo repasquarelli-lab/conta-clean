@@ -114,21 +114,30 @@ export type Database = {
         Row: {
           brand_name: string
           created_at: string
+          custom_categories: Json | null
+          custom_income_categories: Json | null
           id: string
+          notification_settings: Json | null
           updated_at: string
           user_name: string
         }
         Insert: {
           brand_name?: string
           created_at?: string
+          custom_categories?: Json | null
+          custom_income_categories?: Json | null
           id: string
+          notification_settings?: Json | null
           updated_at?: string
           user_name?: string
         }
         Update: {
           brand_name?: string
           created_at?: string
+          custom_categories?: Json | null
+          custom_income_categories?: Json | null
           id?: string
+          notification_settings?: Json | null
           updated_at?: string
           user_name?: string
         }
