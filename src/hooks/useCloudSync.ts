@@ -73,9 +73,9 @@ export function useCloudSync(userId: string | undefined) {
       await supabase.from('profiles').update({
         user_name: state.userName,
         brand_name: state.brandName,
-        custom_categories: (state.customCategories || []) as unknown as Record<string, unknown>,
-        custom_income_categories: (state.customIncomeCategories || []) as unknown as Record<string, unknown>,
-        notification_settings: (state.notificationSettings || defaultNotificationSettings) as unknown as Record<string, unknown>,
+        custom_categories: JSON.parse(JSON.stringify(state.customCategories || [])),
+        custom_income_categories: JSON.parse(JSON.stringify(state.customIncomeCategories || [])),
+        notification_settings: JSON.parse(JSON.stringify(state.notificationSettings || defaultNotificationSettings)),
         updated_at: new Date().toISOString(),
       }).eq('id', userId);
 
