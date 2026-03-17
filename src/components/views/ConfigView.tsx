@@ -426,6 +426,20 @@ export default function ConfigView() {
         })()}
       </div>
 
+      {/* Subscription Management */}
+      <div className="glass-panel p-4 mb-4">
+        <div className="flex items-start gap-2.5 mb-3">
+          <CreditCard className="size-5 text-muted-foreground mt-0.5 shrink-0" strokeWidth={1.5} />
+          <div>
+            <h3 className="font-bold">Assinatura</h3>
+            <p className="text-muted-foreground text-sm">Gerencie seu plano e método de pagamento</p>
+          </div>
+        </div>
+        <button onClick={openPortal} className="brand-gradient border-none rounded-2xl px-4 py-2.5 font-bold cursor-pointer text-sm text-primary-foreground flex items-center gap-1.5">
+          <CreditCard className="size-4" strokeWidth={1.5} /> Gerenciar Assinatura
+        </button>
+      </div>
+
       <div className="glass-panel p-4">
         <div className="flex items-start gap-2.5 mb-3">
           <Database className="size-5 text-muted-foreground mt-0.5 shrink-0" strokeWidth={1.5} />
