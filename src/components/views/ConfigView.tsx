@@ -1,7 +1,8 @@
 import { useState } from 'react';
 import { useApp } from '@/contexts/AppContext';
 import { getAllCategories, getAllIncomeCategories, defaultCategories, defaultIncomeCategories, currency, BudgetGoal, defaultNotificationSettings } from '@/lib/store';
-import { Plus, Trash2, Mail, User, Target, Download, RefreshCw, AlertTriangle, Save, Database, Bell, BellOff, Sun, Moon, Monitor, Tag, X } from 'lucide-react';
+import { Plus, Trash2, Mail, User, Target, Download, RefreshCw, AlertTriangle, Save, Database, Bell, BellOff, Sun, Moon, Monitor, Tag, X, CreditCard } from 'lucide-react';
+import { useSubscription } from '@/hooks/useSubscription';
 import { getCategoryIcon } from '@/lib/categoryIcons';
 import { useTheme } from '@/hooks/use-theme';
 import { motion, AnimatePresence } from 'framer-motion';
@@ -10,6 +11,7 @@ import { toast } from 'sonner';
 export default function ConfigView() {
   const { state, updateState, reloadDemo, onAuthSuccess } = useApp();
   const { theme, mode, setTheme, toggleTheme } = useTheme();
+  const { openPortal } = useSubscription(onAuthSuccess.user);
   const userEmail = onAuthSuccess.user?.email || '';
   const [newCat, setNewCat] = useState('');
   const [newLimit, setNewLimit] = useState('');
@@ -422,6 +424,20 @@ export default function ConfigView() {
             </div>
           );
         })()}
+      </div>
+
+      {/* Subscription Management */}
+      <div className="glass-panel p-4 mb-4">
+        <div className="flex items-start gap-2.5 mb-3">
+          <CreditCard className="size-5 text-muted-foreground mt-0.5 shrink-0" strokeWidth={1.5} />
+          <div>
+            <h3 className="font-bold">Assinatura</h3>
+            <p className="text-muted-foreground text-sm">Gerencie seu plano e método de pagamento</p>
+          </div>
+        </div>
+        <button onClick={openPortal} className="brand-gradient border-none rounded-2xl px-4 py-2.5 font-bold cursor-pointer text-sm text-primary-foreground flex items-center gap-1.5">
+          <CreditCard className="size-4" strokeWidth={1.5} /> Gerenciar Assinatura
+        </button>
       </div>
 
       <div className="glass-panel p-4">
