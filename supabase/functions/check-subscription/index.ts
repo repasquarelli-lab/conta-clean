@@ -39,6 +39,27 @@ serve(async (req) => {
     if (!user?.email) throw new Error("User not authenticated or email not available");
     logStep("User authenticated", { userId: user.id, email: user.email });
 
+    // Check if user is admin — admins get full access
+    const { data: roles } = await supabaseClient
+      .from("user_roles")
+      .select("role")
+      .eq("user_id", user.id)
+      .eq("role", "admin");
+
+    if (roles && roles.length > 0) {
+      logStep("User is admin, granting full access");
+      return new Response(JSON.stringify({
+        subscribed: true,
+        is_admin: true,
+        trial_active: false,
+        trial_days_left: 0,
+        subscription_end: null,
+      }), {
+        headers: { ...corsHeaders, "Content-Type": "application/json" },
+        status: 200,
+      });
+    }
+
     // Calculate trial status based on account creation
     const createdAt = new Date(user.created_at);
     const now = new Date();
