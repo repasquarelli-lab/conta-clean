@@ -11,6 +11,7 @@ import { toast } from 'sonner';
 export default function ConfigView() {
   const { state, updateState, reloadDemo, onAuthSuccess } = useApp();
   const { theme, mode, setTheme, toggleTheme } = useTheme();
+  const { openPortal } = useSubscription(onAuthSuccess.user);
   const userEmail = onAuthSuccess.user?.email || '';
   const [newCat, setNewCat] = useState('');
   const [newLimit, setNewLimit] = useState('');
