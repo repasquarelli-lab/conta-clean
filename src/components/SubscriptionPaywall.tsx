@@ -2,6 +2,7 @@ import { Shield, CreditCard, Sparkles, BarChart3, Bell, Bot } from 'lucide-react
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { motion } from 'framer-motion';
+import AppLogo from '@/components/AppLogo';
 
 interface SubscriptionPaywallProps {
   onCheckout: () => void;
@@ -27,8 +28,8 @@ export default function SubscriptionPaywall({ onCheckout, loading }: Subscriptio
       >
         <Card className="border-primary/20 shadow-lg">
           <CardHeader className="text-center pb-2">
-            <div className="mx-auto mb-4 w-16 h-16 rounded-2xl bg-primary/10 flex items-center justify-center">
-              <CreditCard className="w-8 h-8 text-primary" />
+            <div className="mx-auto mb-4 flex justify-center">
+              <AppLogo size="lg" showText={false} />
             </div>
             <CardTitle className="text-2xl font-bold text-foreground">
               Seu período gratuito expirou
