@@ -65,8 +65,8 @@ serve(async (req) => {
     const now = new Date();
     const diffMs = now.getTime() - createdAt.getTime();
     const diffDays = diffMs / (1000 * 60 * 60 * 24);
-    const trialActive = diffDays <= 2;
-    const trialDaysLeft = trialActive ? Math.max(0, Math.ceil(2 - diffDays)) : 0;
+    const trialActive = diffDays <= 3;
+    const trialDaysLeft = trialActive ? Math.max(0, Math.ceil(3 - diffDays)) : 0;
     logStep("Trial check", { diffDays, trialActive, trialDaysLeft });
 
     const stripe = new Stripe(stripeKey, { apiVersion: "2025-08-27.basil" });

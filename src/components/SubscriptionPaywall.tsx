@@ -1,11 +1,13 @@
-import { Shield, CreditCard, Sparkles, BarChart3, Bell, Bot } from 'lucide-react';
+import { Shield, CreditCard, Sparkles, BarChart3, Bell, Bot, LogOut, Check } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { motion } from 'framer-motion';
 import AppLogo from '@/components/AppLogo';
+import { useState } from 'react';
 
 interface SubscriptionPaywallProps {
-  onCheckout: () => void;
+  onCheckout: (plan: 'monthly' | 'annual') => void;
+  onBack: () => void;
   loading?: boolean;
 }
 
@@ -17,7 +19,9 @@ const features = [
   { icon: Shield, label: 'Sincronização segura na nuvem' },
 ];
 
-export default function SubscriptionPaywall({ onCheckout, loading }: SubscriptionPaywallProps) {
+export default function SubscriptionPaywall({ onCheckout, onBack, loading }: SubscriptionPaywallProps) {
+  const [selected, setSelected] = useState<'monthly' | 'annual'>('annual');
+
   return (
     <div className="min-h-screen flex items-center justify-center bg-background p-4">
       <motion.div
@@ -35,13 +39,49 @@ export default function SubscriptionPaywall({ onCheckout, loading }: Subscriptio
               Seu período gratuito expirou
             </CardTitle>
             <p className="text-muted-foreground mt-2">
-              Continue usando todos os recursos do Conta Clara Lite por apenas
-            </p>
-            <p className="text-3xl font-bold text-primary mt-2">
-              R$ 14,90<span className="text-sm font-normal text-muted-foreground">/mês</span>
+              Continue usando todos os recursos do Conta Clara Lite
             </p>
           </CardHeader>
-          <CardContent className="space-y-6">
+          <CardContent className="space-y-5">
+            {/* Plan selection */}
+            <div className="grid grid-cols-2 gap-3">
+              <button
+                onClick={() => setSelected('monthly')}
+                className={`relative rounded-xl border-2 p-4 text-left transition-all ${
+                  selected === 'monthly'
+                    ? 'border-primary bg-primary/5'
+                    : 'border-border hover:border-primary/40'
+                }`}
+              >
+                {selected === 'monthly' && (
+                  <Check className="absolute top-2 right-2 w-4 h-4 text-primary" />
+                )}
+                <p className="text-xs font-medium text-muted-foreground">Mensal</p>
+                <p className="text-xl font-bold text-foreground mt-1">R$ 14,90</p>
+                <p className="text-xs text-muted-foreground">/mês</p>
+              </button>
+
+              <button
+                onClick={() => setSelected('annual')}
+                className={`relative rounded-xl border-2 p-4 text-left transition-all ${
+                  selected === 'annual'
+                    ? 'border-primary bg-primary/5'
+                    : 'border-border hover:border-primary/40'
+                }`}
+              >
+                {selected === 'annual' && (
+                  <Check className="absolute top-2 right-2 w-4 h-4 text-primary" />
+                )}
+                <div className="absolute -top-2.5 left-3 bg-primary text-primary-foreground text-[10px] font-bold px-2 py-0.5 rounded-full">
+                  ECONOMIZE 11%
+                </div>
+                <p className="text-xs font-medium text-muted-foreground">Anual</p>
+                <p className="text-xl font-bold text-foreground mt-1">R$ 159,90</p>
+                <p className="text-xs text-muted-foreground">R$ 13,33/mês</p>
+              </button>
+            </div>
+
+            {/* Features */}
             <div className="space-y-3">
               {features.map((f, i) => (
                 <motion.div
@@ -56,15 +96,26 @@ export default function SubscriptionPaywall({ onCheckout, loading }: Subscriptio
                 </motion.div>
               ))}
             </div>
+
             <Button
-              onClick={onCheckout}
+              onClick={() => onCheckout(selected)}
               disabled={loading}
               className="w-full h-12 text-base font-semibold"
               size="lg"
             >
               <CreditCard className="w-5 h-5 mr-2" />
-              Assinar agora
+              {selected === 'annual' ? 'Assinar plano anual' : 'Assinar plano mensal'}
             </Button>
+
+            <Button
+              variant="ghost"
+              onClick={onBack}
+              className="w-full text-muted-foreground"
+            >
+              <LogOut className="w-4 h-4 mr-2" />
+              Voltar e sair
+            </Button>
+
             <p className="text-xs text-center text-muted-foreground">
               Cancele a qualquer momento. Pagamento seguro via Stripe.
             </p>

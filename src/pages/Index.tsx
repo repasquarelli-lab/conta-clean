@@ -6,7 +6,7 @@ import SubscriptionPaywall from '@/components/SubscriptionPaywall';
 import { useSubscription } from '@/hooks/useSubscription';
 
 function ScreenRouter() {
-  const { screen, onAuthSuccess } = useApp();
+  const { screen, onAuthSuccess, logout } = useApp();
   const { hasAccess, loading: subLoading, openCheckout } = useSubscription(onAuthSuccess.user);
 
   if (screen === 'landing') return <Landing />;
@@ -22,7 +22,7 @@ function ScreenRouter() {
   }
 
   if (!hasAccess) {
-    return <SubscriptionPaywall onCheckout={openCheckout} />;
+    return <SubscriptionPaywall onCheckout={openCheckout} onBack={logout} />;
   }
 
   return <AppShell />;
