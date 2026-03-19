@@ -14,7 +14,7 @@ export function useSubscription(user: User | null) {
   const [state, setState] = useState<SubscriptionState>({
     subscribed: false,
     trialActive: true,
-    trialDaysLeft: 2,
+    trialDaysLeft: 3,
     subscriptionEnd: null,
     loading: true,
   });
@@ -48,9 +48,11 @@ export function useSubscription(user: User | null) {
     return () => clearInterval(interval);
   }, [checkSubscription]);
 
-  const openCheckout = useCallback(async () => {
+  const openCheckout = useCallback(async (plan: 'monthly' | 'annual' = 'monthly') => {
     try {
-      const { data, error } = await supabase.functions.invoke('create-checkout');
+      const { data, error } = await supabase.functions.invoke('create-checkout', {
+        body: { plan },
+      });
       if (error) throw error;
       if (data?.url) window.open(data.url, '_blank');
     } catch (err) {
