@@ -435,9 +435,14 @@ export default function ConfigView() {
             <p className="text-muted-foreground text-sm">Gerencie seu plano e método de pagamento</p>
           </div>
         </div>
-        <button onClick={openPortal} className="brand-gradient border-none rounded-2xl px-4 py-2.5 font-bold cursor-pointer text-sm text-primary-foreground flex items-center gap-1.5">
-          <CreditCard className="size-4" strokeWidth={1.5} /> Gerenciar Assinatura
-        </button>
+        <div className="flex gap-2.5 flex-wrap">
+          <button onClick={() => openCheckout('annual')} className="brand-gradient border-none rounded-2xl px-4 py-2.5 font-bold cursor-pointer text-sm text-primary-foreground flex items-center gap-1.5">
+            <CreditCard className="size-4" strokeWidth={1.5} /> Upgrade para Anual
+          </button>
+          <button onClick={openPortal} className="glass-panel rounded-2xl px-4 py-2.5 font-bold cursor-pointer text-sm flex items-center gap-1.5">
+            <CreditCard className="size-4" strokeWidth={1.5} /> Gerenciar Assinatura
+          </button>
+        </div>
       </div>
 
       <div className="glass-panel p-4">
