@@ -33,7 +33,13 @@ serve(async (req) => {
 
     const stripe = new Stripe(stripeKey, { apiVersion: "2025-08-27.basil" });
     const customers = await stripe.customers.list({ email: user.email, limit: 1 });
-    if (customers.data.length === 0) throw new Error("No Stripe customer found for this user");
+    if (customers.data.length === 0) {
+      // No Stripe customer yet — return the static portal login link
+      return new Response(JSON.stringify({ url: "https://billing.stripe.com/p/login/bJe00jfMa9LJfLM5MK6c000" }), {
+        headers: { ...corsHeaders, "Content-Type": "application/json" },
+        status: 200,
+      });
+    }
 
     const origin = req.headers.get("origin") || "http://localhost:3000";
     const portalSession = await stripe.billingPortal.sessions.create({
