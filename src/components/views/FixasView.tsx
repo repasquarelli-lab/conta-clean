@@ -187,8 +187,25 @@ export default function FixasView() {
               </select>
             </div>
           </div>
+          <div>
+            <label className="text-xs font-medium mb-1 block flex items-center gap-1.5">
+              <CreditCard className="size-3.5" strokeWidth={1.5} /> Parcelar?
+            </label>
+            <select value={installments} onChange={e => setInstallments(Number(e.target.value))} className="w-full px-3 py-2.5 rounded-[14px] border border-border bg-input text-foreground text-sm outline-none">
+              <option value={1}>Não (conta fixa mensal)</option>
+              {[2,3,4,5,6,7,8,9,10,11,12].map(n => (
+                <option key={n} value={n}>{n}x parcelas (não recorrente)</option>
+              ))}
+            </select>
+            {installments > 1 && (
+              <p className="text-[11px] text-emerald-600 dark:text-emerald-400 mt-1 font-medium">
+                💡 Serão criados {installments} lançamentos distribuídos nos próximos meses
+              </p>
+            )}
+          </div>
+          </div>
           <div className="mt-3">
-            <button type="submit" className="brand-gradient border-none rounded-2xl px-4 py-2.5 font-bold cursor-pointer text-sm text-primary-foreground flex items-center gap-1.5"><Save className="size-4" strokeWidth={1.5} /> Salvar conta fixa</button>
+            <button type="submit" className="brand-gradient border-none rounded-2xl px-4 py-2.5 font-bold cursor-pointer text-sm text-primary-foreground flex items-center gap-1.5"><Save className="size-4" strokeWidth={1.5} /> {installments > 1 ? 'Criar parcelas' : 'Salvar conta fixa'}</button>
           </div>
         </form>
       </div>
