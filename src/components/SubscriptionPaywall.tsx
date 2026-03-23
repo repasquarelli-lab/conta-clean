@@ -1,14 +1,16 @@
-import { Shield, CreditCard, Sparkles, BarChart3, Bell, Bot, LogOut, Check } from 'lucide-react';
+import { Shield, CreditCard, Sparkles, BarChart3, Bell, Bot, LogOut, Check, Gift, Share2 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { motion } from 'framer-motion';
 import AppLogo from '@/components/AppLogo';
 import { useState } from 'react';
+import { toast } from 'sonner';
 
 interface SubscriptionPaywallProps {
   onCheckout: (plan: 'monthly' | 'annual') => void;
   onBack: () => void;
   loading?: boolean;
+  referralCode?: string;
 }
 
 const features = [
@@ -19,8 +21,19 @@ const features = [
   { icon: Shield, label: 'Sincronização segura na nuvem' },
 ];
 
-export default function SubscriptionPaywall({ onCheckout, onBack, loading }: SubscriptionPaywallProps) {
+export default function SubscriptionPaywall({ onCheckout, onBack, loading, referralCode }: SubscriptionPaywallProps) {
   const [selected, setSelected] = useState<'monthly' | 'annual'>('annual');
+
+  const referralLink = referralCode
+    ? `${window.location.origin}/?ref=${referralCode}`
+    : null;
+
+  function copyReferralLink() {
+    if (referralLink) {
+      navigator.clipboard.writeText(referralLink);
+      toast.success('Link copiado! Compartilhe com seus amigos.');
+    }
+  }
 
   return (
     <div className="min-h-screen flex items-center justify-center bg-background p-4">
@@ -43,6 +56,33 @@ export default function SubscriptionPaywall({ onCheckout, onBack, loading }: Sub
             </p>
           </CardHeader>
           <CardContent className="space-y-5">
+            {/* Referral Banner */}
+            {referralLink && (
+              <motion.div
+                initial={{ opacity: 0, scale: 0.95 }}
+                animate={{ opacity: 1, scale: 1 }}
+                transition={{ delay: 0.3 }}
+                className="rounded-xl border-2 border-dashed border-primary/30 bg-primary/5 p-3"
+              >
+                <div className="flex items-start gap-2.5">
+                  <Gift className="size-5 text-primary shrink-0 mt-0.5" />
+                  <div className="flex-1 min-w-0">
+                    <p className="text-sm font-bold text-foreground">Ganhe 1 mês grátis!</p>
+                    <p className="text-xs text-muted-foreground mt-0.5">
+                      Indique o aplicativo a um amigo através do link abaixo e ganhe um mês grátis quando ele assinar.
+                    </p>
+                    <button
+                      onClick={copyReferralLink}
+                      className="mt-2 flex items-center gap-1.5 text-xs font-semibold text-primary hover:text-primary/80 transition-colors cursor-pointer"
+                    >
+                      <Share2 className="size-3" />
+                      Copiar link de indicação
+                    </button>
+                  </div>
+                </div>
+              </motion.div>
+            )}
+
             {/* Plan selection */}
             <div className="grid grid-cols-2 gap-3">
               <button

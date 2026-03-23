@@ -1,7 +1,7 @@
 import { useState } from 'react';
 import { useApp } from '@/contexts/AppContext';
 import { uid, getAllCategories, currency, ensureMonthFixedBills, FixedBill } from '@/lib/store';
-import { PlusCircle, List, LayoutGrid, Save, Trash2, CalendarDays, Pencil, X } from 'lucide-react';
+import { PlusCircle, List, LayoutGrid, Save, Trash2, CalendarDays, Pencil, X, CreditCard } from 'lucide-react';
 import { getCategoryIcon } from '@/lib/categoryIcons';
 import { motion, AnimatePresence } from 'framer-motion';
 
@@ -9,24 +9,61 @@ export default function FixasView() {
   const { state, updateState, currentMonth, setCurrentMonth } = useApp();
   const [viewMode, setViewMode] = useState<'list' | 'grid'>('list');
   const [editingBill, setEditingBill] = useState<FixedBill | null>(null);
+  const [installments, setInstallments] = useState(1);
   const cats = getAllCategories(state);
 
   function handleSubmit(e: React.FormEvent<HTMLFormElement>) {
     e.preventDefault();
     const fd = new FormData(e.currentTarget);
-    updateState(prev => {
-      const next = {
-        ...prev,
-        fixedBills: [...prev.fixedBills, {
-          id: uid(),
-          name: (fd.get('name') as string).trim(),
-          value: Number(fd.get('value') || 0),
-          day: Number(fd.get('day') || 1),
-          category: fd.get('category') as string,
-        }],
-      };
-      return ensureMonthFixedBills(next, currentMonth);
-    });
+    const name = (fd.get('name') as string).trim();
+    const value = Number(fd.get('value') || 0);
+    const day = Number(fd.get('day') || 1);
+    const category = fd.get('category') as string;
+
+    if (installments > 1) {
+      // Parcelamento: create a fixed bill AND generate installment entries
+      const groupId = uid();
+      const [y, m] = currentMonth.split('-').map(Number);
+      const parcelValue = Math.round((value / installments) * 100) / 100;
+
+      updateState(prev => {
+        const newEntries = [...prev.entries];
+        for (let i = 0; i < installments; i++) {
+          const installDate = new Date(y, m - 1 + i, Math.min(day, 28));
+          const dateStr = `${installDate.getFullYear()}-${String(installDate.getMonth() + 1).padStart(2, '0')}-${String(installDate.getDate()).padStart(2, '0')}`;
+          newEntries.push({
+            id: uid(),
+            type: 'expense',
+            desc: `${name} (${i + 1}/${installments})`,
+            value: parcelValue,
+            date: dateStr,
+            category,
+            recurring: false,
+            paid: false,
+            sourceFixed: false,
+            installments,
+            installmentNumber: i + 1,
+            installmentGroup: groupId,
+          });
+        }
+        return { ...prev, entries: newEntries };
+      });
+    } else {
+      updateState(prev => {
+        const next = {
+          ...prev,
+          fixedBills: [...prev.fixedBills, {
+            id: uid(),
+            name,
+            value,
+            day,
+            category,
+          }],
+        };
+        return ensureMonthFixedBills(next, currentMonth);
+      });
+    }
+    setInstallments(1);
     e.currentTarget.reset();
   }
 
@@ -151,7 +188,23 @@ export default function FixasView() {
             </div>
           </div>
           <div className="mt-3">
-            <button type="submit" className="brand-gradient border-none rounded-2xl px-4 py-2.5 font-bold cursor-pointer text-sm text-primary-foreground flex items-center gap-1.5"><Save className="size-4" strokeWidth={1.5} /> Salvar conta fixa</button>
+            <label className="text-xs font-medium mb-1 block flex items-center gap-1.5">
+              <CreditCard className="size-3.5" strokeWidth={1.5} /> Parcelar?
+            </label>
+            <select value={installments} onChange={e => setInstallments(Number(e.target.value))} className="w-full px-3 py-2.5 rounded-[14px] border border-border bg-input text-foreground text-sm outline-none">
+              <option value={1}>Não (conta fixa mensal)</option>
+              {[2,3,4,5,6,7,8,9,10,11,12].map(n => (
+                <option key={n} value={n}>{n}x parcelas (não recorrente)</option>
+              ))}
+            </select>
+            {installments > 1 && (
+              <p className="text-[11px] text-emerald-600 dark:text-emerald-400 mt-1 font-medium">
+                💡 Serão criados {installments} lançamentos distribuídos nos próximos meses
+              </p>
+            )}
+          </div>
+          <div className="mt-3">
+            <button type="submit" className="brand-gradient border-none rounded-2xl px-4 py-2.5 font-bold cursor-pointer text-sm text-primary-foreground flex items-center gap-1.5"><Save className="size-4" strokeWidth={1.5} /> {installments > 1 ? 'Criar parcelas' : 'Salvar conta fixa'}</button>
           </div>
         </form>
       </div>

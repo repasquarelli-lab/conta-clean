@@ -21,6 +21,9 @@ export interface Entry {
   paid: boolean;
   recurring: boolean;
   sourceFixed?: boolean;
+  installments?: number;
+  installmentNumber?: number;
+  installmentGroup?: string;
 }
 
 export interface NotificationSettings {

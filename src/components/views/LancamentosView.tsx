@@ -2,51 +2,91 @@ import { useState } from 'react';
 import { useApp } from '@/contexts/AppContext';
 import { getMonthEntries, currency, formatDate, todayISO, uid, getAllCategories, getAllIncomeCategories, Entry } from '@/lib/store';
 import MonthNavigator from '../MonthNavigator';
-import { PlusCircle, List, LayoutGrid, Search, Check, Undo2, Trash2, ArrowDownCircle, ArrowUpCircle, Save, Pencil, X } from 'lucide-react';
+import { PlusCircle, List, LayoutGrid, Search, Check, Undo2, Trash2, ArrowDownCircle, ArrowUpCircle, Save, Pencil, X, CreditCard, TrendingUp, TrendingDown } from 'lucide-react';
 import { getCategoryIcon } from '@/lib/categoryIcons';
 import { motion, AnimatePresence } from 'framer-motion';
 
 export default function LancamentosView() {
   const { state, updateState, currentMonth, setCurrentMonth } = useApp();
+  const [activeTab, setActiveTab] = useState<'income' | 'expense'>('income');
   const [entryType, setEntryType] = useState<'income' | 'expense'>('income');
   const [search, setSearch] = useState('');
-  const [filterType, setFilterType] = useState('all');
   const [filterCategory, setFilterCategory] = useState('all');
   const [filterStatus, setFilterStatus] = useState('all');
   const [viewMode, setViewMode] = useState<'list' | 'grid'>('list');
   const [editingEntry, setEditingEntry] = useState<Entry | null>(null);
+  const [installments, setInstallments] = useState(1);
 
   const entries = getMonthEntries(state, currentMonth).sort((a, b) => a.date.localeCompare(b.date));
   const expenseCats = getAllCategories(state);
   const incomeCats = getAllIncomeCategories(state);
   const cats = entryType === 'income' ? incomeCats : expenseCats;
 
-  const allMonthCategories = [...new Set(entries.map(e => e.category))].sort();
+  const tabEntries = entries.filter(e => e.type === activeTab);
+  const allMonthCategories = [...new Set(tabEntries.map(e => e.category))].sort();
 
-  const filtered = entries.filter(e => {
+  const filtered = tabEntries.filter(e => {
     const okText = !search || e.desc.toLowerCase().includes(search.toLowerCase());
-    const okType = filterType === 'all' || e.type === filterType;
     const okCat = filterCategory === 'all' || e.category === filterCategory;
     const okStatus = filterStatus === 'all' || (filterStatus === 'paid' ? e.paid : !e.paid);
-    return okText && okType && okCat && okStatus;
+    return okText && okCat && okStatus;
   });
+
+  const totalIncome = entries.filter(e => e.type === 'income').reduce((a, b) => a + Number(b.value || 0), 0);
+  const totalExpense = entries.filter(e => e.type === 'expense').reduce((a, b) => a + Number(b.value || 0), 0);
 
   function handleSubmit(e: React.FormEvent<HTMLFormElement>) {
     e.preventDefault();
     const fd = new FormData(e.currentTarget);
-    updateState(prev => ({
-      ...prev,
-      entries: [...prev.entries, {
-        id: uid(),
-        type: entryType,
-        desc: (fd.get('desc') as string).trim(),
-        value: Number(fd.get('value') || 0),
-        date: fd.get('date') as string,
-        category: fd.get('category') as string,
-        recurring: fd.get('recurring') === 'true',
-        paid: fd.get('paid') === 'true',
-      }],
-    }));
+    const desc = (fd.get('desc') as string).trim();
+    const totalValue = Number(fd.get('value') || 0);
+    const date = fd.get('date') as string;
+    const category = fd.get('category') as string;
+    const recurring = fd.get('recurring') === 'true';
+    const paid = fd.get('paid') === 'true';
+
+    if (installments > 1 && entryType === 'expense') {
+      const groupId = uid();
+      const parcelValue = Math.round((totalValue / installments) * 100) / 100;
+      const [y, m, d] = date.split('-').map(Number);
+
+      updateState(prev => {
+        const newEntries = [...prev.entries];
+        for (let i = 0; i < installments; i++) {
+          const installDate = new Date(y, m - 1 + i, d);
+          const dateStr = `${installDate.getFullYear()}-${String(installDate.getMonth() + 1).padStart(2, '0')}-${String(installDate.getDate()).padStart(2, '0')}`;
+          newEntries.push({
+            id: uid(),
+            type: entryType,
+            desc: `${desc} (${i + 1}/${installments})`,
+            value: parcelValue,
+            date: dateStr,
+            category,
+            recurring,
+            paid: i === 0 ? paid : false,
+            installments,
+            installmentNumber: i + 1,
+            installmentGroup: groupId,
+          });
+        }
+        return { ...prev, entries: newEntries };
+      });
+    } else {
+      updateState(prev => ({
+        ...prev,
+        entries: [...prev.entries, {
+          id: uid(),
+          type: entryType,
+          desc,
+          value: totalValue,
+          date,
+          category,
+          recurring,
+          paid,
+        }],
+      }));
+    }
+    setInstallments(1);
     e.currentTarget.reset();
   }
 
@@ -155,6 +195,37 @@ export default function LancamentosView() {
         )}
       </AnimatePresence>
 
+      {/* Summary cards */}
+      <div className="grid grid-cols-2 gap-3 mb-4">
+        <motion.div
+          initial={{ opacity: 0, y: 10 }}
+          animate={{ opacity: 1, y: 0 }}
+          className="glass-panel p-4 border-l-4"
+          style={{ borderLeftColor: 'hsl(142, 71%, 45%)' }}
+        >
+          <div className="flex items-center gap-2 mb-1">
+            <TrendingUp className="size-4 text-emerald-600 dark:text-emerald-400" strokeWidth={1.5} />
+            <span className="text-xs font-medium text-muted-foreground">Total Entradas</span>
+          </div>
+          <p className="text-xl font-extrabold text-emerald-600 dark:text-emerald-400">{currency(totalIncome)}</p>
+          <p className="text-[11px] text-muted-foreground mt-0.5">{entries.filter(e => e.type === 'income').length} receitas no mês</p>
+        </motion.div>
+        <motion.div
+          initial={{ opacity: 0, y: 10 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ delay: 0.05 }}
+          className="glass-panel p-4 border-l-4"
+          style={{ borderLeftColor: 'hsl(0, 72%, 51%)' }}
+        >
+          <div className="flex items-center gap-2 mb-1">
+            <TrendingDown className="size-4 text-red-500 dark:text-red-400" strokeWidth={1.5} />
+            <span className="text-xs font-medium text-muted-foreground">Total Saídas</span>
+          </div>
+          <p className="text-xl font-extrabold text-red-500 dark:text-red-400">{currency(totalExpense)}</p>
+          <p className="text-[11px] text-muted-foreground mt-0.5">{entries.filter(e => e.type === 'expense').length} despesas no mês</p>
+        </motion.div>
+      </div>
+
       <div className="glass-panel p-4 mb-4">
         <div className="flex justify-between items-center mb-3 flex-wrap gap-2">
           <div className="flex items-start gap-2.5">
@@ -183,7 +254,7 @@ export default function LancamentosView() {
               <input name="desc" placeholder="Ex.: Mercado do mês" required className="w-full px-3 py-2.5 rounded-[14px] border border-border bg-input text-foreground text-sm outline-none placeholder:text-muted-foreground" />
             </div>
             <div>
-              <label className="text-xs font-medium mb-1 block">Valor</label>
+              <label className="text-xs font-medium mb-1 block">Valor {installments > 1 ? '(total)' : ''}</label>
               <input name="value" type="number" step="0.01" min="0" placeholder="0,00" required className="w-full px-3 py-2.5 rounded-[14px] border border-border bg-input text-foreground text-sm outline-none placeholder:text-muted-foreground" />
             </div>
             <div>
@@ -201,6 +272,24 @@ export default function LancamentosView() {
                 {cats.map(c => <option key={c} value={c}>{c}</option>)}
               </select>
             </div>
+            {entryType === 'expense' && (
+              <div>
+                <label className="text-xs font-medium mb-1 block flex items-center gap-1.5">
+                  <CreditCard className="size-3.5" strokeWidth={1.5} /> Parcelar?
+                </label>
+                <select value={installments} onChange={e => setInstallments(Number(e.target.value))} className="w-full px-3 py-2.5 rounded-[14px] border border-border bg-input text-foreground text-sm outline-none">
+                  <option value={1}>À vista</option>
+                  {[2,3,4,5,6,7,8,9,10,11,12].map(n => (
+                    <option key={n} value={n}>{n}x parcelas</option>
+                  ))}
+                </select>
+                {installments > 1 && (
+                  <p className="text-[11px] text-emerald-600 dark:text-emerald-400 mt-1 font-medium">
+                    💡 Cada parcela será distribuída automaticamente nos próximos meses
+                  </p>
+                )}
+              </div>
+            )}
             <div>
               <label className="text-xs font-medium mb-1 block">Repetir todo mês?</label>
               <select name="recurring" className="w-full px-3 py-2.5 rounded-[14px] border border-border bg-input text-foreground text-sm outline-none">
@@ -222,19 +311,30 @@ export default function LancamentosView() {
         </form>
       </div>
 
+      {/* Entries list with tabs */}
       <div className="glass-panel p-4">
         <div className="flex justify-between items-center mb-3 flex-wrap gap-2">
           <h3 className="font-bold flex items-center gap-2">
             <List className="size-5 text-muted-foreground" strokeWidth={1.5} />
             Lançamentos do mês
           </h3>
-          <div className="flex gap-1 bg-accent rounded-xl p-1 border border-border">
-            <button onClick={() => setViewMode('list')} className={`p-1.5 rounded-lg cursor-pointer transition-colors ${viewMode === 'list' ? 'bg-background shadow-sm text-foreground' : 'text-muted-foreground hover:text-foreground'}`} title="Visualização em lista">
-              <List className="size-4" strokeWidth={1.5} />
-            </button>
-            <button onClick={() => setViewMode('grid')} className={`p-1.5 rounded-lg cursor-pointer transition-colors ${viewMode === 'grid' ? 'bg-background shadow-sm text-foreground' : 'text-muted-foreground hover:text-foreground'}`} title="Visualização em quadro">
-              <LayoutGrid className="size-4" strokeWidth={1.5} />
-            </button>
+          <div className="flex gap-2 items-center">
+            <div className="flex gap-1 bg-accent rounded-xl p-1 border border-border">
+              <button onClick={() => setActiveTab('income')} className={`px-3 py-1.5 rounded-lg cursor-pointer text-xs font-medium transition-all flex items-center gap-1 ${activeTab === 'income' ? 'bg-emerald-500/15 shadow-sm text-emerald-700 dark:text-emerald-400 font-bold' : 'text-muted-foreground hover:text-foreground'}`}>
+                <TrendingUp className="size-3" /> Entradas
+              </button>
+              <button onClick={() => setActiveTab('expense')} className={`px-3 py-1.5 rounded-lg cursor-pointer text-xs font-medium transition-all flex items-center gap-1 ${activeTab === 'expense' ? 'bg-red-500/15 shadow-sm text-red-600 dark:text-red-400 font-bold' : 'text-muted-foreground hover:text-foreground'}`}>
+                <TrendingDown className="size-3" /> Saídas
+              </button>
+            </div>
+            <div className="flex gap-1 bg-accent rounded-xl p-1 border border-border">
+              <button onClick={() => setViewMode('list')} className={`p-1.5 rounded-lg cursor-pointer transition-colors ${viewMode === 'list' ? 'bg-background shadow-sm text-foreground' : 'text-muted-foreground hover:text-foreground'}`} title="Lista">
+                <List className="size-4" strokeWidth={1.5} />
+              </button>
+              <button onClick={() => setViewMode('grid')} className={`p-1.5 rounded-lg cursor-pointer transition-colors ${viewMode === 'grid' ? 'bg-background shadow-sm text-foreground' : 'text-muted-foreground hover:text-foreground'}`} title="Quadro">
+                <LayoutGrid className="size-4" strokeWidth={1.5} />
+              </button>
+            </div>
           </div>
         </div>
         <div className="flex gap-2 flex-wrap mb-3">
@@ -242,18 +342,13 @@ export default function LancamentosView() {
             <Search className="size-4 text-muted-foreground absolute left-3 top-1/2 -translate-y-1/2" strokeWidth={1.5} />
             <input placeholder="Buscar por descrição..." value={search} onChange={e => setSearch(e.target.value)} className="w-full pl-9 pr-3 py-2.5 rounded-[14px] border border-border bg-input text-foreground text-sm outline-none placeholder:text-muted-foreground" />
           </div>
-          <select value={filterType} onChange={e => setFilterType(e.target.value)} className="min-w-[120px] px-3 py-2.5 rounded-[14px] border border-border bg-input text-foreground text-sm outline-none">
-            <option value="all">Todos os tipos</option>
-            <option value="income">Só receitas</option>
-            <option value="expense">Só despesas</option>
-          </select>
           <select value={filterCategory} onChange={e => setFilterCategory(e.target.value)} className="min-w-[120px] px-3 py-2.5 rounded-[14px] border border-border bg-input text-foreground text-sm outline-none">
             <option value="all">Todas categorias</option>
             {allMonthCategories.map(c => <option key={c} value={c}>{c}</option>)}
           </select>
           <select value={filterStatus} onChange={e => setFilterStatus(e.target.value)} className="min-w-[110px] px-3 py-2.5 rounded-[14px] border border-border bg-input text-foreground text-sm outline-none">
             <option value="all">Qualquer status</option>
-            <option value="paid">Pagos/Recebidos</option>
+            <option value="paid">{activeTab === 'income' ? 'Recebidos' : 'Pagos'}</option>
             <option value="pending">Pendentes</option>
           </select>
         </div>
@@ -262,24 +357,34 @@ export default function LancamentosView() {
           <>
             {/* Desktop table */}
             <div className="overflow-auto border border-border rounded-2xl hidden sm:block">
-              <table className="w-full border-collapse min-w-[760px]" style={{ background: 'hsl(var(--accent))' }}>
+              <table className="w-full border-collapse min-w-[660px]" style={{ background: 'hsl(var(--accent))' }}>
                 <thead>
                   <tr>
-                    {['Tipo', 'Descrição', 'Categoria', 'Venc./Receb.', 'Valor', 'Situação', 'Ações'].map(h => (
+                    {['Descrição', 'Categoria', activeTab === 'income' ? 'Recebimento' : 'Vencimento', 'Valor', 'Situação', 'Ações'].map(h => (
                       <th key={h} className="p-3 border-b border-border text-left text-sm font-bold text-muted-foreground" style={{ background: 'hsla(220,40%,95%,0.02)' }}>{h}</th>
                     ))}
                   </tr>
                 </thead>
                 <tbody>
                   {filtered.length === 0 ? (
-                    <tr><td colSpan={7} className="p-4 text-center text-muted-foreground text-sm border-b border-border">Nenhum lançamento encontrado.</td></tr>
+                    <tr><td colSpan={6} className="p-4 text-center text-muted-foreground text-sm border-b border-border">Nenhum lançamento encontrado.</td></tr>
                   ) : filtered.map(e => (
                     <tr key={e.id} className="hover:bg-accent/50">
-                      <td className="p-3 border-b border-border text-sm">{e.type === 'income' ? 'Receita' : 'Despesa'}</td>
-                      <td className="p-3 border-b border-border text-sm">{e.desc}</td>
+                      <td className="p-3 border-b border-border text-sm">
+                        {e.desc}
+                        {e.installments && e.installments > 1 && (
+                          <span className="ml-1.5 text-[10px] font-bold px-1.5 py-0.5 rounded bg-primary/10 text-primary">
+                            {e.installmentNumber}/{e.installments}
+                          </span>
+                        )}
+                      </td>
                       <td className="p-3 border-b border-border text-sm">{e.category}</td>
                       <td className="p-3 border-b border-border text-sm">{formatDate(e.date)}</td>
-                      <td className="p-3 border-b border-border text-sm">{currency(e.value)}</td>
+                      <td className="p-3 border-b border-border text-sm font-semibold">
+                        <span className={activeTab === 'income' ? 'text-emerald-600 dark:text-emerald-400' : 'text-red-500 dark:text-red-400'}>
+                          {activeTab === 'income' ? '+' : '-'} {currency(e.value)}
+                        </span>
+                      </td>
                       <td className="p-3 border-b border-border text-sm">
                         <span className={e.paid ? 'badge-good' : 'badge-warn'}>
                           {e.type === 'income' ? (e.paid ? 'Recebido' : 'Pendente') : (e.paid ? 'Pago' : 'Pendente')}
@@ -321,7 +426,7 @@ export default function LancamentosView() {
                         </div>
                         <div className="min-w-0">
                           <p className="text-sm font-semibold truncate">{e.desc}</p>
-                          <p className="text-[11px] text-muted-foreground">{e.category} · {e.type === 'income' ? 'Receb.' : 'Venc.'} {formatDate(e.date)}</p>
+                          <p className="text-[11px] text-muted-foreground">{e.category} · {formatDate(e.date)}</p>
                         </div>
                       </div>
                       <span className={e.paid ? 'badge-good' : 'badge-warn'}>
@@ -329,7 +434,7 @@ export default function LancamentosView() {
                       </span>
                     </div>
                     <div className="flex items-center justify-between">
-                      <span className={`text-sm font-bold ${e.type === 'income' ? 'text-emerald-600 dark:text-emerald-400' : 'text-foreground'}`}>
+                      <span className={`text-sm font-bold ${e.type === 'income' ? 'text-emerald-600 dark:text-emerald-400' : 'text-red-500 dark:text-red-400'}`}>
                         {e.type === 'income' ? '+' : '-'} {currency(e.value)}
                       </span>
                       <div className="flex gap-1.5">
@@ -385,7 +490,7 @@ export default function LancamentosView() {
                       <span className={`text-lg font-black ${e.type === 'income' ? 'text-emerald-600 dark:text-emerald-400' : 'text-red-600 dark:text-red-400'}`}>
                         {e.type === 'income' ? '+' : '-'} {currency(e.value)}
                       </span>
-                      <p className="text-[11px] text-muted-foreground mt-0.5">{e.type === 'income' ? '📅 Receb.' : '📅 Venc.'} {formatDate(e.date)}</p>
+                      <p className="text-[11px] text-muted-foreground mt-0.5">📅 {formatDate(e.date)}</p>
                     </div>
                     <div className="flex gap-1.5">
                       <button onClick={() => startEdit(e)} className="badge-good cursor-pointer text-[11px] font-bold flex items-center gap-1 active:scale-95 transition-transform">
