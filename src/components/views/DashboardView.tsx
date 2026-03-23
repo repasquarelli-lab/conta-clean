@@ -150,16 +150,73 @@ export default function DashboardView() {
         <MonthNavigator month={currentMonth} onChange={setCurrentMonth} />
       </motion.div>
 
-      {/* Metrics */}
-      <motion.div className="grid grid-cols-2 gap-2 sm:gap-3 md:grid-cols-3 lg:grid-cols-5" variants={staggerContainer}>
+      {/* Income & Expense Sections */}
+      <motion.div className="grid grid-cols-1 lg:grid-cols-2 gap-3 sm:gap-4" variants={staggerContainer}>
+        {/* Entradas (Income) */}
+        <motion.div className="glass-panel p-3 sm:p-4 border-l-4" style={{ borderLeftColor: 'hsl(142, 71%, 45%)' }} variants={fadeUp} transition={{ duration: 0.35 }}>
+          <div className="flex items-center gap-2 mb-3">
+            <TrendingUp className="size-4 sm:size-5 text-emerald-600 dark:text-emerald-400" strokeWidth={1.5} />
+            <h3 className="font-bold text-sm sm:text-base text-emerald-700 dark:text-emerald-400">Entradas</h3>
+          </div>
+          <div className="grid grid-cols-2 gap-2">
+            <div className="p-2.5 rounded-xl bg-accent border border-border">
+              <p className="text-[10px] sm:text-xs text-muted-foreground">Total recebido</p>
+              <p className="text-lg sm:text-xl font-extrabold text-emerald-600 dark:text-emerald-400">{currency(m.incomes)}</p>
+            </div>
+            <div className="p-2.5 rounded-xl bg-accent border border-border">
+              <p className="text-[10px] sm:text-xs text-muted-foreground">Receitas pendentes</p>
+              <p className="text-lg sm:text-xl font-extrabold text-yellow-600 dark:text-yellow-400">
+                {currency(getMonthEntries(state, currentMonth).filter(e => e.type === 'income' && !e.paid).reduce((a, b) => a + Number(b.value || 0), 0))}
+              </p>
+            </div>
+          </div>
+          <div className="mt-2 flex flex-col gap-1">
+            {getMonthEntries(state, currentMonth).filter(e => e.type === 'income').slice(0, 3).map(e => (
+              <div key={e.id} className="flex items-center justify-between text-xs p-1.5 rounded-lg hover:bg-accent/50">
+                <span className="truncate flex-1">{e.desc}</span>
+                <span className={`font-semibold ml-2 ${e.paid ? 'text-emerald-600 dark:text-emerald-400' : 'text-muted-foreground'}`}>
+                  {currency(e.value)}
+                </span>
+              </div>
+            ))}
+          </div>
+        </motion.div>
+
+        {/* Saídas (Expenses) */}
+        <motion.div className="glass-panel p-3 sm:p-4 border-l-4" style={{ borderLeftColor: 'hsl(0, 72%, 51%)' }} variants={fadeUp} transition={{ duration: 0.35 }}>
+          <div className="flex items-center gap-2 mb-3">
+            <TrendingDown className="size-4 sm:size-5 text-red-500 dark:text-red-400" strokeWidth={1.5} />
+            <h3 className="font-bold text-sm sm:text-base text-red-600 dark:text-red-400">Saídas</h3>
+          </div>
+          <div className="grid grid-cols-2 gap-2">
+            <div className="p-2.5 rounded-xl bg-accent border border-border">
+              <p className="text-[10px] sm:text-xs text-muted-foreground">Total gasto</p>
+              <p className="text-lg sm:text-xl font-extrabold text-red-500 dark:text-red-400">{currency(m.expenses)}</p>
+            </div>
+            <div className="p-2.5 rounded-xl bg-accent border border-border">
+              <p className="text-[10px] sm:text-xs text-muted-foreground">Em aberto</p>
+              <p className="text-lg sm:text-xl font-extrabold text-yellow-600 dark:text-yellow-400">{currency(m.open)}</p>
+            </div>
+          </div>
+          <div className="mt-2 flex flex-col gap-1">
+            {getMonthEntries(state, currentMonth).filter(e => e.type === 'expense' && !e.paid).slice(0, 3).map(e => (
+              <div key={e.id} className="flex items-center justify-between text-xs p-1.5 rounded-lg hover:bg-accent/50">
+                <span className="truncate flex-1">{e.desc}</span>
+                <span className="font-semibold ml-2 text-red-500 dark:text-red-400">{currency(e.value)}</span>
+              </div>
+            ))}
+          </div>
+        </motion.div>
+      </motion.div>
+
+      {/* Summary Metrics */}
+      <motion.div className="grid grid-cols-2 sm:grid-cols-3 gap-2 sm:gap-3 mt-3 sm:mt-4" variants={staggerContainer}>
         {([
-          { label: 'Entrou no mês', value: currency(m.incomes), sub: 'Receitas registradas', icon: TrendingUp, accent: 'text-emerald-600 dark:text-emerald-400' },
-          { label: 'Saiu no mês', value: currency(m.expenses), sub: 'Despesas do mês', icon: TrendingDown, accent: 'text-red-500 dark:text-red-400' },
-          { label: 'Em aberto', value: currency(m.open), sub: 'Contas não pagas', icon: AlertCircle, accent: 'text-yellow-600 dark:text-yellow-400' },
           { label: 'Saldo do mês', value: currency(m.balance), sub: savingsTone, icon: Wallet, accent: m.balance >= 0 ? 'text-emerald-600 dark:text-emerald-400' : 'text-red-500 dark:text-red-400' },
           { label: 'Vence hoje', value: String(today.length), sub: 'Contas com vencimento hoje', icon: Clock, accent: today.length > 0 ? 'text-red-500 dark:text-red-400' : 'text-muted-foreground' },
-        ] as { label: string; value: string; sub: string; icon: LucideIcon; accent: string }[]).map((metric, idx) => (
-          <motion.div key={metric.label} className={`glass-panel p-3 sm:p-4 transition-all hover:border-primary/15 ${idx === 4 ? 'col-span-2 md:col-span-1' : ''}`} variants={fadeUp} transition={{ duration: 0.35 }}>
+          { label: 'Fixas do mês', value: currency(m.fixedExpenses), sub: `${fixedPct}% da renda`, icon: AlertCircle, accent: 'text-muted-foreground' },
+        ] as { label: string; value: string; sub: string; icon: LucideIcon; accent: string }[]).map((metric) => (
+          <motion.div key={metric.label} className="glass-panel p-3 sm:p-4 transition-all hover:border-primary/15" variants={fadeUp} transition={{ duration: 0.35 }}>
             <div className="flex items-center gap-2 mb-1.5 sm:mb-2">
               <div className="w-7 h-7 sm:w-8 sm:h-8 rounded-lg sm:rounded-xl grid place-items-center bg-accent border border-border">
                 <metric.icon className={`size-3.5 sm:size-4 shrink-0 ${metric.accent}`} strokeWidth={1.5} />
