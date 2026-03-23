@@ -187,7 +187,7 @@ export default function FixasView() {
               </select>
             </div>
           </div>
-          <div>
+          <div className="mt-3">
             <label className="text-xs font-medium mb-1 block flex items-center gap-1.5">
               <CreditCard className="size-3.5" strokeWidth={1.5} /> Parcelar?
             </label>
@@ -202,7 +202,6 @@ export default function FixasView() {
                 💡 Serão criados {installments} lançamentos distribuídos nos próximos meses
               </p>
             )}
-          </div>
           </div>
           <div className="mt-3">
             <button type="submit" className="brand-gradient border-none rounded-2xl px-4 py-2.5 font-bold cursor-pointer text-sm text-primary-foreground flex items-center gap-1.5"><Save className="size-4" strokeWidth={1.5} /> {installments > 1 ? 'Criar parcelas' : 'Salvar conta fixa'}</button>
