@@ -1,7 +1,7 @@
 import { useState } from 'react';
 import { useApp } from '@/contexts/AppContext';
 import { getAllCategories, getAllIncomeCategories, defaultCategories, defaultIncomeCategories, currency, BudgetGoal, defaultNotificationSettings } from '@/lib/store';
-import { Plus, Trash2, Mail, User, Target, Download, RefreshCw, AlertTriangle, Save, Database, Bell, BellOff, Sun, Moon, Monitor, Tag, X, CreditCard } from 'lucide-react';
+import { Plus, Trash2, Mail, User, Target, Download, RefreshCw, AlertTriangle, Save, Database, Bell, BellOff, Sun, Moon, Monitor, Tag, X, CreditCard, Gift, Copy, Check, Users } from 'lucide-react';
 import { useSubscription } from '@/hooks/useSubscription';
 import { getCategoryIcon } from '@/lib/categoryIcons';
 import { useTheme } from '@/hooks/use-theme';
