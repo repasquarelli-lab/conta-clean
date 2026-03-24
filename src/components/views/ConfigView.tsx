@@ -7,6 +7,7 @@ import { getCategoryIcon } from '@/lib/categoryIcons';
 import { useTheme } from '@/hooks/use-theme';
 import { motion, AnimatePresence } from 'framer-motion';
 import { toast } from 'sonner';
+import { useReferral } from '@/hooks/useReferral';
 
 export default function ConfigView() {
   const { state, updateState, reloadDemo, onAuthSuccess } = useApp();
