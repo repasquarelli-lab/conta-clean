@@ -56,7 +56,7 @@ serve(async (req) => {
     // Check if user was referred (has a converted referral where they are the referred_id)
     const { data: referral } = await supabaseClient
       .from("referrals")
-      .select("id, reward_applied")
+      .select("id, reward_applied, referrer_id")
       .eq("referred_id", user.id)
       .eq("status", "converted")
       .eq("reward_applied", false)
@@ -74,10 +74,10 @@ serve(async (req) => {
       cancel_url: `${req.headers.get("origin")}/?subscription=canceled`,
     };
 
-    // Apply referral coupon if eligible
+    // Apply referral coupon to the referred user if eligible
     if (hasReferralDiscount) {
       sessionParams.discounts = [{ coupon: REFERRAL_COUPON_ID }];
-      logStep("Applying referral coupon", { couponId: REFERRAL_COUPON_ID });
+      logStep("Applying referral coupon to referred user", { couponId: REFERRAL_COUPON_ID });
 
       // Mark referral reward as applied
       await supabaseClient
@@ -85,6 +85,40 @@ serve(async (req) => {
         .update({ reward_applied: true })
         .eq("id", referral![0].id);
       logStep("Referral reward marked as applied");
+
+      // Reward the referrer: apply coupon to their active subscription
+      try {
+        const referrerId = referral![0].referrer_id;
+        const { data: referrerUser } = await supabaseClient.auth.admin.getUserById(referrerId);
+        const referrerEmail = referrerUser?.user?.email;
+
+        if (referrerEmail) {
+          const referrerCustomers = await stripe.customers.list({ email: referrerEmail, limit: 1 });
+          if (referrerCustomers.data.length > 0) {
+            const referrerCustomerId = referrerCustomers.data[0].id;
+            const referrerSubs = await stripe.subscriptions.list({
+              customer: referrerCustomerId,
+              status: "active",
+              limit: 1,
+            });
+
+            if (referrerSubs.data.length > 0) {
+              // Apply the coupon to the referrer's active subscription
+              await stripe.subscriptions.update(referrerSubs.data[0].id, {
+                coupon: REFERRAL_COUPON_ID,
+              });
+              logStep("Referrer rewarded with free month", { referrerId, subscriptionId: referrerSubs.data[0].id });
+            } else {
+              logStep("Referrer has no active subscription to reward", { referrerId });
+            }
+          } else {
+            logStep("Referrer has no Stripe customer", { referrerId });
+          }
+        }
+      } catch (referrerErr) {
+        // Don't block checkout if referrer reward fails
+        logStep("Error rewarding referrer (non-blocking)", { error: referrerErr.message });
+      }
     }
 
     const session = await stripe.checkout.sessions.create(sessionParams);
