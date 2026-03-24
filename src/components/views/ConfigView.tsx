@@ -510,6 +510,7 @@ export default function ConfigView() {
         )}
       </div>
 
+      <div className="glass-panel p-4">
         <div className="flex items-start gap-2.5 mb-3">
           <Database className="size-5 text-muted-foreground mt-0.5 shrink-0" strokeWidth={1.5} />
           <div>
