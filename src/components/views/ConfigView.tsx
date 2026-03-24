@@ -13,7 +13,9 @@ export default function ConfigView() {
   const { state, updateState, reloadDemo, onAuthSuccess } = useApp();
   const { theme, mode, setTheme, toggleTheme } = useTheme();
   const { openPortal, openCheckout } = useSubscription(onAuthSuccess.user);
+  const { referralCode, stats } = useReferral(onAuthSuccess.user);
   const userEmail = onAuthSuccess.user?.email || '';
+  const [copied, setCopied] = useState(false);
   const [newCat, setNewCat] = useState('');
   const [newLimit, setNewLimit] = useState('');
   const [newCustomCat, setNewCustomCat] = useState('');
