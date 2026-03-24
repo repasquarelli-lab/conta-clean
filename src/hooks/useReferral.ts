@@ -2,9 +2,16 @@ import { useState, useEffect, useCallback } from 'react';
 import { supabase } from '@/integrations/supabase/client';
 import type { User } from '@supabase/supabase-js';
 
+export interface ReferralStats {
+  total: number;
+  converted: number;
+  rewarded: number;
+}
+
 export function useReferral(user: User | null) {
   const [referralCode, setReferralCode] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
+  const [stats, setStats] = useState<ReferralStats>({ total: 0, converted: 0, rewarded: 0 });
 
   const getOrCreateCode = useCallback(async () => {
     if (!user) return;
