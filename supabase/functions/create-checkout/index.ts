@@ -12,6 +12,13 @@ const PRICES: Record<string, string> = {
   annual: "price_1TCPLiHqwRqk6Qz3Pdgk1dPZ",
 };
 
+const REFERRAL_COUPON_ID = "uJMk0Uma";
+
+const logStep = (step: string, details?: any) => {
+  const detailsStr = details ? ` - ${JSON.stringify(details)}` : '';
+  console.log(`[CREATE-CHECKOUT] ${step}${detailsStr}`);
+};
+
 serve(async (req) => {
   if (req.method === "OPTIONS") {
     return new Response(null, { headers: corsHeaders });
@@ -19,7 +26,8 @@ serve(async (req) => {
 
   const supabaseClient = createClient(
     Deno.env.get("SUPABASE_URL") ?? "",
-    Deno.env.get("SUPABASE_ANON_KEY") ?? ""
+    Deno.env.get("SUPABASE_SERVICE_ROLE_KEY") ?? "",
+    { auth: { persistSession: false } }
   );
 
   try {
@@ -28,6 +36,7 @@ serve(async (req) => {
     const { data } = await supabaseClient.auth.getUser(token);
     const user = data.user;
     if (!user?.email) throw new Error("User not authenticated or email not available");
+    logStep("User authenticated", { userId: user.id, email: user.email });
 
     const body = await req.json().catch(() => ({}));
     const plan = body.plan || "monthly";
@@ -44,20 +53,49 @@ serve(async (req) => {
       customerId = customers.data[0].id;
     }
 
-    const session = await stripe.checkout.sessions.create({
+    // Check if user was referred (has a converted referral where they are the referred_id)
+    const { data: referral } = await supabaseClient
+      .from("referrals")
+      .select("id, reward_applied")
+      .eq("referred_id", user.id)
+      .eq("status", "converted")
+      .eq("reward_applied", false)
+      .limit(1);
+
+    const hasReferralDiscount = referral && referral.length > 0;
+    logStep("Referral check", { hasReferralDiscount, referralId: referral?.[0]?.id });
+
+    const sessionParams: any = {
       customer: customerId,
       customer_email: customerId ? undefined : user.email,
       line_items: [{ price: priceId, quantity: 1 }],
       mode: "subscription",
       success_url: `${req.headers.get("origin")}/?subscription=success`,
       cancel_url: `${req.headers.get("origin")}/?subscription=canceled`,
-    });
+    };
+
+    // Apply referral coupon if eligible
+    if (hasReferralDiscount) {
+      sessionParams.discounts = [{ coupon: REFERRAL_COUPON_ID }];
+      logStep("Applying referral coupon", { couponId: REFERRAL_COUPON_ID });
+
+      // Mark referral reward as applied
+      await supabaseClient
+        .from("referrals")
+        .update({ reward_applied: true })
+        .eq("id", referral![0].id);
+      logStep("Referral reward marked as applied");
+    }
+
+    const session = await stripe.checkout.sessions.create(sessionParams);
+    logStep("Checkout session created", { sessionId: session.id });
 
     return new Response(JSON.stringify({ url: session.url }), {
       headers: { ...corsHeaders, "Content-Type": "application/json" },
       status: 200,
     });
   } catch (error) {
+    logStep("ERROR", { message: error.message });
     return new Response(JSON.stringify({ error: error.message }), {
       headers: { ...corsHeaders, "Content-Type": "application/json" },
       status: 500,
