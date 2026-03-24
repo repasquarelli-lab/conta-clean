@@ -80,5 +80,5 @@ export function useReferral(user: User | null) {
     }
   }, [user, trackReferral]);
 
-  return { referralCode, loading };
+  return { referralCode, loading, stats, refreshStats: fetchStats };
 }
