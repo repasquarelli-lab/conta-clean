@@ -43,9 +43,25 @@ export function useReferral(user: User | null) {
     }
   }, [user]);
 
+  const fetchStats = useCallback(async () => {
+    if (!user) return;
+    try {
+      const { data, error } = await supabase.functions.invoke('referral', {
+        body: { action: 'get-stats' },
+      });
+      if (error) throw error;
+      setStats({ total: data.total || 0, converted: data.converted || 0, rewarded: data.rewarded || 0 });
+    } catch (err) {
+      console.error('Error fetching referral stats:', err);
+    }
+  }, [user]);
+
   useEffect(() => {
-    if (user) getOrCreateCode();
-  }, [user, getOrCreateCode]);
+    if (user) {
+      getOrCreateCode();
+      fetchStats();
+    }
+  }, [user, getOrCreateCode, fetchStats]);
 
   // Check URL for referral code on mount
   useEffect(() => {
