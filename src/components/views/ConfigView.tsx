@@ -448,7 +448,68 @@ export default function ConfigView() {
         </div>
       </div>
 
-      <div className="glass-panel p-4">
+      {/* Referral Panel */}
+      <div className="glass-panel p-4 mb-4">
+        <div className="flex items-start gap-2.5 mb-3">
+          <Gift className="size-5 text-muted-foreground mt-0.5 shrink-0" strokeWidth={1.5} />
+          <div>
+            <h3 className="font-bold">Indique e Ganhe</h3>
+            <p className="text-muted-foreground text-sm">Convide amigos e ganhe 1 mês grátis por cada indicação convertida</p>
+          </div>
+        </div>
+
+        {/* Stats */}
+        <div className="grid grid-cols-3 gap-2.5 mb-4">
+          <div className="p-3 rounded-xl bg-accent border border-border text-center">
+            <div className="flex items-center justify-center gap-1.5 mb-1">
+              <Users className="size-3.5 text-muted-foreground" strokeWidth={1.5} />
+            </div>
+            <div className="text-xl font-bold text-foreground">{stats.total}</div>
+            <div className="text-[11px] text-muted-foreground">Indicações</div>
+          </div>
+          <div className="p-3 rounded-xl bg-accent border border-border text-center">
+            <div className="flex items-center justify-center gap-1.5 mb-1">
+              <Check className="size-3.5 text-chart-2" strokeWidth={2} />
+            </div>
+            <div className="text-xl font-bold text-chart-2">{stats.converted}</div>
+            <div className="text-[11px] text-muted-foreground">Convertidas</div>
+          </div>
+          <div className="p-3 rounded-xl bg-accent border border-border text-center">
+            <div className="flex items-center justify-center gap-1.5 mb-1">
+              <Gift className="size-3.5 text-primary" strokeWidth={1.5} />
+            </div>
+            <div className="text-xl font-bold text-primary">{stats.rewarded}</div>
+            <div className="text-[11px] text-muted-foreground">Recompensas</div>
+          </div>
+        </div>
+
+        {/* Referral Link */}
+        {referralCode && (
+          <div>
+            <label className="text-xs font-medium mb-1.5 block">Seu link de indicação</label>
+            <div className="flex gap-2">
+              <input
+                readOnly
+                value={`${window.location.origin}/?ref=${referralCode}`}
+                className="flex-1 px-3 py-2.5 rounded-[14px] border border-border bg-input text-foreground text-sm outline-none select-all"
+              />
+              <button
+                onClick={() => {
+                  navigator.clipboard.writeText(`${window.location.origin}/?ref=${referralCode}`);
+                  setCopied(true);
+                  toast.success('Link copiado!');
+                  setTimeout(() => setCopied(false), 2000);
+                }}
+                className="brand-gradient border-none rounded-2xl px-4 py-2.5 font-bold cursor-pointer text-sm text-primary-foreground flex items-center gap-1.5 shrink-0"
+              >
+                {copied ? <Check className="size-4" strokeWidth={2} /> : <Copy className="size-4" strokeWidth={1.5} />}
+                {copied ? 'Copiado!' : 'Copiar'}
+              </button>
+            </div>
+          </div>
+        )}
+      </div>
+
         <div className="flex items-start gap-2.5 mb-3">
           <Database className="size-5 text-muted-foreground mt-0.5 shrink-0" strokeWidth={1.5} />
           <div>
