@@ -108,6 +108,29 @@ serve(async (req) => {
                 coupon: REFERRAL_COUPON_ID,
               });
               logStep("Referrer rewarded with free month", { referrerId, subscriptionId: referrerSubs.data[0].id });
+
+              // Send reward notification email to referrer
+              try {
+                const referrerProfile = await supabaseClient
+                  .from("profiles")
+                  .select("user_name")
+                  .eq("id", referrerId)
+                  .maybeSingle();
+
+                await supabaseClient.functions.invoke("send-transactional-email", {
+                  body: {
+                    templateName: "referral-reward",
+                    recipientEmail: referrerEmail,
+                    idempotencyKey: `referral-reward-${referral![0].id}`,
+                    templateData: {
+                      referrerName: referrerProfile?.data?.user_name || undefined,
+                    },
+                  },
+                });
+                logStep("Referral reward email sent to referrer", { referrerEmail });
+              } catch (emailErr) {
+                logStep("Error sending referral reward email (non-blocking)", { error: emailErr.message });
+              }
             } else {
               logStep("Referrer has no active subscription to reward", { referrerId });
             }
