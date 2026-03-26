@@ -45,7 +45,25 @@ export function useSubscription(user: User | null) {
   useEffect(() => {
     checkSubscription();
     const interval = setInterval(checkSubscription, 60000);
-    return () => clearInterval(interval);
+
+    // Re-check when tab regains focus (e.g. returning from Stripe checkout)
+    const handleFocus = () => checkSubscription();
+    window.addEventListener('focus', handleFocus);
+
+    // Handle ?subscription=success in URL
+    const params = new URLSearchParams(window.location.search);
+    if (params.get('subscription') === 'success') {
+      // Remove query param and force re-check
+      const url = new URL(window.location.href);
+      url.searchParams.delete('subscription');
+      window.history.replaceState({}, '', url.pathname);
+      checkSubscription();
+    }
+
+    return () => {
+      clearInterval(interval);
+      window.removeEventListener('focus', handleFocus);
+    };
   }, [checkSubscription]);
 
   const openCheckout = useCallback(async (plan: 'monthly' | 'annual' = 'monthly') => {
