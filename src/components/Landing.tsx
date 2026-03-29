@@ -10,22 +10,18 @@ const fadeUp = {
   visible: (i: number) => ({ opacity: 1, y: 0, transition: { delay: i * 0.08, duration: 0.5, ease: [0.25, 0.1, 0.25, 1] as const } }),
 };
 
-const float = {
-  animate: {
-    y: [0, -12, 0],
-    transition: { duration: 4, repeat: Infinity, ease: 'easeInOut' },
-  },
+const floatAnim = {
+  y: [0, -12, 0],
+  transition: { duration: 4, repeat: Infinity, ease: 'easeInOut' as const },
 };
 
-const glow = {
-  animate: {
-    boxShadow: [
-      '0 0 30px hsla(217, 90%, 55%, 0.2)',
-      '0 0 60px hsla(217, 90%, 55%, 0.35)',
-      '0 0 30px hsla(217, 90%, 55%, 0.2)',
-    ],
-    transition: { duration: 3, repeat: Infinity, ease: 'easeInOut' },
-  },
+const glowAnim = {
+  boxShadow: [
+    '0 0 30px hsla(217, 90%, 55%, 0.2)',
+    '0 0 60px hsla(217, 90%, 55%, 0.35)',
+    '0 0 30px hsla(217, 90%, 55%, 0.2)',
+  ],
+  transition: { duration: 3, repeat: Infinity, ease: 'easeInOut' as const },
 };
 
 export default function Landing() {
