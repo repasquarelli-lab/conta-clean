@@ -115,15 +115,13 @@ export default function Landing() {
             {/* Floating icon */}
             <motion.div
               className="absolute -top-4 -left-4 lg:top-0 lg:-left-8 z-20 w-24 h-24 md:w-32 md:h-32"
-              variants={float}
-              animate="animate"
+              animate={floatAnim}
             >
               <motion.img
                 src={heroIcon}
                 alt="Conta Clara Lite"
                 className="w-full h-full object-contain drop-shadow-2xl rounded-3xl"
-                variants={glow}
-                animate="animate"
+                animate={glowAnim}
               />
             </motion.div>
 
