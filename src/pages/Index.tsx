@@ -38,7 +38,6 @@ function ScreenRouter() {
       />
     );
   }
-  }
 
   return <AppShell />;
 }
