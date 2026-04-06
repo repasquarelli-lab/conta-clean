@@ -8,7 +8,7 @@ import { useReferral } from '@/hooks/useReferral';
 
 function ScreenRouter() {
   const { screen, onAuthSuccess, logout } = useApp();
-  const { hasAccess, loading: subLoading, openCheckout } = useSubscription(onAuthSuccess.user);
+  const { hasAccess, loading: subLoading, openCheckout, dataRetentionDaysLeft } = useSubscription(onAuthSuccess.user);
   const { referralCode } = useReferral(onAuthSuccess.user);
 
   if (screen === 'landing') return <Landing />;
@@ -24,7 +24,7 @@ function ScreenRouter() {
   }
 
   if (!hasAccess) {
-    return <SubscriptionPaywall onCheckout={openCheckout} onBack={logout} referralCode={referralCode || undefined} />;
+    return <SubscriptionPaywall onCheckout={openCheckout} onBack={logout} referralCode={referralCode || undefined} dataRetentionDaysLeft={dataRetentionDaysLeft} />;
   }
 
   return <AppShell />;
