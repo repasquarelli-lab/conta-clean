@@ -1,4 +1,4 @@
-import { Shield, CreditCard, Sparkles, BarChart3, Bell, Bot, LogOut, Check, Gift, Share2, AlertTriangle } from 'lucide-react';
+import { Shield, CreditCard, Sparkles, BarChart3, Bell, Bot, LogOut, Check, Gift, Share2, AlertTriangle, Download, FileText } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { motion } from 'framer-motion';
@@ -12,6 +12,9 @@ interface SubscriptionPaywallProps {
   loading?: boolean;
   referralCode?: string;
   dataRetentionDaysLeft?: number | null;
+  onExportCSV?: () => void;
+  onExportPDF?: () => void;
+  exporting?: boolean;
 }
 
 const features = [
@@ -22,7 +25,7 @@ const features = [
   { icon: Shield, label: 'Sincronização segura na nuvem' },
 ];
 
-export default function SubscriptionPaywall({ onCheckout, onBack, loading, referralCode, dataRetentionDaysLeft }: SubscriptionPaywallProps) {
+export default function SubscriptionPaywall({ onCheckout, onBack, loading, referralCode, dataRetentionDaysLeft, onExportCSV, onExportPDF, exporting }: SubscriptionPaywallProps) {
   const [selected, setSelected] = useState<'monthly' | 'annual'>('annual');
 
   const referralLink = referralCode
