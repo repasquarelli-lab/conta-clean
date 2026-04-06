@@ -7,6 +7,7 @@ interface SubscriptionState {
   trialActive: boolean;
   trialDaysLeft: number;
   subscriptionEnd: string | null;
+  dataRetentionDaysLeft: number | null;
   loading: boolean;
 }
 
@@ -16,6 +17,7 @@ export function useSubscription(user: User | null) {
     trialActive: true,
     trialDaysLeft: 3,
     subscriptionEnd: null,
+    dataRetentionDaysLeft: null,
     loading: true,
   });
 
@@ -34,6 +36,7 @@ export function useSubscription(user: User | null) {
         trialActive: data.trial_active,
         trialDaysLeft: data.trial_days_left,
         subscriptionEnd: data.subscription_end,
+        dataRetentionDaysLeft: data.data_retention_days_left ?? null,
         loading: false,
       });
     } catch (err) {
