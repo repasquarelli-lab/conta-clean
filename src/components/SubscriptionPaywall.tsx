@@ -1,4 +1,4 @@
-import { Shield, CreditCard, Sparkles, BarChart3, Bell, Bot, LogOut, Check, Gift, Share2 } from 'lucide-react';
+import { Shield, CreditCard, Sparkles, BarChart3, Bell, Bot, LogOut, Check, Gift, Share2, AlertTriangle } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { motion } from 'framer-motion';
@@ -11,6 +11,7 @@ interface SubscriptionPaywallProps {
   onBack: () => void;
   loading?: boolean;
   referralCode?: string;
+  dataRetentionDaysLeft?: number | null;
 }
 
 const features = [
@@ -21,7 +22,7 @@ const features = [
   { icon: Shield, label: 'Sincronização segura na nuvem' },
 ];
 
-export default function SubscriptionPaywall({ onCheckout, onBack, loading, referralCode }: SubscriptionPaywallProps) {
+export default function SubscriptionPaywall({ onCheckout, onBack, loading, referralCode, dataRetentionDaysLeft }: SubscriptionPaywallProps) {
   const [selected, setSelected] = useState<'monthly' | 'annual'>('annual');
 
   const referralLink = referralCode
@@ -78,6 +79,36 @@ export default function SubscriptionPaywall({ onCheckout, onBack, loading, refer
                       <Share2 className="size-3" />
                       Copiar link de indicação
                     </button>
+                  </div>
+                </div>
+              </motion.div>
+            )}
+
+            {/* Data retention warning */}
+            {dataRetentionDaysLeft !== null && dataRetentionDaysLeft !== undefined && dataRetentionDaysLeft <= 15 && (
+              <motion.div
+                initial={{ opacity: 0, scale: 0.95 }}
+                animate={{ opacity: 1, scale: 1 }}
+                transition={{ delay: 0.2 }}
+                className={`rounded-xl border-2 p-3 ${
+                  dataRetentionDaysLeft <= 3
+                    ? 'border-destructive/50 bg-destructive/10'
+                    : 'border-yellow-500/30 bg-yellow-500/5'
+                }`}
+              >
+                <div className="flex items-start gap-2.5">
+                  <AlertTriangle className={`size-5 shrink-0 mt-0.5 ${
+                    dataRetentionDaysLeft <= 3 ? 'text-destructive' : 'text-yellow-600'
+                  }`} />
+                  <div className="flex-1">
+                    <p className="text-sm font-bold text-foreground">
+                      {dataRetentionDaysLeft <= 0
+                        ? 'Seus dados estão sendo removidos'
+                        : `Seus dados serão excluídos em ${dataRetentionDaysLeft} dia${dataRetentionDaysLeft !== 1 ? 's' : ''}`}
+                    </p>
+                    <p className="text-xs text-muted-foreground mt-0.5">
+                      Assine agora para manter todos os seus lançamentos, contas fixas e metas.
+                    </p>
                   </div>
                 </div>
               </motion.div>

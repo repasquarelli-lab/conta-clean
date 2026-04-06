@@ -203,8 +203,10 @@ export type Database = {
           created_at: string
           custom_categories: Json | null
           custom_income_categories: Json | null
+          data_deletion_notified: boolean | null
           id: string
           notification_settings: Json | null
+          subscription_ended_at: string | null
           updated_at: string
           user_name: string
         }
@@ -213,8 +215,10 @@ export type Database = {
           created_at?: string
           custom_categories?: Json | null
           custom_income_categories?: Json | null
+          data_deletion_notified?: boolean | null
           id: string
           notification_settings?: Json | null
+          subscription_ended_at?: string | null
           updated_at?: string
           user_name?: string
         }
@@ -223,8 +227,10 @@ export type Database = {
           created_at?: string
           custom_categories?: Json | null
           custom_income_categories?: Json | null
+          data_deletion_notified?: boolean | null
           id?: string
           notification_settings?: Json | null
+          subscription_ended_at?: string | null
           updated_at?: string
           user_name?: string
         }
