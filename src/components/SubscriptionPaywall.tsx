@@ -1,4 +1,4 @@
-import { Shield, CreditCard, Sparkles, BarChart3, Bell, Bot, LogOut, Check, Gift, Share2, AlertTriangle } from 'lucide-react';
+import { Shield, CreditCard, Sparkles, BarChart3, Bell, Bot, LogOut, Check, Gift, Share2, AlertTriangle, Download, FileText } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { motion } from 'framer-motion';
@@ -12,6 +12,9 @@ interface SubscriptionPaywallProps {
   loading?: boolean;
   referralCode?: string;
   dataRetentionDaysLeft?: number | null;
+  onExportCSV?: () => void;
+  onExportPDF?: () => void;
+  exporting?: boolean;
 }
 
 const features = [
@@ -22,7 +25,7 @@ const features = [
   { icon: Shield, label: 'Sincronização segura na nuvem' },
 ];
 
-export default function SubscriptionPaywall({ onCheckout, onBack, loading, referralCode, dataRetentionDaysLeft }: SubscriptionPaywallProps) {
+export default function SubscriptionPaywall({ onCheckout, onBack, loading, referralCode, dataRetentionDaysLeft, onExportCSV, onExportPDF, exporting }: SubscriptionPaywallProps) {
   const [selected, setSelected] = useState<'monthly' | 'annual'>('annual');
 
   const referralLink = referralCode
@@ -107,8 +110,32 @@ export default function SubscriptionPaywall({ onCheckout, onBack, loading, refer
                         : `Seus dados serão excluídos em ${dataRetentionDaysLeft} dia${dataRetentionDaysLeft !== 1 ? 's' : ''}`}
                     </p>
                     <p className="text-xs text-muted-foreground mt-0.5">
-                      Assine agora para manter todos os seus lançamentos, contas fixas e metas.
+                      Assine agora para manter seus dados, ou exporte antes que sejam excluídos.
                     </p>
+                    {(onExportCSV || onExportPDF) && (
+                      <div className="flex gap-2 mt-2">
+                        {onExportCSV && (
+                          <button
+                            onClick={onExportCSV}
+                            disabled={exporting}
+                            className="flex items-center gap-1 text-xs font-semibold text-primary hover:text-primary/80 transition-colors cursor-pointer disabled:opacity-50"
+                          >
+                            <Download className="size-3" />
+                            Exportar CSV
+                          </button>
+                        )}
+                        {onExportPDF && (
+                          <button
+                            onClick={onExportPDF}
+                            disabled={exporting}
+                            className="flex items-center gap-1 text-xs font-semibold text-primary hover:text-primary/80 transition-colors cursor-pointer disabled:opacity-50"
+                          >
+                            <FileText className="size-3" />
+                            Exportar PDF
+                          </button>
+                        )}
+                      </div>
+                    )}
                   </div>
                 </div>
               </motion.div>
