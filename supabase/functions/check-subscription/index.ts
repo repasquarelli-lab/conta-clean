@@ -48,12 +48,19 @@ serve(async (req) => {
 
     if (roles && roles.length > 0) {
       logStep("User is admin, granting full access");
+      // Clear any retention tracking for admins
+      await supabaseClient.from("profiles").update({
+        subscription_ended_at: null,
+        data_deletion_notified: false,
+      }).eq("id", user.id);
+
       return new Response(JSON.stringify({
         subscribed: true,
         is_admin: true,
         trial_active: false,
         trial_days_left: 0,
         subscription_end: null,
+        data_retention_days_left: null,
       }), {
         headers: { ...corsHeaders, "Content-Type": "application/json" },
         status: 200,
@@ -72,35 +79,70 @@ serve(async (req) => {
     const stripe = new Stripe(stripeKey, { apiVersion: "2025-08-27.basil" });
     const customers = await stripe.customers.list({ email: user.email, limit: 1 });
 
-    if (customers.data.length === 0) {
-      logStep("No Stripe customer found");
-      return new Response(JSON.stringify({
-        subscribed: false,
-        trial_active: trialActive,
-        trial_days_left: trialDaysLeft,
-      }), {
-        headers: { ...corsHeaders, "Content-Type": "application/json" },
-        status: 200,
-      });
-    }
-
-    const customerId = customers.data[0].id;
-    logStep("Found Stripe customer", { customerId });
-
-    const subscriptions = await stripe.subscriptions.list({
-      customer: customerId,
-      status: "active",
-      limit: 1,
-    });
-    const hasActiveSub = subscriptions.data.length > 0;
+    let hasActiveSub = false;
     let subscriptionEnd = null;
 
-    if (hasActiveSub) {
-      const subscription = subscriptions.data[0];
-      subscriptionEnd = new Date(subscription.current_period_end * 1000).toISOString();
-      logStep("Active subscription found", { subscriptionId: subscription.id });
+    if (customers.data.length > 0) {
+      const customerId = customers.data[0].id;
+      logStep("Found Stripe customer", { customerId });
+
+      const subscriptions = await stripe.subscriptions.list({
+        customer: customerId,
+        status: "active",
+        limit: 1,
+      });
+      hasActiveSub = subscriptions.data.length > 0;
+
+      if (hasActiveSub) {
+        const subscription = subscriptions.data[0];
+        subscriptionEnd = new Date(subscription.current_period_end * 1000).toISOString();
+        logStep("Active subscription found", { subscriptionId: subscription.id });
+      } else {
+        logStep("No active subscription found");
+      }
     } else {
-      logStep("No active subscription found");
+      logStep("No Stripe customer found");
+    }
+
+    const hasAccess = hasActiveSub || trialActive;
+
+    // Track subscription_ended_at for data retention policy
+    if (hasAccess) {
+      // User has access — clear any retention tracking
+      await supabaseClient.from("profiles").update({
+        subscription_ended_at: null,
+        data_deletion_notified: false,
+      }).eq("id", user.id);
+    } else {
+      // User lost access — set subscription_ended_at if not already set
+      const { data: profile } = await supabaseClient
+        .from("profiles")
+        .select("subscription_ended_at")
+        .eq("id", user.id)
+        .single();
+
+      if (!profile?.subscription_ended_at) {
+        await supabaseClient.from("profiles").update({
+          subscription_ended_at: new Date().toISOString(),
+        }).eq("id", user.id);
+        logStep("Marked subscription_ended_at for data retention");
+      }
+    }
+
+    // Calculate data retention days left
+    let dataRetentionDaysLeft: number | null = null;
+    if (!hasAccess) {
+      const { data: profile } = await supabaseClient
+        .from("profiles")
+        .select("subscription_ended_at")
+        .eq("id", user.id)
+        .single();
+
+      if (profile?.subscription_ended_at) {
+        const endedAt = new Date(profile.subscription_ended_at);
+        const daysSinceEnd = (now.getTime() - endedAt.getTime()) / (1000 * 60 * 60 * 24);
+        dataRetentionDaysLeft = Math.max(0, Math.ceil(15 - daysSinceEnd));
+      }
     }
 
     return new Response(JSON.stringify({
@@ -108,6 +150,7 @@ serve(async (req) => {
       subscription_end: subscriptionEnd,
       trial_active: trialActive,
       trial_days_left: trialDaysLeft,
+      data_retention_days_left: dataRetentionDaysLeft,
     }), {
       headers: { ...corsHeaders, "Content-Type": "application/json" },
       status: 200,
