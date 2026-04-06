@@ -112,7 +112,7 @@ export default function SubscriptionPaywall({ onCheckout, onBack, loading, refer
                   </div>
                 </div>
               </motion.div>
-            )
+            )}
 
             {/* Plan selection */}
             <div className="grid grid-cols-2 gap-3">
