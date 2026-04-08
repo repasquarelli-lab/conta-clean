@@ -161,12 +161,12 @@ export default function DashboardView() {
           <div className="grid grid-cols-2 gap-2">
             <div className="p-2.5 rounded-xl bg-accent border border-border">
               <p className="text-[10px] sm:text-xs text-muted-foreground">Total recebido</p>
-              <p className="text-lg sm:text-xl font-extrabold text-emerald-600 dark:text-emerald-400">{currency(m.incomes)}</p>
+              <p className="text-lg sm:text-xl font-extrabold text-emerald-600 dark:text-emerald-400">{currency(m.paidIncomes)}</p>
             </div>
             <div className="p-2.5 rounded-xl bg-accent border border-border">
               <p className="text-[10px] sm:text-xs text-muted-foreground">Receitas pendentes</p>
               <p className="text-lg sm:text-xl font-extrabold text-yellow-600 dark:text-yellow-400">
-                {currency(getMonthEntries(state, currentMonth).filter(e => e.type === 'income' && !e.paid).reduce((a, b) => a + Number(b.value || 0), 0))}
+                {currency(m.pendingIncomes)}
               </p>
             </div>
           </div>
@@ -191,7 +191,7 @@ export default function DashboardView() {
           <div className="grid grid-cols-2 gap-2">
             <div className="p-2.5 rounded-xl bg-accent border border-border">
               <p className="text-[10px] sm:text-xs text-muted-foreground">Total gasto</p>
-              <p className="text-lg sm:text-xl font-extrabold text-red-500 dark:text-red-400">{currency(m.expenses)}</p>
+              <p className="text-lg sm:text-xl font-extrabold text-red-500 dark:text-red-400">{currency(m.paidExpenses)}</p>
             </div>
             <div className="p-2.5 rounded-xl bg-accent border border-border">
               <p className="text-[10px] sm:text-xs text-muted-foreground">Em aberto</p>
