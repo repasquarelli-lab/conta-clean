@@ -210,7 +210,7 @@ export default function DashboardView() {
       </motion.div>
 
       {/* Summary Metrics */}
-      <motion.div className="grid grid-cols-2 sm:grid-cols-3 gap-2 sm:gap-3 mt-3 sm:mt-4" variants={staggerContainer}>
+      <motion.div className="grid grid-cols-2 sm:grid-cols-4 gap-2 sm:gap-3 mt-3 sm:mt-4" variants={staggerContainer}>
         {([
           { label: 'Saldo do mês', value: currency(m.balance), sub: savingsTone, icon: Wallet, accent: m.balance >= 0 ? 'text-emerald-600 dark:text-emerald-400' : 'text-red-500 dark:text-red-400' },
           { label: 'Vence hoje', value: String(today.length), sub: 'Contas com vencimento hoje', icon: Clock, accent: today.length > 0 ? 'text-red-500 dark:text-red-400' : 'text-muted-foreground' },
@@ -226,6 +226,30 @@ export default function DashboardView() {
             <h3 className="text-muted-foreground text-[10px] sm:text-xs font-medium mt-0.5 sm:mt-1">{metric.label}</h3>
           </motion.div>
         ))}
+
+        {/* Paid vs Pending indicator */}
+        <motion.div className="glass-panel p-3 sm:p-4 transition-all hover:border-primary/15" variants={fadeUp} transition={{ duration: 0.35 }}>
+          <div className="flex items-center gap-2 mb-1.5 sm:mb-2">
+            <div className="w-7 h-7 sm:w-8 sm:h-8 rounded-lg sm:rounded-xl grid place-items-center bg-accent border border-border">
+              <CheckCircle2 className="size-3.5 sm:size-4 shrink-0 text-emerald-600 dark:text-emerald-400" strokeWidth={1.5} />
+            </div>
+          </div>
+          <p className="text-lg sm:text-2xl font-extrabold tracking-tight leading-tight">
+            {counts.paid}<span className="text-muted-foreground text-sm font-medium">/{counts.total}</span>
+          </p>
+          <h3 className="text-muted-foreground text-[10px] sm:text-xs font-medium mt-0.5 sm:mt-1">Contas pagas</h3>
+          {/* Progress bar */}
+          <div className="mt-2 w-full h-2 rounded-full bg-accent border border-border overflow-hidden">
+            <motion.div
+              className="h-full rounded-full"
+              style={{ background: progressPct === 100 ? 'hsl(142, 71%, 45%)' : progressPct >= 50 ? 'hsl(45, 90%, 55%)' : 'hsl(0, 72%, 51%)' }}
+              initial={{ width: 0 }}
+              animate={{ width: `${progressPct}%` }}
+              transition={{ duration: 0.8, ease: 'easeOut' }}
+            />
+          </div>
+          <p className="text-[10px] text-muted-foreground mt-1">{progressPct}% concluído</p>
+        </motion.div>
       </motion.div>
 
       {/* Charts */}
