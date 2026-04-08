@@ -175,6 +175,8 @@ export function getMonthEntries(state: AppState, month: string): Entry[] {
 export interface MonthMetrics {
   entries: Entry[];
   incomes: number;
+  paidIncomes: number;
+  pendingIncomes: number;
   expenses: number;
   open: number;
   paidExpenses: number;
@@ -186,11 +188,13 @@ export interface MonthMetrics {
 export function monthMetrics(state: AppState, month: string): MonthMetrics {
   const entries = getMonthEntries(state, month);
   const incomes = entries.filter(e => e.type === 'income').reduce((a, b) => a + Number(b.value || 0), 0);
+  const paidIncomes = entries.filter(e => e.type === 'income' && e.paid).reduce((a, b) => a + Number(b.value || 0), 0);
+  const pendingIncomes = entries.filter(e => e.type === 'income' && !e.paid).reduce((a, b) => a + Number(b.value || 0), 0);
   const expenses = entries.filter(e => e.type === 'expense').reduce((a, b) => a + Number(b.value || 0), 0);
   const open = entries.filter(e => e.type === 'expense' && !e.paid).reduce((a, b) => a + Number(b.value || 0), 0);
   const paidExpenses = entries.filter(e => e.type === 'expense' && e.paid).reduce((a, b) => a + Number(b.value || 0), 0);
   const fixedExpenses = entries.filter(e => e.type === 'expense' && e.recurring).reduce((a, b) => a + Number(b.value || 0), 0);
-  return { entries, incomes, expenses, open, paidExpenses, fixedExpenses, balance: incomes - expenses, free: incomes - paidExpenses - open };
+  return { entries, incomes, paidIncomes, pendingIncomes, expenses, open, paidExpenses, fixedExpenses, balance: paidIncomes - paidExpenses, free: paidIncomes - paidExpenses - open };
 }
 
 export function upcomingBills(state: AppState, days: number = 7) {

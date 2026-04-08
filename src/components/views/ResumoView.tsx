@@ -375,8 +375,8 @@ export default function ResumoView() {
         </div>
         <div className="grid grid-cols-2 lg:grid-cols-4 gap-3">
           {([
-            { label: 'Entradas', value: currency(m.incomes), icon: TrendingUp },
-            { label: 'Saídas', value: currency(m.expenses), icon: CreditCard },
+            { label: 'Recebido', value: currency(m.paidIncomes), icon: TrendingUp },
+            { label: 'Gasto', value: currency(m.paidExpenses), icon: CreditCard },
             { label: 'Em aberto', value: currency(m.open), icon: HelpCircle },
             { label: 'Sobra estimada', value: currency(m.free), icon: PiggyBank },
           ] as { label: string; value: string; icon: typeof TrendingUp }[]).map(item => (
