@@ -118,9 +118,9 @@ function getMonthComparison(state: AppState, month: string) {
 }
 
 export default function DashboardView() {
-  const { state, currentMonth, setCurrentMonth } = useApp();
+  const { state, currentMonth, setCurrentMonth, updateState } = useApp();
   const [evolutionChart, setEvolutionChart] = useState<'area' | 'bar'>('area');
-  
+  const [partialEntry, setPartialEntry] = useState<Entry | null>(null);
   ensureMonthFixedBills(state, currentMonth);
 
   const m = monthMetrics(state, currentMonth);
