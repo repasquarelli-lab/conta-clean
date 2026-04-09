@@ -1,12 +1,13 @@
 import { useState } from 'react';
 import { useApp } from '@/contexts/AppContext';
-import { currency, monthMetrics, paidCount, upcomingBills, dueTodayBills, overdueBills, topCategory, getMonthEntries, ensureMonthFixedBills, AppState, budgetProgress } from '@/lib/store';
+import { currency, monthMetrics, paidCount, upcomingBills, dueTodayBills, overdueBills, topCategory, getMonthEntries, ensureMonthFixedBills, AppState, budgetProgress, Entry } from '@/lib/store';
 import BillItem from '../BillItem';
+import PartialPaymentDialog from '../PartialPaymentDialog';
 import { PieChart, Pie, Cell, ResponsiveContainer, Tooltip, BarChart, Bar, XAxis, YAxis, CartesianGrid, AreaChart, Area, Legend } from 'recharts';
 import MonthNavigator from '../MonthNavigator';
 import MarketTicker from '../MarketTicker';
 
-import { TrendingUp, TrendingDown, Clock, Wallet, AlertCircle, PieChart as PieChartIcon, BarChart3, LineChart, Target, CalendarClock, Activity, CheckCircle2, Percent, ArrowUpRight, ArrowDownRight, Minus, type LucideIcon } from 'lucide-react';
+import { TrendingUp, TrendingDown, Clock, Wallet, AlertCircle, PieChart as PieChartIcon, BarChart3, LineChart, Target, CalendarClock, Activity, CheckCircle2, Percent, ArrowUpRight, ArrowDownRight, Minus, Check, Undo2, SplitSquareHorizontal, type LucideIcon } from 'lucide-react';
 import { getCategoryIcon } from '@/lib/categoryIcons';
 import { motion } from 'framer-motion';
 
