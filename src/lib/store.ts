@@ -24,6 +24,7 @@ export interface Entry {
   installments?: number;
   installmentNumber?: number;
   installmentGroup?: string;
+  partialOf?: string;
 }
 
 export interface NotificationSettings {
