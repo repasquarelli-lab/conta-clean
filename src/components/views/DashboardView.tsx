@@ -682,6 +682,13 @@ export default function DashboardView() {
           <div className="mt-3.5 text-[11px] text-muted-foreground text-center opacity-70">Atualizado com base nos seus lançamentos deste mês.</div>
         </motion.div>
       </motion.div>
+
+      {/* Partial Payment Dialog */}
+      <PartialPaymentDialog
+        entry={partialEntry!}
+        open={!!partialEntry}
+        onClose={() => setPartialEntry(null)}
+      />
     </motion.div>
   );
 }
