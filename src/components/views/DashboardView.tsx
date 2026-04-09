@@ -171,15 +171,42 @@ export default function DashboardView() {
               </p>
             </div>
           </div>
-          <div className="mt-2 flex flex-col gap-1">
-            {getMonthEntries(state, currentMonth).filter(e => e.type === 'income').slice(0, 3).map(e => (
-              <div key={e.id} className="flex items-center justify-between text-xs p-1.5 rounded-lg hover:bg-accent/50">
-                <span className="truncate flex-1">{e.desc}</span>
-                <span className={`font-semibold ml-2 ${e.paid ? 'text-emerald-600 dark:text-emerald-400' : 'text-muted-foreground'}`}>
-                  {currency(e.value)}
-                </span>
-              </div>
-            ))}
+          <div className="mt-2 flex flex-col gap-1.5">
+            {getMonthEntries(state, currentMonth).filter(e => e.type === 'income' && !e.partialOf).slice(0, 5).map(e => {
+              const partials = state.entries.filter(p => p.partialOf === e.id);
+              const totalPartials = partials.reduce((a, b) => a + Number(b.value || 0), 0);
+              const hasPartials = partials.length > 0;
+              return (
+                <div key={e.id} className="flex items-center justify-between gap-2 p-2 rounded-xl hover:bg-accent/50 border border-transparent hover:border-border transition-colors">
+                  <div className="min-w-0 flex-1">
+                    <span className="text-xs font-medium truncate block">{e.desc}</span>
+                    <span className={`text-xs font-bold ${e.paid ? 'text-emerald-600 dark:text-emerald-400' : 'text-muted-foreground'}`}>
+                      {currency(e.value)}
+                    </span>
+                    {hasPartials && (
+                      <span className="text-[10px] text-muted-foreground ml-1">
+                        ({currency(totalPartials)} recebido)
+                      </span>
+                    )}
+                  </div>
+                  <div className="flex gap-1 shrink-0">
+                    <button
+                      onClick={() => setPartialEntry(e)}
+                      className="badge-warn cursor-pointer text-[10px] font-bold flex items-center gap-0.5 active:scale-95 transition-transform"
+                      title="Recebimento parcial"
+                    >
+                      <SplitSquareHorizontal className="size-3" />
+                    </button>
+                    <button
+                      onClick={() => updateState(prev => ({ ...prev, entries: prev.entries.map(en => en.id === e.id ? { ...en, paid: !en.paid } : en) }))}
+                      className={`${e.paid ? 'badge-warn' : 'badge-good'} cursor-pointer text-[10px] font-bold flex items-center gap-0.5 active:scale-95 transition-transform`}
+                    >
+                      {e.paid ? <><Undo2 className="size-3" /></> : <><Check className="size-3" /></>}
+                    </button>
+                  </div>
+                </div>
+              );
+            })}
           </div>
         </motion.div>
 
@@ -199,13 +226,40 @@ export default function DashboardView() {
               <p className="text-lg sm:text-xl font-extrabold text-yellow-600 dark:text-yellow-400">{currency(m.open)}</p>
             </div>
           </div>
-          <div className="mt-2 flex flex-col gap-1">
-            {getMonthEntries(state, currentMonth).filter(e => e.type === 'expense' && !e.paid).slice(0, 3).map(e => (
-              <div key={e.id} className="flex items-center justify-between text-xs p-1.5 rounded-lg hover:bg-accent/50">
-                <span className="truncate flex-1">{e.desc}</span>
-                <span className="font-semibold ml-2 text-red-500 dark:text-red-400">{currency(e.value)}</span>
-              </div>
-            ))}
+          <div className="mt-2 flex flex-col gap-1.5">
+            {getMonthEntries(state, currentMonth).filter(e => e.type === 'expense' && !e.paid && !e.partialOf).slice(0, 5).map(e => {
+              const partials = state.entries.filter(p => p.partialOf === e.id);
+              const totalPartials = partials.reduce((a, b) => a + Number(b.value || 0), 0);
+              const hasPartials = partials.length > 0;
+              return (
+                <div key={e.id} className="flex items-center justify-between gap-2 p-2 rounded-xl hover:bg-accent/50 border border-transparent hover:border-border transition-colors">
+                  <div className="min-w-0 flex-1">
+                    <span className="text-xs font-medium truncate block">{e.desc}</span>
+                    <span className="text-xs font-bold text-red-500 dark:text-red-400">{currency(e.value)}</span>
+                    {hasPartials && (
+                      <span className="text-[10px] text-muted-foreground ml-1">
+                        ({currency(totalPartials)} pago)
+                      </span>
+                    )}
+                  </div>
+                  <div className="flex gap-1 shrink-0">
+                    <button
+                      onClick={() => setPartialEntry(e)}
+                      className="badge-warn cursor-pointer text-[10px] font-bold flex items-center gap-0.5 active:scale-95 transition-transform"
+                      title="Pagamento parcial"
+                    >
+                      <SplitSquareHorizontal className="size-3" />
+                    </button>
+                    <button
+                      onClick={() => updateState(prev => ({ ...prev, entries: prev.entries.map(en => en.id === e.id ? { ...en, paid: !en.paid } : en) }))}
+                      className="badge-good cursor-pointer text-[10px] font-bold flex items-center gap-0.5 active:scale-95 transition-transform"
+                    >
+                      <Check className="size-3" />
+                    </button>
+                  </div>
+                </div>
+              );
+            })}
           </div>
         </motion.div>
       </motion.div>
