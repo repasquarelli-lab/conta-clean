@@ -593,6 +593,9 @@ export default function LancamentosView() {
                       <p className="text-[11px] text-muted-foreground mt-0.5">📅 {formatDate(e.date)}</p>
                     </div>
                     <div className="flex gap-1.5">
+                      <button onClick={() => setPartialEntry(e)} className="badge-warn cursor-pointer text-[11px] font-bold flex items-center gap-1 active:scale-95 transition-transform" title={e.type === 'income' ? 'Recebimento parcial' : 'Pagamento parcial'}>
+                        <SplitSquareHorizontal className="size-3" />
+                      </button>
                       <button onClick={() => startEdit(e)} className="badge-good cursor-pointer text-[11px] font-bold flex items-center gap-1 active:scale-95 transition-transform">
                         <Pencil className="size-3" />
                       </button>
@@ -610,6 +613,13 @@ export default function LancamentosView() {
           </div>
         )}
       </div>
+
+      {/* Partial Payment Dialog */}
+      <PartialPaymentDialog
+        entry={partialEntry!}
+        open={!!partialEntry}
+        onClose={() => setPartialEntry(null)}
+      />
     </div>
   );
 }
