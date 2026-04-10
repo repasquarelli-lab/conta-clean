@@ -384,43 +384,94 @@ export default function LancamentosView() {
                 <tbody>
                   {filtered.length === 0 ? (
                     <tr><td colSpan={6} className="p-4 text-center text-muted-foreground text-sm border-b border-border">Nenhum lançamento encontrado.</td></tr>
-                  ) : filtered.map(e => (
-                    <tr key={e.id} className="hover:bg-accent/50">
-                      <td className="p-3 border-b border-border text-sm">
-                        {e.desc}
-                        {e.installments && e.installments > 1 && (
-                          <span className="ml-1.5 text-[10px] font-bold px-1.5 py-0.5 rounded bg-primary/10 text-primary">
-                            {e.installmentNumber}/{e.installments}
-                          </span>
-                        )}
-                      </td>
-                      <td className="p-3 border-b border-border text-sm">{e.category}</td>
-                      <td className="p-3 border-b border-border text-sm">{formatDate(e.date)}</td>
-                      <td className="p-3 border-b border-border text-sm font-semibold">
-                        <span className={activeTab === 'income' ? 'text-emerald-600 dark:text-emerald-400' : 'text-red-500 dark:text-red-400'}>
-                          {activeTab === 'income' ? '+' : '-'} {currency(e.value)}
-                        </span>
-                      </td>
-                      <td className="p-3 border-b border-border text-sm">
-                        <span className={e.paid ? 'badge-good' : 'badge-warn'}>
-                          {e.type === 'income' ? (e.paid ? 'Recebido' : 'Pendente') : (e.paid ? 'Pago' : 'Pendente')}
-                        </span>
-                      </td>
-                      <td className="p-3 border-b border-border text-sm">
-                        <div className="flex gap-2 flex-wrap">
-                          <button onClick={() => startEdit(e)} className="badge-good cursor-pointer text-xs font-bold flex items-center gap-1">
-                            <Pencil className="size-3" /> Editar
-                          </button>
-                          <button onClick={() => togglePaid(e.id)} className={`${e.paid ? 'badge-warn' : 'badge-good'} cursor-pointer text-xs font-bold flex items-center gap-1`}>
-                            {e.paid ? <><Undo2 className="size-3" /> Pendente</> : <><Check className="size-3" /> Pago</>}
-                          </button>
-                          <button onClick={() => removeEntry(e.id)} className="badge-bad cursor-pointer text-xs font-bold flex items-center gap-1">
-                            <Trash2 className="size-3" /> Excluir
-                          </button>
-                        </div>
-                      </td>
-                    </tr>
-                  ))}
+                  ) : filtered.map(e => {
+                    const partials = getPartials(e.id);
+                    const totalPartials = partials.reduce((a, b) => a + Number(b.value || 0), 0);
+                    const hasPartials = partials.length > 0;
+                    const isExpanded = expandedPartials.has(e.id);
+                    return (
+                      <React.Fragment key={e.id}>
+                        <tr className="hover:bg-accent/50">
+                          <td className="p-3 border-b border-border text-sm">
+                            <div className="flex items-center gap-1.5">
+                              {e.desc}
+                              {e.installments && e.installments > 1 && (
+                                <span className="text-[10px] font-bold px-1.5 py-0.5 rounded bg-primary/10 text-primary">
+                                  {e.installmentNumber}/{e.installments}
+                                </span>
+                              )}
+                              {hasPartials && (
+                                <button onClick={() => toggleExpandPartials(e.id)} className="inline-flex items-center gap-0.5 text-[10px] font-bold px-1.5 py-0.5 rounded-full bg-primary/10 text-primary cursor-pointer hover:bg-primary/20 transition-colors">
+                                  <SplitSquareHorizontal className="size-3" />
+                                  {partials.length} {partials.length === 1 ? 'parcial' : 'parciais'}
+                                  {isExpanded ? <ChevronUp className="size-3" /> : <ChevronDown className="size-3" />}
+                                </button>
+                              )}
+                            </div>
+                            {hasPartials && (
+                              <div className="text-[10px] text-muted-foreground mt-0.5">
+                                {currency(totalPartials)} de {currency(e.value)} {e.type === 'income' ? 'recebido' : 'pago'}
+                              </div>
+                            )}
+                          </td>
+                          <td className="p-3 border-b border-border text-sm">{e.category}</td>
+                          <td className="p-3 border-b border-border text-sm">{formatDate(e.date)}</td>
+                          <td className="p-3 border-b border-border text-sm font-semibold">
+                            <span className={activeTab === 'income' ? 'text-emerald-600 dark:text-emerald-400' : 'text-red-500 dark:text-red-400'}>
+                              {activeTab === 'income' ? '+' : '-'} {currency(e.value)}
+                            </span>
+                          </td>
+                          <td className="p-3 border-b border-border text-sm">
+                            <span className={e.paid ? 'badge-good' : 'badge-warn'}>
+                              {e.type === 'income' ? (e.paid ? 'Recebido' : 'Pendente') : (e.paid ? 'Pago' : 'Pendente')}
+                            </span>
+                          </td>
+                          <td className="p-3 border-b border-border text-sm">
+                            <div className="flex gap-2 flex-wrap">
+                              <button onClick={() => setPartialEntry(e)} className="badge-warn cursor-pointer text-xs font-bold flex items-center gap-1" title={e.type === 'income' ? 'Recebimento parcial' : 'Pagamento parcial'}>
+                                <SplitSquareHorizontal className="size-3" /> Parcial
+                              </button>
+                              <button onClick={() => startEdit(e)} className="badge-good cursor-pointer text-xs font-bold flex items-center gap-1">
+                                <Pencil className="size-3" /> Editar
+                              </button>
+                              <button onClick={() => togglePaid(e.id)} className={`${e.paid ? 'badge-warn' : 'badge-good'} cursor-pointer text-xs font-bold flex items-center gap-1`}>
+                                {e.paid ? <><Undo2 className="size-3" /> Pendente</> : <><Check className="size-3" /> Pago</>}
+                              </button>
+                              <button onClick={() => removeEntry(e.id)} className="badge-bad cursor-pointer text-xs font-bold flex items-center gap-1">
+                                <Trash2 className="size-3" /> Excluir
+                              </button>
+                            </div>
+                          </td>
+                        </tr>
+                        {/* Partial payments sub-rows */}
+                        {isExpanded && partials.map(p => (
+                          <tr key={p.id} className="bg-primary/5">
+                            <td className="p-2 pl-8 border-b border-border text-xs text-muted-foreground">
+                              <div className="flex items-center gap-1.5">
+                                <SplitSquareHorizontal className="size-3 text-primary" />
+                                {p.desc}
+                              </div>
+                            </td>
+                            <td className="p-2 border-b border-border text-xs text-muted-foreground">{p.category}</td>
+                            <td className="p-2 border-b border-border text-xs text-muted-foreground">{formatDate(p.date)}</td>
+                            <td className="p-2 border-b border-border text-xs font-medium">
+                              <span className="text-emerald-600 dark:text-emerald-400">
+                                +{currency(p.value)}
+                              </span>
+                            </td>
+                            <td className="p-2 border-b border-border text-xs">
+                              <span className="badge-good">Confirmado</span>
+                            </td>
+                            <td className="p-2 border-b border-border text-xs">
+                              <button onClick={() => removeEntry(p.id)} className="badge-bad cursor-pointer text-[11px] font-bold flex items-center gap-1">
+                                <Trash2 className="size-3" />
+                              </button>
+                            </td>
+                          </tr>
+                        ))}
+                      </React.Fragment>
+                    );
+                  })}
                 </tbody>
               </table>
             </div>
