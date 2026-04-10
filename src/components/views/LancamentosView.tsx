@@ -484,6 +484,10 @@ export default function LancamentosView() {
                 </div>
               ) : filtered.map(e => {
                 const CatIcon = getCategoryIcon(e.category);
+                const partials = getPartials(e.id);
+                const totalPartials = partials.reduce((a, b) => a + Number(b.value || 0), 0);
+                const hasPartials = partials.length > 0;
+                const isExpanded = expandedPartials.has(e.id);
                 return (
                   <div key={e.id} className="p-3 rounded-2xl bg-accent border border-border">
                     <div className="flex items-start justify-between gap-2 mb-2">
@@ -501,10 +505,20 @@ export default function LancamentosView() {
                       </span>
                     </div>
                     <div className="flex items-center justify-between">
-                      <span className={`text-sm font-bold ${e.type === 'income' ? 'text-emerald-600 dark:text-emerald-400' : 'text-red-500 dark:text-red-400'}`}>
-                        {e.type === 'income' ? '+' : '-'} {currency(e.value)}
-                      </span>
+                      <div>
+                        <span className={`text-sm font-bold ${e.type === 'income' ? 'text-emerald-600 dark:text-emerald-400' : 'text-red-500 dark:text-red-400'}`}>
+                          {e.type === 'income' ? '+' : '-'} {currency(e.value)}
+                        </span>
+                        {hasPartials && (
+                          <span className="text-[10px] text-muted-foreground ml-1">
+                            ({currency(totalPartials)} {e.type === 'income' ? 'recebido' : 'pago'})
+                          </span>
+                        )}
+                      </div>
                       <div className="flex gap-1.5">
+                        <button onClick={() => setPartialEntry(e)} className="badge-warn cursor-pointer text-[11px] font-bold flex items-center gap-1 active:scale-95 transition-transform" title={e.type === 'income' ? 'Recebimento parcial' : 'Pagamento parcial'}>
+                          <SplitSquareHorizontal className="size-3" />
+                        </button>
                         <button onClick={() => startEdit(e)} className="badge-good cursor-pointer text-[11px] font-bold flex items-center gap-1 active:scale-95 transition-transform">
                           <Pencil className="size-3" />
                         </button>
@@ -516,6 +530,25 @@ export default function LancamentosView() {
                         </button>
                       </div>
                     </div>
+                    {/* Partial payments history */}
+                    {hasPartials && (
+                      <div className="mt-2 pt-2 border-t border-border">
+                        <button onClick={() => toggleExpandPartials(e.id)} className="flex items-center gap-1 text-[10px] font-bold text-primary cursor-pointer mb-1">
+                          <SplitSquareHorizontal className="size-3" />
+                          {partials.length} {partials.length === 1 ? 'lançamento parcial' : 'lançamentos parciais'}
+                          {isExpanded ? <ChevronUp className="size-3" /> : <ChevronDown className="size-3" />}
+                        </button>
+                        {isExpanded && partials.map(p => (
+                          <div key={p.id} className="flex justify-between items-center text-[11px] py-1 pl-2 border-l-2 border-primary/30 mb-1">
+                            <div>
+                              <span className="text-muted-foreground">{p.desc}</span>
+                              <span className="text-muted-foreground ml-1">· {formatDate(p.date)}</span>
+                            </div>
+                            <span className="font-bold text-emerald-600 dark:text-emerald-400">{currency(p.value)}</span>
+                          </div>
+                        ))}
+                      </div>
+                    )}
                   </div>
                 );
               })}
