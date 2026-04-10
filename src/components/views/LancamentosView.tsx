@@ -17,6 +17,8 @@ export default function LancamentosView() {
   const [viewMode, setViewMode] = useState<'list' | 'grid'>('list');
   const [editingEntry, setEditingEntry] = useState<Entry | null>(null);
   const [installments, setInstallments] = useState(1);
+  const [partialEntry, setPartialEntry] = useState<Entry | null>(null);
+  const [expandedPartials, setExpandedPartials] = useState<Set<string>>(new Set());
 
   const entries = getMonthEntries(state, currentMonth).sort((a, b) => a.date.localeCompare(b.date));
   const expenseCats = getAllCategories(state);
