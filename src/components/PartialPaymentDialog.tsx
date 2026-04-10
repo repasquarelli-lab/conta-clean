@@ -17,7 +17,7 @@ export default function PartialPaymentDialog({ entry, open, onClose }: PartialPa
   const [desc, setDesc] = useState('');
 
   // Calculate already paid partial amounts
-  const partials = state.entries.filter(e => e.partialOf === entry.id);
+  const partials = state.entries.filter(e => e && e.partialOf === entry.id);
   const totalPartials = partials.reduce((a, b) => a + Number(b.value || 0), 0);
   const remaining = Number(entry.value || 0) - totalPartials;
 

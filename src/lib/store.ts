@@ -170,7 +170,7 @@ export function ensureMonthFixedBills(state: AppState, month: string): AppState 
 }
 
 export function getMonthEntries(state: AppState, month: string): Entry[] {
-  return state.entries.filter(e => e.date?.slice(0, 7) === month);
+  return state.entries.filter(e => e && e.date?.slice(0, 7) === month);
 }
 
 export interface MonthMetrics {
