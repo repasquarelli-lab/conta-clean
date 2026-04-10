@@ -173,7 +173,7 @@ export default function DashboardView() {
           </div>
           <div className="mt-2 flex flex-col gap-1.5">
             {getMonthEntries(state, currentMonth).filter(e => e.type === 'income' && !e.partialOf).slice(0, 5).map(e => {
-              const partials = state.entries.filter(p => p.partialOf === e.id);
+              const partials = state.entries.filter(p => p && p.partialOf === e.id);
               const totalPartials = partials.reduce((a, b) => a + Number(b.value || 0), 0);
               const hasPartials = partials.length > 0;
               return (
@@ -228,7 +228,7 @@ export default function DashboardView() {
           </div>
           <div className="mt-2 flex flex-col gap-1.5">
             {getMonthEntries(state, currentMonth).filter(e => e.type === 'expense' && !e.paid && !e.partialOf).slice(0, 5).map(e => {
-              const partials = state.entries.filter(p => p.partialOf === e.id);
+              const partials = state.entries.filter(p => p && p.partialOf === e.id);
               const totalPartials = partials.reduce((a, b) => a + Number(b.value || 0), 0);
               const hasPartials = partials.length > 0;
               return (
