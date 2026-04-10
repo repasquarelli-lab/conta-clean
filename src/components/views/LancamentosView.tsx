@@ -1,8 +1,9 @@
-import { useState } from 'react';
+import React, { useState } from 'react';
 import { useApp } from '@/contexts/AppContext';
 import { getMonthEntries, currency, formatDate, todayISO, uid, getAllCategories, getAllIncomeCategories, Entry } from '@/lib/store';
 import MonthNavigator from '../MonthNavigator';
-import { PlusCircle, List, LayoutGrid, Search, Check, Undo2, Trash2, ArrowDownCircle, ArrowUpCircle, Save, Pencil, X, CreditCard, TrendingUp, TrendingDown } from 'lucide-react';
+import PartialPaymentDialog from '../PartialPaymentDialog';
+import { PlusCircle, List, LayoutGrid, Search, Check, Undo2, Trash2, ArrowDownCircle, ArrowUpCircle, Save, Pencil, X, CreditCard, TrendingUp, TrendingDown, SplitSquareHorizontal, ChevronDown, ChevronUp } from 'lucide-react';
 import { getCategoryIcon } from '@/lib/categoryIcons';
 import { motion, AnimatePresence } from 'framer-motion';
 
@@ -16,13 +17,15 @@ export default function LancamentosView() {
   const [viewMode, setViewMode] = useState<'list' | 'grid'>('list');
   const [editingEntry, setEditingEntry] = useState<Entry | null>(null);
   const [installments, setInstallments] = useState(1);
+  const [partialEntry, setPartialEntry] = useState<Entry | null>(null);
+  const [expandedPartials, setExpandedPartials] = useState<Set<string>>(new Set());
 
   const entries = getMonthEntries(state, currentMonth).sort((a, b) => a.date.localeCompare(b.date));
   const expenseCats = getAllCategories(state);
   const incomeCats = getAllIncomeCategories(state);
   const cats = entryType === 'income' ? incomeCats : expenseCats;
 
-  const tabEntries = entries.filter(e => e.type === activeTab);
+  const tabEntries = entries.filter(e => e.type === activeTab && !e.partialOf);
   const allMonthCategories = [...new Set(tabEntries.map(e => e.category))].sort();
 
   const filtered = tabEntries.filter(e => {
@@ -31,6 +34,19 @@ export default function LancamentosView() {
     const okStatus = filterStatus === 'all' || (filterStatus === 'paid' ? e.paid : !e.paid);
     return okText && okCat && okStatus;
   });
+
+  function getPartials(entryId: string) {
+    return state.entries.filter(e => e && e.partialOf === entryId);
+  }
+
+  function toggleExpandPartials(id: string) {
+    setExpandedPartials(prev => {
+      const next = new Set(prev);
+      if (next.has(id)) next.delete(id);
+      else next.add(id);
+      return next;
+    });
+  }
 
   const totalIncome = entries.filter(e => e.type === 'income').reduce((a, b) => a + Number(b.value || 0), 0);
   const totalExpense = entries.filter(e => e.type === 'expense').reduce((a, b) => a + Number(b.value || 0), 0);
@@ -368,43 +384,94 @@ export default function LancamentosView() {
                 <tbody>
                   {filtered.length === 0 ? (
                     <tr><td colSpan={6} className="p-4 text-center text-muted-foreground text-sm border-b border-border">Nenhum lançamento encontrado.</td></tr>
-                  ) : filtered.map(e => (
-                    <tr key={e.id} className="hover:bg-accent/50">
-                      <td className="p-3 border-b border-border text-sm">
-                        {e.desc}
-                        {e.installments && e.installments > 1 && (
-                          <span className="ml-1.5 text-[10px] font-bold px-1.5 py-0.5 rounded bg-primary/10 text-primary">
-                            {e.installmentNumber}/{e.installments}
-                          </span>
-                        )}
-                      </td>
-                      <td className="p-3 border-b border-border text-sm">{e.category}</td>
-                      <td className="p-3 border-b border-border text-sm">{formatDate(e.date)}</td>
-                      <td className="p-3 border-b border-border text-sm font-semibold">
-                        <span className={activeTab === 'income' ? 'text-emerald-600 dark:text-emerald-400' : 'text-red-500 dark:text-red-400'}>
-                          {activeTab === 'income' ? '+' : '-'} {currency(e.value)}
-                        </span>
-                      </td>
-                      <td className="p-3 border-b border-border text-sm">
-                        <span className={e.paid ? 'badge-good' : 'badge-warn'}>
-                          {e.type === 'income' ? (e.paid ? 'Recebido' : 'Pendente') : (e.paid ? 'Pago' : 'Pendente')}
-                        </span>
-                      </td>
-                      <td className="p-3 border-b border-border text-sm">
-                        <div className="flex gap-2 flex-wrap">
-                          <button onClick={() => startEdit(e)} className="badge-good cursor-pointer text-xs font-bold flex items-center gap-1">
-                            <Pencil className="size-3" /> Editar
-                          </button>
-                          <button onClick={() => togglePaid(e.id)} className={`${e.paid ? 'badge-warn' : 'badge-good'} cursor-pointer text-xs font-bold flex items-center gap-1`}>
-                            {e.paid ? <><Undo2 className="size-3" /> Pendente</> : <><Check className="size-3" /> Pago</>}
-                          </button>
-                          <button onClick={() => removeEntry(e.id)} className="badge-bad cursor-pointer text-xs font-bold flex items-center gap-1">
-                            <Trash2 className="size-3" /> Excluir
-                          </button>
-                        </div>
-                      </td>
-                    </tr>
-                  ))}
+                  ) : filtered.map(e => {
+                    const partials = getPartials(e.id);
+                    const totalPartials = partials.reduce((a, b) => a + Number(b.value || 0), 0);
+                    const hasPartials = partials.length > 0;
+                    const isExpanded = expandedPartials.has(e.id);
+                    return (
+                      <React.Fragment key={e.id}>
+                        <tr className="hover:bg-accent/50">
+                          <td className="p-3 border-b border-border text-sm">
+                            <div className="flex items-center gap-1.5">
+                              {e.desc}
+                              {e.installments && e.installments > 1 && (
+                                <span className="text-[10px] font-bold px-1.5 py-0.5 rounded bg-primary/10 text-primary">
+                                  {e.installmentNumber}/{e.installments}
+                                </span>
+                              )}
+                              {hasPartials && (
+                                <button onClick={() => toggleExpandPartials(e.id)} className="inline-flex items-center gap-0.5 text-[10px] font-bold px-1.5 py-0.5 rounded-full bg-primary/10 text-primary cursor-pointer hover:bg-primary/20 transition-colors">
+                                  <SplitSquareHorizontal className="size-3" />
+                                  {partials.length} {partials.length === 1 ? 'parcial' : 'parciais'}
+                                  {isExpanded ? <ChevronUp className="size-3" /> : <ChevronDown className="size-3" />}
+                                </button>
+                              )}
+                            </div>
+                            {hasPartials && (
+                              <div className="text-[10px] text-muted-foreground mt-0.5">
+                                {currency(totalPartials)} de {currency(e.value)} {e.type === 'income' ? 'recebido' : 'pago'}
+                              </div>
+                            )}
+                          </td>
+                          <td className="p-3 border-b border-border text-sm">{e.category}</td>
+                          <td className="p-3 border-b border-border text-sm">{formatDate(e.date)}</td>
+                          <td className="p-3 border-b border-border text-sm font-semibold">
+                            <span className={activeTab === 'income' ? 'text-emerald-600 dark:text-emerald-400' : 'text-red-500 dark:text-red-400'}>
+                              {activeTab === 'income' ? '+' : '-'} {currency(e.value)}
+                            </span>
+                          </td>
+                          <td className="p-3 border-b border-border text-sm">
+                            <span className={e.paid ? 'badge-good' : 'badge-warn'}>
+                              {e.type === 'income' ? (e.paid ? 'Recebido' : 'Pendente') : (e.paid ? 'Pago' : 'Pendente')}
+                            </span>
+                          </td>
+                          <td className="p-3 border-b border-border text-sm">
+                            <div className="flex gap-2 flex-wrap">
+                              <button onClick={() => setPartialEntry(e)} className="badge-warn cursor-pointer text-xs font-bold flex items-center gap-1" title={e.type === 'income' ? 'Recebimento parcial' : 'Pagamento parcial'}>
+                                <SplitSquareHorizontal className="size-3" /> Parcial
+                              </button>
+                              <button onClick={() => startEdit(e)} className="badge-good cursor-pointer text-xs font-bold flex items-center gap-1">
+                                <Pencil className="size-3" /> Editar
+                              </button>
+                              <button onClick={() => togglePaid(e.id)} className={`${e.paid ? 'badge-warn' : 'badge-good'} cursor-pointer text-xs font-bold flex items-center gap-1`}>
+                                {e.paid ? <><Undo2 className="size-3" /> Pendente</> : <><Check className="size-3" /> Pago</>}
+                              </button>
+                              <button onClick={() => removeEntry(e.id)} className="badge-bad cursor-pointer text-xs font-bold flex items-center gap-1">
+                                <Trash2 className="size-3" /> Excluir
+                              </button>
+                            </div>
+                          </td>
+                        </tr>
+                        {/* Partial payments sub-rows */}
+                        {isExpanded && partials.map(p => (
+                          <tr key={p.id} className="bg-primary/5">
+                            <td className="p-2 pl-8 border-b border-border text-xs text-muted-foreground">
+                              <div className="flex items-center gap-1.5">
+                                <SplitSquareHorizontal className="size-3 text-primary" />
+                                {p.desc}
+                              </div>
+                            </td>
+                            <td className="p-2 border-b border-border text-xs text-muted-foreground">{p.category}</td>
+                            <td className="p-2 border-b border-border text-xs text-muted-foreground">{formatDate(p.date)}</td>
+                            <td className="p-2 border-b border-border text-xs font-medium">
+                              <span className="text-emerald-600 dark:text-emerald-400">
+                                +{currency(p.value)}
+                              </span>
+                            </td>
+                            <td className="p-2 border-b border-border text-xs">
+                              <span className="badge-good">Confirmado</span>
+                            </td>
+                            <td className="p-2 border-b border-border text-xs">
+                              <button onClick={() => removeEntry(p.id)} className="badge-bad cursor-pointer text-[11px] font-bold flex items-center gap-1">
+                                <Trash2 className="size-3" />
+                              </button>
+                            </td>
+                          </tr>
+                        ))}
+                      </React.Fragment>
+                    );
+                  })}
                 </tbody>
               </table>
             </div>
@@ -417,6 +484,10 @@ export default function LancamentosView() {
                 </div>
               ) : filtered.map(e => {
                 const CatIcon = getCategoryIcon(e.category);
+                const partials = getPartials(e.id);
+                const totalPartials = partials.reduce((a, b) => a + Number(b.value || 0), 0);
+                const hasPartials = partials.length > 0;
+                const isExpanded = expandedPartials.has(e.id);
                 return (
                   <div key={e.id} className="p-3 rounded-2xl bg-accent border border-border">
                     <div className="flex items-start justify-between gap-2 mb-2">
@@ -434,10 +505,20 @@ export default function LancamentosView() {
                       </span>
                     </div>
                     <div className="flex items-center justify-between">
-                      <span className={`text-sm font-bold ${e.type === 'income' ? 'text-emerald-600 dark:text-emerald-400' : 'text-red-500 dark:text-red-400'}`}>
-                        {e.type === 'income' ? '+' : '-'} {currency(e.value)}
-                      </span>
+                      <div>
+                        <span className={`text-sm font-bold ${e.type === 'income' ? 'text-emerald-600 dark:text-emerald-400' : 'text-red-500 dark:text-red-400'}`}>
+                          {e.type === 'income' ? '+' : '-'} {currency(e.value)}
+                        </span>
+                        {hasPartials && (
+                          <span className="text-[10px] text-muted-foreground ml-1">
+                            ({currency(totalPartials)} {e.type === 'income' ? 'recebido' : 'pago'})
+                          </span>
+                        )}
+                      </div>
                       <div className="flex gap-1.5">
+                        <button onClick={() => setPartialEntry(e)} className="badge-warn cursor-pointer text-[11px] font-bold flex items-center gap-1 active:scale-95 transition-transform" title={e.type === 'income' ? 'Recebimento parcial' : 'Pagamento parcial'}>
+                          <SplitSquareHorizontal className="size-3" />
+                        </button>
                         <button onClick={() => startEdit(e)} className="badge-good cursor-pointer text-[11px] font-bold flex items-center gap-1 active:scale-95 transition-transform">
                           <Pencil className="size-3" />
                         </button>
@@ -449,6 +530,25 @@ export default function LancamentosView() {
                         </button>
                       </div>
                     </div>
+                    {/* Partial payments history */}
+                    {hasPartials && (
+                      <div className="mt-2 pt-2 border-t border-border">
+                        <button onClick={() => toggleExpandPartials(e.id)} className="flex items-center gap-1 text-[10px] font-bold text-primary cursor-pointer mb-1">
+                          <SplitSquareHorizontal className="size-3" />
+                          {partials.length} {partials.length === 1 ? 'lançamento parcial' : 'lançamentos parciais'}
+                          {isExpanded ? <ChevronUp className="size-3" /> : <ChevronDown className="size-3" />}
+                        </button>
+                        {isExpanded && partials.map(p => (
+                          <div key={p.id} className="flex justify-between items-center text-[11px] py-1 pl-2 border-l-2 border-primary/30 mb-1">
+                            <div>
+                              <span className="text-muted-foreground">{p.desc}</span>
+                              <span className="text-muted-foreground ml-1">· {formatDate(p.date)}</span>
+                            </div>
+                            <span className="font-bold text-emerald-600 dark:text-emerald-400">{currency(p.value)}</span>
+                          </div>
+                        ))}
+                      </div>
+                    )}
                   </div>
                 );
               })}
@@ -493,6 +593,9 @@ export default function LancamentosView() {
                       <p className="text-[11px] text-muted-foreground mt-0.5">📅 {formatDate(e.date)}</p>
                     </div>
                     <div className="flex gap-1.5">
+                      <button onClick={() => setPartialEntry(e)} className="badge-warn cursor-pointer text-[11px] font-bold flex items-center gap-1 active:scale-95 transition-transform" title={e.type === 'income' ? 'Recebimento parcial' : 'Pagamento parcial'}>
+                        <SplitSquareHorizontal className="size-3" />
+                      </button>
                       <button onClick={() => startEdit(e)} className="badge-good cursor-pointer text-[11px] font-bold flex items-center gap-1 active:scale-95 transition-transform">
                         <Pencil className="size-3" />
                       </button>
@@ -510,6 +613,13 @@ export default function LancamentosView() {
           </div>
         )}
       </div>
+
+      {/* Partial Payment Dialog */}
+      <PartialPaymentDialog
+        entry={partialEntry!}
+        open={!!partialEntry}
+        onClose={() => setPartialEntry(null)}
+      />
     </div>
   );
 }
