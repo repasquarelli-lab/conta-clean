@@ -2,7 +2,8 @@ import { useState } from 'react';
 import { useApp } from '@/contexts/AppContext';
 import { getMonthEntries, currency, formatDate, todayISO, uid, getAllCategories, getAllIncomeCategories, Entry } from '@/lib/store';
 import MonthNavigator from '../MonthNavigator';
-import { PlusCircle, List, LayoutGrid, Search, Check, Undo2, Trash2, ArrowDownCircle, ArrowUpCircle, Save, Pencil, X, CreditCard, TrendingUp, TrendingDown } from 'lucide-react';
+import PartialPaymentDialog from '../PartialPaymentDialog';
+import { PlusCircle, List, LayoutGrid, Search, Check, Undo2, Trash2, ArrowDownCircle, ArrowUpCircle, Save, Pencil, X, CreditCard, TrendingUp, TrendingDown, SplitSquareHorizontal, ChevronDown, ChevronUp } from 'lucide-react';
 import { getCategoryIcon } from '@/lib/categoryIcons';
 import { motion, AnimatePresence } from 'framer-motion';
 
