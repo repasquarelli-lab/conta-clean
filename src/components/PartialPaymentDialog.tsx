@@ -25,6 +25,7 @@ export default function PartialPaymentDialog({ entry, open, onClose }: PartialPa
 
   function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
+    if (!entry) return;
     const val = Number(amount);
     if (val <= 0 || val > remaining) return;
 
