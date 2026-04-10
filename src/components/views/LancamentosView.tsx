@@ -25,7 +25,7 @@ export default function LancamentosView() {
   const incomeCats = getAllIncomeCategories(state);
   const cats = entryType === 'income' ? incomeCats : expenseCats;
 
-  const tabEntries = entries.filter(e => e.type === activeTab);
+  const tabEntries = entries.filter(e => e.type === activeTab && !e.partialOf);
   const allMonthCategories = [...new Set(tabEntries.map(e => e.category))].sort();
 
   const filtered = tabEntries.filter(e => {
@@ -34,6 +34,19 @@ export default function LancamentosView() {
     const okStatus = filterStatus === 'all' || (filterStatus === 'paid' ? e.paid : !e.paid);
     return okText && okCat && okStatus;
   });
+
+  function getPartials(entryId: string) {
+    return state.entries.filter(e => e && e.partialOf === entryId);
+  }
+
+  function toggleExpandPartials(id: string) {
+    setExpandedPartials(prev => {
+      const next = new Set(prev);
+      if (next.has(id)) next.delete(id);
+      else next.add(id);
+      return next;
+    });
+  }
 
   const totalIncome = entries.filter(e => e.type === 'income').reduce((a, b) => a + Number(b.value || 0), 0);
   const totalExpense = entries.filter(e => e.type === 'expense').reduce((a, b) => a + Number(b.value || 0), 0);
