@@ -21,7 +21,7 @@ export default function PartialPaymentDialog({ entry, open, onClose }: PartialPa
   const totalPartials = partials.reduce((a, b) => a + Number(b.value || 0), 0);
   const remaining = entry ? Number(entry.value || 0) - totalPartials : 0;
 
-  const cats = entry.type === 'income' ? getAllIncomeCategories(state) : getAllCategories(state);
+  const cats = entry ? (entry.type === 'income' ? getAllIncomeCategories(state) : getAllCategories(state)) : [];
 
   function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
