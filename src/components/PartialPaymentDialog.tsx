@@ -56,6 +56,8 @@ export default function PartialPaymentDialog({ entry, open, onClose }: PartialPa
     onClose();
   }
 
+  if (!entry) return null;
+
   return (
     <AnimatePresence>
       {open && (
