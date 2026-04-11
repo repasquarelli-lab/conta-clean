@@ -1,9 +1,9 @@
 import { useApp } from '@/contexts/AppContext';
 import { monthMetrics, paidCount, topCategory, currency, budgetProgress, getMonthEntries, AppState } from '@/lib/store';
 import MonthNavigator from '../MonthNavigator';
-import { Lightbulb, TrendingUp, TrendingDown, AlertTriangle, CheckCircle, Target, ShieldCheck, ArrowUpRight, ArrowDownRight, Minus, DollarSign, CreditCard, HelpCircle, PiggyBank, BarChart3 } from 'lucide-react';
+import { Lightbulb, TrendingUp, TrendingDown, AlertTriangle, CheckCircle, Target, ShieldCheck, ArrowUpRight, ArrowDownRight, Minus, DollarSign, CreditCard, HelpCircle, PiggyBank, BarChart3, LineChart as LineChartIcon } from 'lucide-react';
 import { getCategoryIcon } from '@/lib/categoryIcons';
-import { BarChart, Bar, XAxis, YAxis, Tooltip, ResponsiveContainer, Cell, PieChart, Pie } from 'recharts';
+import { BarChart, Bar, XAxis, YAxis, Tooltip, ResponsiveContainer, Cell, PieChart, Pie, LineChart, Line, CartesianGrid, Legend } from 'recharts';
 
 function generateTips(state: any, month: string) {
   const m = monthMetrics(state, month);
@@ -188,6 +188,23 @@ function getCategoryData(state: AppState, month: string) {
     .sort((a, b) => b.value - a.value);
 }
 
+function getMonthlyEvolution(state: AppState, currentMonth: string) {
+  const [curY, curM] = currentMonth.split('-').map(Number);
+  const months: { month: string; label: string; receitas: number; despesas: number }[] = [];
+  for (let i = 5; i >= 0; i--) {
+    const d = new Date(curY, curM - 1 - i, 1);
+    const m = `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}`;
+    const metrics = monthMetrics(state, m);
+    months.push({
+      month: m,
+      label: monthLabel(m),
+      receitas: Math.round(metrics.incomes * 100) / 100,
+      despesas: Math.round(metrics.expenses * 100) / 100,
+    });
+  }
+  return months;
+}
+
 export default function ResumoView() {
   const { state, currentMonth, setCurrentMonth } = useApp();
 
@@ -197,6 +214,7 @@ export default function ResumoView() {
   const comparison = getCategoryComparison(state, currentMonth);
   const prevMonthStr = getPrevMonth(currentMonth);
   const categoryData = getCategoryData(state, currentMonth);
+  const evolutionData = getMonthlyEvolution(state, currentMonth);
 
   return (
     <div>
@@ -307,6 +325,36 @@ export default function ResumoView() {
                 );
               })}
             </div>
+          </div>
+        </div>
+      )}
+
+      {/* Monthly Evolution Chart */}
+      {evolutionData.some(d => d.receitas > 0 || d.despesas > 0) && (
+        <div className="glass-panel p-4 mb-4">
+          <div className="mb-3 flex items-start gap-2.5">
+            <LineChartIcon className="size-5 text-muted-foreground mt-0.5 shrink-0" strokeWidth={1.5} />
+            <div>
+              <h3 className="font-bold">Evolução mensal</h3>
+              <p className="text-muted-foreground text-sm">Receitas vs despesas nos últimos 6 meses</p>
+            </div>
+          </div>
+          <div className="h-72 w-full">
+            <ResponsiveContainer width="100%" height="100%">
+              <LineChart data={evolutionData} margin={{ left: 8, right: 16, top: 8, bottom: 4 }}>
+                <CartesianGrid strokeDasharray="3 3" stroke="hsl(var(--border))" />
+                <XAxis dataKey="label" tick={{ fontSize: 12, fill: 'hsl(var(--muted-foreground))' }} axisLine={false} tickLine={false} />
+                <YAxis tickFormatter={(v: number) => `R$${(v / 1000).toFixed(1)}k`} tick={{ fontSize: 11, fill: 'hsl(var(--muted-foreground))' }} axisLine={false} tickLine={false} />
+                <Tooltip
+                  formatter={(value: number, name: string) => [currency(value), name === 'receitas' ? 'Receitas' : 'Despesas']}
+                  contentStyle={{ background: 'hsl(var(--card))', border: '1px solid hsl(var(--border))', borderRadius: '12px', fontSize: '13px' }}
+                  labelStyle={{ color: 'hsl(var(--foreground))', fontWeight: 'bold' }}
+                />
+                <Legend formatter={(value: string) => value === 'receitas' ? 'Receitas' : 'Despesas'} />
+                <Line type="monotone" dataKey="receitas" stroke="hsl(142, 71%, 45%)" strokeWidth={2.5} dot={{ r: 4, fill: 'hsl(142, 71%, 45%)' }} activeDot={{ r: 6 }} />
+                <Line type="monotone" dataKey="despesas" stroke="hsl(0, 84%, 60%)" strokeWidth={2.5} dot={{ r: 4, fill: 'hsl(0, 84%, 60%)' }} activeDot={{ r: 6 }} />
+              </LineChart>
+            </ResponsiveContainer>
           </div>
         </div>
       )}

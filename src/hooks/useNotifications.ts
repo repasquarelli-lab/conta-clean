@@ -40,11 +40,24 @@ export function useNotifications(state: AppState, isAuthenticated: boolean) {
 
     if (settings.dueTodayAlert) {
       const dueToday = dueTodayBills(appState);
-      if (dueToday.length > 0) {
-        const total = dueToday.reduce((s, e) => s + e.value, 0);
+      const fixedDueToday = dueToday.filter(e => e.sourceFixed);
+      const otherDueToday = dueToday.filter(e => !e.sourceFixed);
+
+      if (fixedDueToday.length > 0) {
+        const total = fixedDueToday.reduce((s, e) => s + e.value, 0);
+        const names = fixedDueToday.map(e => e.desc).join(', ');
+        sendNotification(
+          '📌 Contas fixas vencem hoje!',
+          `${fixedDueToday.length} conta${fixedDueToday.length > 1 ? 's' : ''} fixa${fixedDueToday.length > 1 ? 's' : ''}: ${names} (R$ ${total.toFixed(2).replace('.', ',')})`,
+          'fixed-due-today'
+        );
+      }
+
+      if (otherDueToday.length > 0) {
+        const total = otherDueToday.reduce((s, e) => s + e.value, 0);
         sendNotification(
           '📅 Contas vencem hoje!',
-          `Você tem ${dueToday.length} conta${dueToday.length > 1 ? 's' : ''} vencendo hoje, totalizando R$ ${total.toFixed(2).replace('.', ',')}`,
+          `${otherDueToday.length} conta${otherDueToday.length > 1 ? 's' : ''} vencendo hoje, totalizando R$ ${total.toFixed(2).replace('.', ',')}`,
           'due-today'
         );
       }
@@ -52,11 +65,24 @@ export function useNotifications(state: AppState, isAuthenticated: boolean) {
 
     if (settings.overdueAlert) {
       const overdue = overdueBills(appState);
-      if (overdue.length > 0) {
-        const total = overdue.reduce((s, e) => s + e.value, 0);
+      const fixedOverdue = overdue.filter(e => e.sourceFixed);
+      const otherOverdue = overdue.filter(e => !e.sourceFixed);
+
+      if (fixedOverdue.length > 0) {
+        const total = fixedOverdue.reduce((s, e) => s + e.value, 0);
+        const names = fixedOverdue.map(e => e.desc).join(', ');
+        sendNotification(
+          '🚨 Contas fixas atrasadas!',
+          `${fixedOverdue.length} conta${fixedOverdue.length > 1 ? 's' : ''} fixa${fixedOverdue.length > 1 ? 's' : ''} atrasada${fixedOverdue.length > 1 ? 's' : ''}: ${names} (R$ ${total.toFixed(2).replace('.', ',')})`,
+          'fixed-overdue'
+        );
+      }
+
+      if (otherOverdue.length > 0) {
+        const total = otherOverdue.reduce((s, e) => s + e.value, 0);
         sendNotification(
           '⚠️ Contas atrasadas!',
-          `${overdue.length} conta${overdue.length > 1 ? 's' : ''} atrasada${overdue.length > 1 ? 's' : ''}: R$ ${total.toFixed(2).replace('.', ',')}`,
+          `${otherOverdue.length} conta${otherOverdue.length > 1 ? 's' : ''} atrasada${otherOverdue.length > 1 ? 's' : ''}: R$ ${total.toFixed(2).replace('.', ',')}`,
           'overdue'
         );
       }
