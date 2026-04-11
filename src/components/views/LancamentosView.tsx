@@ -25,7 +25,7 @@ export default function LancamentosView() {
   const incomeCats = getAllIncomeCategories(state);
   const cats = entryType === 'income' ? incomeCats : expenseCats;
 
-  const tabEntries = entries.filter(e => e.type === activeTab && !e.partialOf);
+  const tabEntries = entries.filter(e => e && e.type === activeTab && !e.partialOf);
   const allMonthCategories = [...new Set(tabEntries.map(e => e.category))].sort();
 
   const filtered = tabEntries.filter(e => {
