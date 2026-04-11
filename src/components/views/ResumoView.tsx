@@ -188,6 +188,23 @@ function getCategoryData(state: AppState, month: string) {
     .sort((a, b) => b.value - a.value);
 }
 
+function getMonthlyEvolution(state: AppState, currentMonth: string) {
+  const [curY, curM] = currentMonth.split('-').map(Number);
+  const months: { month: string; label: string; receitas: number; despesas: number }[] = [];
+  for (let i = 5; i >= 0; i--) {
+    const d = new Date(curY, curM - 1 - i, 1);
+    const m = `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}`;
+    const metrics = monthMetrics(state, m);
+    months.push({
+      month: m,
+      label: monthLabel(m),
+      receitas: Math.round(metrics.incomes * 100) / 100,
+      despesas: Math.round(metrics.expenses * 100) / 100,
+    });
+  }
+  return months;
+}
+
 export default function ResumoView() {
   const { state, currentMonth, setCurrentMonth } = useApp();
 
@@ -197,6 +214,7 @@ export default function ResumoView() {
   const comparison = getCategoryComparison(state, currentMonth);
   const prevMonthStr = getPrevMonth(currentMonth);
   const categoryData = getCategoryData(state, currentMonth);
+  const evolutionData = getMonthlyEvolution(state, currentMonth);
 
   return (
     <div>
