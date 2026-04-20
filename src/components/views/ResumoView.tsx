@@ -448,11 +448,31 @@ export default function ResumoView() {
       {/* Monthly Evolution Chart */}
       {evolutionData.some(d => d.receitas > 0 || d.despesas > 0) && (
         <div className="glass-panel p-4 mb-4">
-          <div className="mb-3 flex items-start gap-2.5">
-            <LineChartIcon className="size-5 text-muted-foreground mt-0.5 shrink-0" strokeWidth={1.5} />
-            <div>
-              <h3 className="font-bold">Evolução mensal</h3>
-              <p className="text-muted-foreground text-sm">Receitas vs despesas nos últimos 6 meses</p>
+          <div className="mb-3 flex items-start justify-between gap-3 flex-wrap">
+            <div className="flex items-start gap-2.5">
+              <LineChartIcon className="size-5 text-muted-foreground mt-0.5 shrink-0" strokeWidth={1.5} />
+              <div>
+                <h3 className="font-bold">Evolução mensal</h3>
+                <p className="text-muted-foreground text-sm">Receitas vs despesas nos últimos {evolutionPeriod} meses</p>
+              </div>
+            </div>
+            <div className="inline-flex rounded-xl bg-accent border border-border p-0.5 shrink-0" role="tablist" aria-label="Período">
+              {([3, 6, 12] as const).map(p => (
+                <button
+                  key={p}
+                  type="button"
+                  role="tab"
+                  aria-selected={evolutionPeriod === p}
+                  onClick={() => setEvolutionPeriod(p)}
+                  className={`px-3 py-1.5 text-xs font-semibold rounded-lg transition-colors ${
+                    evolutionPeriod === p
+                      ? 'bg-background text-foreground shadow-sm'
+                      : 'text-muted-foreground hover:text-foreground'
+                  }`}
+                >
+                  {p}M
+                </button>
+              ))}
             </div>
           </div>
           <div className="h-52 sm:h-72 w-full">
