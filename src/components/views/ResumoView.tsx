@@ -261,8 +261,8 @@ function getFinancialHealth(state: AppState, month: string) {
   breakdown.push({ label: budgetLabel, value: budgetPts, max: 20, status: budgetStatus });
 
   // 4. Disciplina de pagamento (0-15 pts)
-  const totalBills = counts.expensesTotal;
-  const paidBills = counts.expensesPaid;
+  const totalBills = counts.total;
+  const paidBills = counts.paid;
   const payRate = totalBills > 0 ? (paidBills / totalBills) * 100 : 100;
   let payPts = 0;
   let payStatus: 'good' | 'warn' | 'bad' = 'bad';
