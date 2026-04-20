@@ -1,7 +1,8 @@
 import { useApp } from '@/contexts/AppContext';
+import { useState } from 'react';
 import { monthMetrics, paidCount, topCategory, currency, budgetProgress, getMonthEntries, AppState } from '@/lib/store';
 import MonthNavigator from '../MonthNavigator';
-import { Lightbulb, TrendingUp, TrendingDown, AlertTriangle, CheckCircle, Target, ShieldCheck, ArrowUpRight, ArrowDownRight, Minus, DollarSign, CreditCard, HelpCircle, PiggyBank, BarChart3, LineChart as LineChartIcon } from 'lucide-react';
+import { Lightbulb, TrendingUp, TrendingDown, AlertTriangle, CheckCircle, Target, ShieldCheck, ArrowUpRight, ArrowDownRight, Minus, DollarSign, CreditCard, HelpCircle, PiggyBank, BarChart3, LineChart as LineChartIcon, HeartPulse } from 'lucide-react';
 import { getCategoryIcon } from '@/lib/categoryIcons';
 import { BarChart, Bar, XAxis, YAxis, Tooltip, ResponsiveContainer, Cell, PieChart, Pie, LineChart, Line, CartesianGrid, Legend } from 'recharts';
 
@@ -188,10 +189,10 @@ function getCategoryData(state: AppState, month: string) {
     .sort((a, b) => b.value - a.value);
 }
 
-function getMonthlyEvolution(state: AppState, currentMonth: string) {
+function getMonthlyEvolution(state: AppState, currentMonth: string, periodMonths: number) {
   const [curY, curM] = currentMonth.split('-').map(Number);
   const months: { month: string; label: string; receitas: number; despesas: number }[] = [];
-  for (let i = 5; i >= 0; i--) {
+  for (let i = periodMonths - 1; i >= 0; i--) {
     const d = new Date(curY, curM - 1 - i, 1);
     const m = `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}`;
     const metrics = monthMetrics(state, m);
@@ -205,8 +206,87 @@ function getMonthlyEvolution(state: AppState, currentMonth: string) {
   return months;
 }
 
+function getFinancialHealth(state: AppState, month: string) {
+  const m = monthMetrics(state, month);
+  const counts = paidCount(state, month);
+  const budgets = budgetProgress(state, month);
+
+  let score = 0;
+  const breakdown: { label: string; value: number; max: number; status: 'good' | 'warn' | 'bad' }[] = [];
+
+  // 1. Saldo positivo + taxa de economia (0-40 pts)
+  const savingsRate = m.incomes > 0 ? (m.balance / m.incomes) * 100 : 0;
+  let savingsPts = 0;
+  let savingsStatus: 'good' | 'warn' | 'bad' = 'bad';
+  if (savingsRate >= 20) { savingsPts = 40; savingsStatus = 'good'; }
+  else if (savingsRate >= 10) { savingsPts = 30; savingsStatus = 'good'; }
+  else if (savingsRate >= 0) { savingsPts = 20; savingsStatus = 'warn'; }
+  else if (savingsRate >= -10) { savingsPts = 10; savingsStatus = 'bad'; }
+  score += savingsPts;
+  breakdown.push({ label: `Taxa de economia: ${savingsRate.toFixed(0)}%`, value: savingsPts, max: 40, status: savingsStatus });
+
+  // 2. Contas fixas vs renda (0-25 pts)
+  const fixedPct = m.incomes > 0 ? (m.fixedExpenses / m.incomes) * 100 : 100;
+  let fixedPts = 0;
+  let fixedStatus: 'good' | 'warn' | 'bad' = 'bad';
+  if (fixedPct <= 50) { fixedPts = 25; fixedStatus = 'good'; }
+  else if (fixedPct <= 70) { fixedPts = 15; fixedStatus = 'warn'; }
+  else if (fixedPct <= 90) { fixedPts = 8; fixedStatus = 'bad'; }
+  score += fixedPts;
+  breakdown.push({ label: `Contas fixas: ${fixedPct.toFixed(0)}% da renda`, value: fixedPts, max: 25, status: fixedStatus });
+
+  // 3. Metas de orçamento (0-20 pts)
+  let budgetPts = 20;
+  let budgetStatus: 'good' | 'warn' | 'bad' = 'good';
+  let budgetLabel = 'Sem metas definidas';
+  if (budgets.length > 0) {
+    const exceeded = budgets.filter(b => b.pct > 100).length;
+    const nearLimit = budgets.filter(b => b.pct >= 80 && b.pct <= 100).length;
+    if (exceeded > 0) {
+      budgetPts = Math.max(0, 20 - exceeded * 8);
+      budgetStatus = 'bad';
+      budgetLabel = `${exceeded} meta(s) estourada(s)`;
+    } else if (nearLimit > 0) {
+      budgetPts = 12;
+      budgetStatus = 'warn';
+      budgetLabel = `${nearLimit} meta(s) no limite`;
+    } else {
+      budgetLabel = 'Todas as metas em dia';
+    }
+  } else {
+    budgetPts = 10;
+    budgetStatus = 'warn';
+  }
+  score += budgetPts;
+  breakdown.push({ label: budgetLabel, value: budgetPts, max: 20, status: budgetStatus });
+
+  // 4. Disciplina de pagamento (0-15 pts)
+  const totalBills = counts.total;
+  const paidBills = counts.paid;
+  const payRate = totalBills > 0 ? (paidBills / totalBills) * 100 : 100;
+  let payPts = 0;
+  let payStatus: 'good' | 'warn' | 'bad' = 'bad';
+  if (payRate >= 90) { payPts = 15; payStatus = 'good'; }
+  else if (payRate >= 70) { payPts = 10; payStatus = 'warn'; }
+  else if (payRate >= 50) { payPts = 6; payStatus = 'warn'; }
+  else { payPts = 2; payStatus = 'bad'; }
+  score += payPts;
+  breakdown.push({ label: `Contas pagas: ${paidBills}/${totalBills} (${payRate.toFixed(0)}%)`, value: payPts, max: 15, status: payStatus });
+
+  score = Math.min(100, Math.max(0, Math.round(score)));
+
+  let level: { label: string; color: string; bg: string; ring: string };
+  if (score >= 80) level = { label: 'Excelente', color: 'text-emerald-600 dark:text-emerald-400', bg: 'bg-emerald-500/10', ring: 'ring-emerald-500/30' };
+  else if (score >= 60) level = { label: 'Boa', color: 'text-sky-600 dark:text-sky-400', bg: 'bg-sky-500/10', ring: 'ring-sky-500/30' };
+  else if (score >= 40) level = { label: 'Atenção', color: 'text-yellow-600 dark:text-yellow-400', bg: 'bg-yellow-500/10', ring: 'ring-yellow-500/30' };
+  else level = { label: 'Crítica', color: 'text-red-600 dark:text-red-400', bg: 'bg-red-500/10', ring: 'ring-red-500/30' };
+
+  return { score, level, breakdown };
+}
+
 export default function ResumoView() {
   const { state, currentMonth, setCurrentMonth } = useApp();
+  const [evolutionPeriod, setEvolutionPeriod] = useState<3 | 6 | 12>(6);
 
   const m = monthMetrics(state, currentMonth);
   const counts = paidCount(state, currentMonth);
@@ -214,7 +294,8 @@ export default function ResumoView() {
   const comparison = getCategoryComparison(state, currentMonth);
   const prevMonthStr = getPrevMonth(currentMonth);
   const categoryData = getCategoryData(state, currentMonth);
-  const evolutionData = getMonthlyEvolution(state, currentMonth);
+  const evolutionData = getMonthlyEvolution(state, currentMonth, evolutionPeriod);
+  const health = getFinancialHealth(state, currentMonth);
 
   return (
     <div>
@@ -243,7 +324,42 @@ export default function ResumoView() {
         </div>
       </div>
 
-      {/* Category Bar Chart */}
+      {/* Financial Health Score */}
+      <div className="glass-panel p-4 mb-4">
+        <div className="mb-3 flex items-start gap-2.5">
+          <HeartPulse className="size-5 text-muted-foreground mt-0.5 shrink-0" strokeWidth={1.5} />
+          <div>
+            <h3 className="font-bold">Saúde financeira</h3>
+            <p className="text-muted-foreground text-sm">Score baseado em economia, contas fixas, metas e disciplina</p>
+          </div>
+        </div>
+        <div className="flex flex-col sm:flex-row gap-4 items-center sm:items-stretch">
+          <div className={`flex flex-col items-center justify-center rounded-2xl p-5 ${health.level.bg} ring-1 ${health.level.ring} shrink-0 w-full sm:w-40`}>
+            <div className={`text-5xl font-extrabold tabular-nums ${health.level.color}`}>{health.score}</div>
+            <div className="text-xs text-muted-foreground mt-1">de 100</div>
+            <div className={`mt-2 text-sm font-bold ${health.level.color}`}>{health.level.label}</div>
+          </div>
+          <div className="flex-1 flex flex-col gap-2 w-full">
+            {health.breakdown.map((b, i) => {
+              const pct = b.max > 0 ? (b.value / b.max) * 100 : 0;
+              const barColor = b.status === 'good' ? 'bg-emerald-500' : b.status === 'warn' ? 'bg-yellow-500' : 'bg-red-500';
+              return (
+                <div key={i} className="flex flex-col gap-1">
+                  <div className="flex items-center justify-between text-xs">
+                    <span className="text-foreground/90 font-medium truncate pr-2">{b.label}</span>
+                    <span className="text-muted-foreground tabular-nums shrink-0">{b.value}/{b.max}</span>
+                  </div>
+                  <div className="h-2 w-full rounded-full bg-accent overflow-hidden">
+                    <div className={`h-full rounded-full ${barColor} transition-all`} style={{ width: `${pct}%` }} />
+                  </div>
+                </div>
+              );
+            })}
+          </div>
+        </div>
+      </div>
+
+
       {categoryData.length > 0 && (
         <div className="glass-panel p-4 mb-4">
           <div className="mb-3 flex items-start gap-2.5">
@@ -332,11 +448,31 @@ export default function ResumoView() {
       {/* Monthly Evolution Chart */}
       {evolutionData.some(d => d.receitas > 0 || d.despesas > 0) && (
         <div className="glass-panel p-4 mb-4">
-          <div className="mb-3 flex items-start gap-2.5">
-            <LineChartIcon className="size-5 text-muted-foreground mt-0.5 shrink-0" strokeWidth={1.5} />
-            <div>
-              <h3 className="font-bold">Evolução mensal</h3>
-              <p className="text-muted-foreground text-sm">Receitas vs despesas nos últimos 6 meses</p>
+          <div className="mb-3 flex items-start justify-between gap-3 flex-wrap">
+            <div className="flex items-start gap-2.5">
+              <LineChartIcon className="size-5 text-muted-foreground mt-0.5 shrink-0" strokeWidth={1.5} />
+              <div>
+                <h3 className="font-bold">Evolução mensal</h3>
+                <p className="text-muted-foreground text-sm">Receitas vs despesas nos últimos {evolutionPeriod} meses</p>
+              </div>
+            </div>
+            <div className="inline-flex rounded-xl bg-accent border border-border p-0.5 shrink-0" role="tablist" aria-label="Período">
+              {([3, 6, 12] as const).map(p => (
+                <button
+                  key={p}
+                  type="button"
+                  role="tab"
+                  aria-selected={evolutionPeriod === p}
+                  onClick={() => setEvolutionPeriod(p)}
+                  className={`px-3 py-1.5 text-xs font-semibold rounded-lg transition-colors ${
+                    evolutionPeriod === p
+                      ? 'bg-background text-foreground shadow-sm'
+                      : 'text-muted-foreground hover:text-foreground'
+                  }`}
+                >
+                  {p}M
+                </button>
+              ))}
             </div>
           </div>
           <div className="h-52 sm:h-72 w-full">
