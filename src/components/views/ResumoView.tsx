@@ -1,7 +1,8 @@
 import { useApp } from '@/contexts/AppContext';
+import { useState } from 'react';
 import { monthMetrics, paidCount, topCategory, currency, budgetProgress, getMonthEntries, AppState } from '@/lib/store';
 import MonthNavigator from '../MonthNavigator';
-import { Lightbulb, TrendingUp, TrendingDown, AlertTriangle, CheckCircle, Target, ShieldCheck, ArrowUpRight, ArrowDownRight, Minus, DollarSign, CreditCard, HelpCircle, PiggyBank, BarChart3, LineChart as LineChartIcon } from 'lucide-react';
+import { Lightbulb, TrendingUp, TrendingDown, AlertTriangle, CheckCircle, Target, ShieldCheck, ArrowUpRight, ArrowDownRight, Minus, DollarSign, CreditCard, HelpCircle, PiggyBank, BarChart3, LineChart as LineChartIcon, HeartPulse } from 'lucide-react';
 import { getCategoryIcon } from '@/lib/categoryIcons';
 import { BarChart, Bar, XAxis, YAxis, Tooltip, ResponsiveContainer, Cell, PieChart, Pie, LineChart, Line, CartesianGrid, Legend } from 'recharts';
 
