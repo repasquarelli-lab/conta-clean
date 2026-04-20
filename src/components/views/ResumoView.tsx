@@ -286,6 +286,7 @@ function getFinancialHealth(state: AppState, month: string) {
 
 export default function ResumoView() {
   const { state, currentMonth, setCurrentMonth } = useApp();
+  const [evolutionPeriod, setEvolutionPeriod] = useState<3 | 6 | 12>(6);
 
   const m = monthMetrics(state, currentMonth);
   const counts = paidCount(state, currentMonth);
@@ -293,7 +294,8 @@ export default function ResumoView() {
   const comparison = getCategoryComparison(state, currentMonth);
   const prevMonthStr = getPrevMonth(currentMonth);
   const categoryData = getCategoryData(state, currentMonth);
-  const evolutionData = getMonthlyEvolution(state, currentMonth);
+  const evolutionData = getMonthlyEvolution(state, currentMonth, evolutionPeriod);
+  const health = getFinancialHealth(state, currentMonth);
 
   return (
     <div>
