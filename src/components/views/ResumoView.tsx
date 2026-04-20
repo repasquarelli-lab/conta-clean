@@ -339,12 +339,12 @@ export default function ResumoView() {
               <p className="text-muted-foreground text-sm">Receitas vs despesas nos últimos 6 meses</p>
             </div>
           </div>
-          <div className="h-72 w-full">
+          <div className="h-52 sm:h-72 w-full">
             <ResponsiveContainer width="100%" height="100%">
-              <LineChart data={evolutionData} margin={{ left: 8, right: 16, top: 8, bottom: 4 }}>
+              <LineChart data={evolutionData} margin={{ left: 0, right: 8, top: 8, bottom: 4 }}>
                 <CartesianGrid strokeDasharray="3 3" stroke="hsl(var(--border))" />
-                <XAxis dataKey="label" tick={{ fontSize: 12, fill: 'hsl(var(--muted-foreground))' }} axisLine={false} tickLine={false} />
-                <YAxis tickFormatter={(v: number) => `R$${(v / 1000).toFixed(1)}k`} tick={{ fontSize: 11, fill: 'hsl(var(--muted-foreground))' }} axisLine={false} tickLine={false} />
+                <XAxis dataKey="label" tick={{ fontSize: 10, fill: 'hsl(var(--muted-foreground))' }} axisLine={false} tickLine={false} interval="preserveStartEnd" />
+                <YAxis width={42} tickFormatter={(v: number) => `R$${(v / 1000).toFixed(1)}k`} tick={{ fontSize: 9, fill: 'hsl(var(--muted-foreground))' }} axisLine={false} tickLine={false} />
                 <Tooltip
                   formatter={(value: number, name: string) => [currency(value), name === 'receitas' ? 'Receitas' : 'Despesas']}
                   contentStyle={{ background: 'hsl(var(--card))', border: '1px solid hsl(var(--border))', borderRadius: '12px', fontSize: '13px' }}
