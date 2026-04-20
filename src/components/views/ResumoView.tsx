@@ -324,7 +324,42 @@ export default function ResumoView() {
         </div>
       </div>
 
-      {/* Category Bar Chart */}
+      {/* Financial Health Score */}
+      <div className="glass-panel p-4 mb-4">
+        <div className="mb-3 flex items-start gap-2.5">
+          <HeartPulse className="size-5 text-muted-foreground mt-0.5 shrink-0" strokeWidth={1.5} />
+          <div>
+            <h3 className="font-bold">Saúde financeira</h3>
+            <p className="text-muted-foreground text-sm">Score baseado em economia, contas fixas, metas e disciplina</p>
+          </div>
+        </div>
+        <div className="flex flex-col sm:flex-row gap-4 items-center sm:items-stretch">
+          <div className={`flex flex-col items-center justify-center rounded-2xl p-5 ${health.level.bg} ring-1 ${health.level.ring} shrink-0 w-full sm:w-40`}>
+            <div className={`text-5xl font-extrabold tabular-nums ${health.level.color}`}>{health.score}</div>
+            <div className="text-xs text-muted-foreground mt-1">de 100</div>
+            <div className={`mt-2 text-sm font-bold ${health.level.color}`}>{health.level.label}</div>
+          </div>
+          <div className="flex-1 flex flex-col gap-2 w-full">
+            {health.breakdown.map((b, i) => {
+              const pct = b.max > 0 ? (b.value / b.max) * 100 : 0;
+              const barColor = b.status === 'good' ? 'bg-emerald-500' : b.status === 'warn' ? 'bg-yellow-500' : 'bg-red-500';
+              return (
+                <div key={i} className="flex flex-col gap-1">
+                  <div className="flex items-center justify-between text-xs">
+                    <span className="text-foreground/90 font-medium truncate pr-2">{b.label}</span>
+                    <span className="text-muted-foreground tabular-nums shrink-0">{b.value}/{b.max}</span>
+                  </div>
+                  <div className="h-2 w-full rounded-full bg-accent overflow-hidden">
+                    <div className={`h-full rounded-full ${barColor} transition-all`} style={{ width: `${pct}%` }} />
+                  </div>
+                </div>
+              );
+            })}
+          </div>
+        </div>
+      </div>
+
+
       {categoryData.length > 0 && (
         <div className="glass-panel p-4 mb-4">
           <div className="mb-3 flex items-start gap-2.5">
