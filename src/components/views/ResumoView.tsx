@@ -189,10 +189,10 @@ function getCategoryData(state: AppState, month: string) {
     .sort((a, b) => b.value - a.value);
 }
 
-function getMonthlyEvolution(state: AppState, currentMonth: string) {
+function getMonthlyEvolution(state: AppState, currentMonth: string, periodMonths: number) {
   const [curY, curM] = currentMonth.split('-').map(Number);
   const months: { month: string; label: string; receitas: number; despesas: number }[] = [];
-  for (let i = 5; i >= 0; i--) {
+  for (let i = periodMonths - 1; i >= 0; i--) {
     const d = new Date(curY, curM - 1 - i, 1);
     const m = `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}`;
     const metrics = monthMetrics(state, m);
@@ -204,6 +204,84 @@ function getMonthlyEvolution(state: AppState, currentMonth: string) {
     });
   }
   return months;
+}
+
+function getFinancialHealth(state: AppState, month: string) {
+  const m = monthMetrics(state, month);
+  const counts = paidCount(state, month);
+  const budgets = budgetProgress(state, month);
+
+  let score = 0;
+  const breakdown: { label: string; value: number; max: number; status: 'good' | 'warn' | 'bad' }[] = [];
+
+  // 1. Saldo positivo + taxa de economia (0-40 pts)
+  const savingsRate = m.incomes > 0 ? (m.balance / m.incomes) * 100 : 0;
+  let savingsPts = 0;
+  let savingsStatus: 'good' | 'warn' | 'bad' = 'bad';
+  if (savingsRate >= 20) { savingsPts = 40; savingsStatus = 'good'; }
+  else if (savingsRate >= 10) { savingsPts = 30; savingsStatus = 'good'; }
+  else if (savingsRate >= 0) { savingsPts = 20; savingsStatus = 'warn'; }
+  else if (savingsRate >= -10) { savingsPts = 10; savingsStatus = 'bad'; }
+  score += savingsPts;
+  breakdown.push({ label: `Taxa de economia: ${savingsRate.toFixed(0)}%`, value: savingsPts, max: 40, status: savingsStatus });
+
+  // 2. Contas fixas vs renda (0-25 pts)
+  const fixedPct = m.incomes > 0 ? (m.fixedExpenses / m.incomes) * 100 : 100;
+  let fixedPts = 0;
+  let fixedStatus: 'good' | 'warn' | 'bad' = 'bad';
+  if (fixedPct <= 50) { fixedPts = 25; fixedStatus = 'good'; }
+  else if (fixedPct <= 70) { fixedPts = 15; fixedStatus = 'warn'; }
+  else if (fixedPct <= 90) { fixedPts = 8; fixedStatus = 'bad'; }
+  score += fixedPts;
+  breakdown.push({ label: `Contas fixas: ${fixedPct.toFixed(0)}% da renda`, value: fixedPts, max: 25, status: fixedStatus });
+
+  // 3. Metas de orçamento (0-20 pts)
+  let budgetPts = 20;
+  let budgetStatus: 'good' | 'warn' | 'bad' = 'good';
+  let budgetLabel = 'Sem metas definidas';
+  if (budgets.length > 0) {
+    const exceeded = budgets.filter(b => b.pct > 100).length;
+    const nearLimit = budgets.filter(b => b.pct >= 80 && b.pct <= 100).length;
+    if (exceeded > 0) {
+      budgetPts = Math.max(0, 20 - exceeded * 8);
+      budgetStatus = 'bad';
+      budgetLabel = `${exceeded} meta(s) estourada(s)`;
+    } else if (nearLimit > 0) {
+      budgetPts = 12;
+      budgetStatus = 'warn';
+      budgetLabel = `${nearLimit} meta(s) no limite`;
+    } else {
+      budgetLabel = 'Todas as metas em dia';
+    }
+  } else {
+    budgetPts = 10;
+    budgetStatus = 'warn';
+  }
+  score += budgetPts;
+  breakdown.push({ label: budgetLabel, value: budgetPts, max: 20, status: budgetStatus });
+
+  // 4. Disciplina de pagamento (0-15 pts)
+  const totalBills = counts.expensesTotal;
+  const paidBills = counts.expensesPaid;
+  const payRate = totalBills > 0 ? (paidBills / totalBills) * 100 : 100;
+  let payPts = 0;
+  let payStatus: 'good' | 'warn' | 'bad' = 'bad';
+  if (payRate >= 90) { payPts = 15; payStatus = 'good'; }
+  else if (payRate >= 70) { payPts = 10; payStatus = 'warn'; }
+  else if (payRate >= 50) { payPts = 6; payStatus = 'warn'; }
+  else { payPts = 2; payStatus = 'bad'; }
+  score += payPts;
+  breakdown.push({ label: `Contas pagas: ${paidBills}/${totalBills} (${payRate.toFixed(0)}%)`, value: payPts, max: 15, status: payStatus });
+
+  score = Math.min(100, Math.max(0, Math.round(score)));
+
+  let level: { label: string; color: string; bg: string; ring: string };
+  if (score >= 80) level = { label: 'Excelente', color: 'text-emerald-600 dark:text-emerald-400', bg: 'bg-emerald-500/10', ring: 'ring-emerald-500/30' };
+  else if (score >= 60) level = { label: 'Boa', color: 'text-sky-600 dark:text-sky-400', bg: 'bg-sky-500/10', ring: 'ring-sky-500/30' };
+  else if (score >= 40) level = { label: 'Atenção', color: 'text-yellow-600 dark:text-yellow-400', bg: 'bg-yellow-500/10', ring: 'ring-yellow-500/30' };
+  else level = { label: 'Crítica', color: 'text-red-600 dark:text-red-400', bg: 'bg-red-500/10', ring: 'ring-red-500/30' };
+
+  return { score, level, breakdown };
 }
 
 export default function ResumoView() {
