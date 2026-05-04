@@ -549,6 +549,30 @@ export default function ConfigView() {
         </div>
         <div className="mt-3.5 text-[11px] text-muted-foreground opacity-70">Conta Clara v1.0 · Suas finanças, simples e seguras.</div>
       </div>
+
+      {/* Zona de perigo — LGPD: direito ao esquecimento */}
+      <div className="glass-panel p-4 mt-4 border border-destructive/30">
+        <div className="flex items-start gap-2.5 mb-3">
+          <ShieldAlert className="size-5 text-destructive mt-0.5 shrink-0" strokeWidth={1.5} />
+          <div>
+            <h3 className="font-bold text-destructive">Excluir minha conta</h3>
+            <p className="text-muted-foreground text-sm">
+              Apaga permanentemente sua conta, lançamentos, contas fixas e metas. Esta ação é irreversível e atende ao seu direito de exclusão (LGPD art. 18).
+            </p>
+          </div>
+        </div>
+        <button
+          onClick={deleteAccount}
+          disabled={deleting}
+          className="badge-bad cursor-pointer px-4 py-2.5 rounded-2xl font-bold text-sm flex items-center gap-1.5 disabled:opacity-50"
+        >
+          <Trash2 className="size-4" strokeWidth={1.5} />
+          {deleting ? 'Excluindo...' : 'Excluir minha conta permanentemente'}
+        </button>
+        <p className="text-[11px] text-muted-foreground mt-2.5">
+          Dica: antes de excluir, você pode <button onClick={exportBackup} className="underline text-primary">exportar um backup</button> dos seus dados.
+        </p>
+      </div>
     </div>
   );
 }
