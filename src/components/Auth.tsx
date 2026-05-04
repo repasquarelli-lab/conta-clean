@@ -13,6 +13,7 @@ export default function Auth() {
   const [userName, setUserName] = useState('');
   const [loading, setLoading] = useState(false);
   const [showPassword, setShowPassword] = useState(false);
+  const [acceptTerms, setAcceptTerms] = useState(false);
 
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
@@ -30,6 +31,10 @@ export default function Auth() {
         return;
       }
       if (mode === 'signup') {
+        if (!acceptTerms) {
+          toast.error('Você precisa aceitar os Termos de Uso e a Política de Privacidade.');
+          return;
+        }
         const { error } = await onAuthSuccess.signUp(email, password, userName);
         if (error) {
           toast.error(error.message === 'User already registered'
