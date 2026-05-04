@@ -172,6 +172,22 @@ export default function Auth() {
                     Esqueci minha senha
                   </button>
                 )}
+                {mode === 'signup' && (
+                  <label className="flex items-start gap-2 text-xs text-muted-foreground cursor-pointer select-none mt-1">
+                    <input
+                      type="checkbox"
+                      checked={acceptTerms}
+                      onChange={e => setAcceptTerms(e.target.checked)}
+                      className="mt-0.5 size-4 rounded border-border accent-primary cursor-pointer shrink-0"
+                    />
+                    <span>
+                      Li e concordo com os{' '}
+                      <a href="/termos" target="_blank" rel="noopener" className="text-primary underline font-medium">Termos de Uso</a>
+                      {' '}e a{' '}
+                      <a href="/privacidade" target="_blank" rel="noopener" className="text-primary underline font-medium">Política de Privacidade</a>.
+                    </span>
+                  </label>
+                )}
                 <button
                   type="submit"
                   disabled={loading}
