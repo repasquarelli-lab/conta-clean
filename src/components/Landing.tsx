@@ -260,7 +260,12 @@ export default function Landing() {
         </motion.div>
 
         {/* Footer */}
-        <div className="pb-6 text-center">
+        <div className="pb-6 text-center space-y-2">
+          <div className="flex justify-center gap-4 text-xs">
+            <a href="/termos" className="text-muted-foreground hover:text-primary underline transition-colors">Termos de Uso</a>
+            <a href="/privacidade" className="text-muted-foreground hover:text-primary underline transition-colors">Privacidade</a>
+            <a href="mailto:suporte.tech@dynamismartapps.com" className="text-muted-foreground hover:text-primary underline transition-colors">Contato</a>
+          </div>
           <p className="text-xs text-muted-foreground">
             © {new Date().getFullYear()} Conta Clara · Feito com carinho para simplificar sua vida financeira
           </p>
