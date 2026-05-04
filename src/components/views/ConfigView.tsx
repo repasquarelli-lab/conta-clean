@@ -1,13 +1,14 @@
 import { useState } from 'react';
 import { useApp } from '@/contexts/AppContext';
 import { getAllCategories, getAllIncomeCategories, defaultCategories, defaultIncomeCategories, currency, BudgetGoal, defaultNotificationSettings } from '@/lib/store';
-import { Plus, Trash2, Mail, User, Target, Download, RefreshCw, AlertTriangle, Save, Database, Bell, BellOff, Sun, Moon, Monitor, Tag, X, CreditCard, Gift, Copy, Check, Users } from 'lucide-react';
+import { Plus, Trash2, Mail, User, Target, Download, RefreshCw, AlertTriangle, Save, Database, Bell, BellOff, Sun, Moon, Monitor, Tag, X, CreditCard, Gift, Copy, Check, Users, ShieldAlert } from 'lucide-react';
 import { useSubscription } from '@/hooks/useSubscription';
 import { getCategoryIcon } from '@/lib/categoryIcons';
 import { useTheme } from '@/hooks/use-theme';
 import { motion, AnimatePresence } from 'framer-motion';
 import { toast } from 'sonner';
 import { useReferral } from '@/hooks/useReferral';
+import { supabase } from '@/integrations/supabase/client';
 
 export default function ConfigView() {
   const { state, updateState, reloadDemo, onAuthSuccess } = useApp();
@@ -121,6 +122,29 @@ export default function ConfigView() {
   function clearAll() {
     if (!confirm('Deseja apagar todos os dados salvos neste navegador?')) return;
     updateState(() => ({ brandName: 'Conta Clara Lite', userName: '', fixedBills: [], entries: [], budgetGoals: [] }));
+  }
+
+  const [deleting, setDeleting] = useState(false);
+  async function deleteAccount() {
+    const confirm1 = window.prompt(
+      'ATENÇÃO: esta ação é IRREVERSÍVEL e apagará permanentemente sua conta, todos os lançamentos, contas fixas e metas.\n\nPara confirmar, digite EXCLUIR (em maiúsculas):'
+    );
+    if (confirm1 !== 'EXCLUIR') {
+      if (confirm1 !== null) toast.error('Confirmação incorreta. Conta não foi excluída.');
+      return;
+    }
+    setDeleting(true);
+    try {
+      const { error } = await supabase.functions.invoke('delete-account');
+      if (error) throw error;
+      toast.success('Sua conta foi excluída. Até logo!');
+      await supabase.auth.signOut();
+      window.location.href = '/';
+    } catch (e: any) {
+      toast.error('Não foi possível excluir a conta: ' + (e.message || 'erro desconhecido'));
+    } finally {
+      setDeleting(false);
+    }
   }
 
   return (
@@ -524,6 +548,30 @@ export default function ConfigView() {
           <button onClick={clearAll} className="badge-bad cursor-pointer px-4 py-2.5 rounded-2xl font-bold text-sm flex items-center gap-1.5"><AlertTriangle className="size-4" strokeWidth={1.5} /> Apagar tudo</button>
         </div>
         <div className="mt-3.5 text-[11px] text-muted-foreground opacity-70">Conta Clara v1.0 · Suas finanças, simples e seguras.</div>
+      </div>
+
+      {/* Zona de perigo — LGPD: direito ao esquecimento */}
+      <div className="glass-panel p-4 mt-4 border border-destructive/30">
+        <div className="flex items-start gap-2.5 mb-3">
+          <ShieldAlert className="size-5 text-destructive mt-0.5 shrink-0" strokeWidth={1.5} />
+          <div>
+            <h3 className="font-bold text-destructive">Excluir minha conta</h3>
+            <p className="text-muted-foreground text-sm">
+              Apaga permanentemente sua conta, lançamentos, contas fixas e metas. Esta ação é irreversível e atende ao seu direito de exclusão (LGPD art. 18).
+            </p>
+          </div>
+        </div>
+        <button
+          onClick={deleteAccount}
+          disabled={deleting}
+          className="badge-bad cursor-pointer px-4 py-2.5 rounded-2xl font-bold text-sm flex items-center gap-1.5 disabled:opacity-50"
+        >
+          <Trash2 className="size-4" strokeWidth={1.5} />
+          {deleting ? 'Excluindo...' : 'Excluir minha conta permanentemente'}
+        </button>
+        <p className="text-[11px] text-muted-foreground mt-2.5">
+          Dica: antes de excluir, você pode <button onClick={exportBackup} className="underline text-primary">exportar um backup</button> dos seus dados.
+        </p>
       </div>
     </div>
   );

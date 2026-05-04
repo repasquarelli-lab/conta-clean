@@ -13,6 +13,7 @@ export default function Auth() {
   const [userName, setUserName] = useState('');
   const [loading, setLoading] = useState(false);
   const [showPassword, setShowPassword] = useState(false);
+  const [acceptTerms, setAcceptTerms] = useState(false);
 
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
@@ -30,6 +31,10 @@ export default function Auth() {
         return;
       }
       if (mode === 'signup') {
+        if (!acceptTerms) {
+          toast.error('Você precisa aceitar os Termos de Uso e a Política de Privacidade.');
+          return;
+        }
         const { error } = await onAuthSuccess.signUp(email, password, userName);
         if (error) {
           toast.error(error.message === 'User already registered'
@@ -166,6 +171,22 @@ export default function Auth() {
                   >
                     Esqueci minha senha
                   </button>
+                )}
+                {mode === 'signup' && (
+                  <label className="flex items-start gap-2 text-xs text-muted-foreground cursor-pointer select-none mt-1">
+                    <input
+                      type="checkbox"
+                      checked={acceptTerms}
+                      onChange={e => setAcceptTerms(e.target.checked)}
+                      className="mt-0.5 size-4 rounded border-border accent-primary cursor-pointer shrink-0"
+                    />
+                    <span>
+                      Li e concordo com os{' '}
+                      <a href="/termos" target="_blank" rel="noopener" className="text-primary underline font-medium">Termos de Uso</a>
+                      {' '}e a{' '}
+                      <a href="/privacidade" target="_blank" rel="noopener" className="text-primary underline font-medium">Política de Privacidade</a>.
+                    </span>
+                  </label>
                 )}
                 <button
                   type="submit"
