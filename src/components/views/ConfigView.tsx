@@ -1,13 +1,14 @@
 import { useState } from 'react';
 import { useApp } from '@/contexts/AppContext';
 import { getAllCategories, getAllIncomeCategories, defaultCategories, defaultIncomeCategories, currency, BudgetGoal, defaultNotificationSettings } from '@/lib/store';
-import { Plus, Trash2, Mail, User, Target, Download, RefreshCw, AlertTriangle, Save, Database, Bell, BellOff, Sun, Moon, Monitor, Tag, X, CreditCard, Gift, Copy, Check, Users } from 'lucide-react';
+import { Plus, Trash2, Mail, User, Target, Download, RefreshCw, AlertTriangle, Save, Database, Bell, BellOff, Sun, Moon, Monitor, Tag, X, CreditCard, Gift, Copy, Check, Users, ShieldAlert } from 'lucide-react';
 import { useSubscription } from '@/hooks/useSubscription';
 import { getCategoryIcon } from '@/lib/categoryIcons';
 import { useTheme } from '@/hooks/use-theme';
 import { motion, AnimatePresence } from 'framer-motion';
 import { toast } from 'sonner';
 import { useReferral } from '@/hooks/useReferral';
+import { supabase } from '@/integrations/supabase/client';
 
 export default function ConfigView() {
   const { state, updateState, reloadDemo, onAuthSuccess } = useApp();
@@ -121,6 +122,29 @@ export default function ConfigView() {
   function clearAll() {
     if (!confirm('Deseja apagar todos os dados salvos neste navegador?')) return;
     updateState(() => ({ brandName: 'Conta Clara Lite', userName: '', fixedBills: [], entries: [], budgetGoals: [] }));
+  }
+
+  const [deleting, setDeleting] = useState(false);
+  async function deleteAccount() {
+    const confirm1 = window.prompt(
+      'ATENÇÃO: esta ação é IRREVERSÍVEL e apagará permanentemente sua conta, todos os lançamentos, contas fixas e metas.\n\nPara confirmar, digite EXCLUIR (em maiúsculas):'
+    );
+    if (confirm1 !== 'EXCLUIR') {
+      if (confirm1 !== null) toast.error('Confirmação incorreta. Conta não foi excluída.');
+      return;
+    }
+    setDeleting(true);
+    try {
+      const { error } = await supabase.functions.invoke('delete-account');
+      if (error) throw error;
+      toast.success('Sua conta foi excluída. Até logo!');
+      await supabase.auth.signOut();
+      window.location.href = '/';
+    } catch (e: any) {
+      toast.error('Não foi possível excluir a conta: ' + (e.message || 'erro desconhecido'));
+    } finally {
+      setDeleting(false);
+    }
   }
 
   return (
