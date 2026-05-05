@@ -148,31 +148,14 @@ function RecoveryInline({ onCancel, onRecovered }: { onCancel: () => void; onRec
     if (!code.trim()) return;
     setBusy(true);
     try {
-      const { data: { session } } = await supabase.auth.getSession();
-      if (!session) { toast.error('Sessão expirada. Faça login novamente.'); onCancel(); return; }
-      // We need email + password for recover endpoint; here user is mid-MFA so we use a session-based variant:
-      // Mark backup code via direct DB call using user session (RLS allows update on own rows).
-      const codeUpper = code.trim().toUpperCase();
-      const codeHash = await sha256(codeUpper);
-      const { data: row, error: re } = await supabase
-        .from('mfa_backup_codes' as any)
-        .select('id, used_at')
-        .eq('user_id', session.user.id)
-        .eq('code_hash', codeHash)
-        .maybeSingle();
-      if (re) throw re;
-      if (!row) { toast.error('Código inválido.'); return; }
-      if ((row as any).used_at) { toast.error('Código já utilizado.'); return; }
-      await supabase.from('mfa_backup_codes' as any).update({ used_at: new Date().toISOString() }).eq('id', (row as any).id);
-
-      // Unenroll all TOTP factors via user session
-      const { data: factors } = await supabase.auth.mfa.listFactors();
-      for (const f of (factors?.totp || [])) {
-        try { await supabase.auth.mfa.unenroll({ factorId: f.id }); } catch {}
-      }
+      const { data, error } = await supabase.functions.invoke('mfa-backup-codes?action=recover', {
+        body: { code: code.trim() },
+      });
+      if (error) throw error;
+      if ((data as any)?.error) throw new Error((data as any).error);
       onRecovered();
     } catch (e: any) {
-      toast.error('Erro ao validar código: ' + (e.message || ''));
+      toast.error('Erro: ' + (e.message || 'código inválido'));
     } finally {
       setBusy(false);
     }
