@@ -32,3 +32,6 @@ verify_jwt = false
 
 [functions.handle-email-suppression]
 verify_jwt = false
+
+[functions.mfa-backup-codes]
+verify_jwt = false
