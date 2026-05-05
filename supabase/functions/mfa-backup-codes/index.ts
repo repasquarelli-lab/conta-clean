@@ -62,18 +62,29 @@ Deno.serve(async (req) => {
 
     if (action === "recover") {
       const body = await req.json().catch(() => ({}));
-      const email = String(body.email || "").trim().toLowerCase();
-      const password = String(body.password || "");
       const code = String(body.code || "").trim().toUpperCase();
-      if (!email || !password || !code) return json({ error: "Dados incompletos" }, 400);
+      if (!code) return json({ error: "Código obrigatório" }, 400);
 
-      // Validate password by signing in
-      const tmpClient = createClient(SUPABASE_URL, ANON_KEY);
-      const { data: signIn, error: siErr } = await tmpClient.auth.signInWithPassword({ email, password });
-      if (siErr || !signIn?.user) return json({ error: "E-mail ou senha incorretos" }, 401);
-      const userId = signIn.user.id;
-      // Sign out the temporary session immediately
-      await tmpClient.auth.signOut();
+      // Identify user — either via session (mid-MFA aal1) or via email+password
+      let userId: string | null = null;
+      const authHeader = req.headers.get("Authorization") || "";
+      if (authHeader.startsWith("Bearer ")) {
+        const userClient = createClient(SUPABASE_URL, ANON_KEY, {
+          global: { headers: { Authorization: authHeader } },
+        });
+        const { data: u } = await userClient.auth.getUser();
+        if (u?.user) userId = u.user.id;
+      }
+      if (!userId) {
+        const email = String(body.email || "").trim().toLowerCase();
+        const password = String(body.password || "");
+        if (!email || !password) return json({ error: "Credenciais necessárias" }, 401);
+        const tmpClient = createClient(SUPABASE_URL, ANON_KEY);
+        const { data: signIn, error: siErr } = await tmpClient.auth.signInWithPassword({ email, password });
+        if (siErr || !signIn?.user) return json({ error: "E-mail ou senha incorretos" }, 401);
+        userId = signIn.user.id;
+        await tmpClient.auth.signOut();
+      }
 
       const codeHash = await sha256(code);
       const { data: row, error: re } = await admin
@@ -86,11 +97,10 @@ Deno.serve(async (req) => {
       if (!row) return json({ error: "Código de recuperação inválido" }, 401);
       if (row.used_at) return json({ error: "Este código já foi utilizado" }, 401);
 
-      // Mark code used
       await admin.from("mfa_backup_codes").update({ used_at: new Date().toISOString() }).eq("id", row.id);
 
-      // Unenroll ALL MFA factors for this user via admin API
-      // @ts-ignore - admin namespace
+      // Unenroll ALL MFA factors via admin API
+      // @ts-ignore
       const { data: factorList } = await (admin.auth.admin as any).mfa.listFactors({ userId });
       const factors = factorList?.factors || [];
       for (const f of factors) {
