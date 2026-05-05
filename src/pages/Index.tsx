@@ -9,6 +9,7 @@ import { useSubscription } from '@/hooks/useSubscription';
 import { useReferral } from '@/hooks/useReferral';
 import { useDataExport } from '@/hooks/useDataExport';
 import { supabase } from '@/integrations/supabase/client';
+import { isDeviceTrusted } from '@/lib/trustedDevices';
 
 function ScreenRouter() {
   const { screen, onAuthSuccess, logout } = useApp();
@@ -26,6 +27,7 @@ function ScreenRouter() {
       if (cancelled) return;
       if (error) { setMfaState('ok'); return; }
       if (data?.nextLevel === 'aal2' && data?.currentLevel !== 'aal2') {
+        if (isDeviceTrusted(onAuthSuccess.user!.id)) { setMfaState('ok'); return; }
         setMfaState('required');
       } else {
         setMfaState('ok');
