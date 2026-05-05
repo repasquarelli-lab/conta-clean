@@ -21,7 +21,7 @@ export default function TwoFactorSettings() {
     const verified = data?.totp?.find(f => f.status === 'verified') || null;
     setFactor(verified as Factor | null);
     // clean up any leftover unverified factor
-    const unverified = data?.totp?.find(f => f.status === 'unverified');
+    const unverified = data?.totp?.find(f => (f.status as string) === 'unverified');
     if (unverified && !pendingFactorId) {
       await supabase.auth.mfa.unenroll({ factorId: unverified.id });
     }
