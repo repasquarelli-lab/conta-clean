@@ -1,8 +1,9 @@
-import React, { useState } from 'react';
+import React, { useRef, useState } from 'react';
 import { useApp } from '@/contexts/AppContext';
 import { getMonthEntries, currency, formatDate, todayISO, uid, getAllCategories, getAllIncomeCategories, Entry } from '@/lib/store';
 import MonthNavigator from '../MonthNavigator';
 import PartialPaymentDialog from '../PartialPaymentDialog';
+import ReceiptScanner from '../ReceiptScanner';
 import { PlusCircle, List, LayoutGrid, Search, Check, Undo2, Trash2, ArrowDownCircle, ArrowUpCircle, Save, Pencil, X, CreditCard, TrendingUp, TrendingDown, SplitSquareHorizontal, ChevronDown, ChevronUp } from 'lucide-react';
 import { getCategoryIcon } from '@/lib/categoryIcons';
 import { motion, AnimatePresence } from 'framer-motion';
@@ -19,6 +20,23 @@ export default function LancamentosView() {
   const [installments, setInstallments] = useState(1);
   const [partialEntry, setPartialEntry] = useState<Entry | null>(null);
   const [expandedPartials, setExpandedPartials] = useState<Set<string>>(new Set());
+  const formRef = useRef<HTMLFormElement>(null);
+
+  function applyExtracted(r: { description: string | null; value: number | null; date: string | null; category: string | null }) {
+    setEntryType('expense');
+    setTimeout(() => {
+      const f = formRef.current;
+      if (!f) return;
+      if (r.description) (f.elements.namedItem('desc') as HTMLInputElement).value = r.description;
+      if (r.value != null) (f.elements.namedItem('value') as HTMLInputElement).value = String(r.value);
+      if (r.date) (f.elements.namedItem('date') as HTMLInputElement).value = r.date;
+      const sel = f.elements.namedItem('category') as HTMLSelectElement | null;
+      if (sel && r.category) {
+        const opt = Array.from(sel.options).find(o => o.value.toLowerCase() === r.category!.toLowerCase());
+        if (opt) sel.value = opt.value;
+      }
+    }, 50);
+  }
 
   const entries = getMonthEntries(state, currentMonth).sort((a, b) => a.date.localeCompare(b.date));
   const expenseCats = getAllCategories(state);
@@ -256,16 +274,19 @@ export default function LancamentosView() {
           <MonthNavigator month={currentMonth} onChange={setCurrentMonth} />
         </div>
 
-        <div className="flex gap-2 mb-4">
+        <div className="flex gap-2 mb-4 flex-wrap items-center">
           <button onClick={() => setEntryType('income')} className={`px-3 py-2.5 rounded-xl border text-sm cursor-pointer flex items-center gap-1.5 ${entryType === 'income' ? 'brand-gradient border-transparent text-primary-foreground font-bold' : 'bg-card border-border'}`}>
             <ArrowDownCircle className="size-4" strokeWidth={1.5} /> Receita
           </button>
           <button onClick={() => setEntryType('expense')} className={`px-3 py-2.5 rounded-xl border text-sm cursor-pointer flex items-center gap-1.5 ${entryType === 'expense' ? 'brand-gradient border-transparent text-primary-foreground font-bold' : 'bg-card border-border'}`}>
             <ArrowUpCircle className="size-4" strokeWidth={1.5} /> Despesa
           </button>
+          <div className="ml-auto">
+            <ReceiptScanner categories={expenseCats} onExtracted={applyExtracted} />
+          </div>
         </div>
 
-        <form onSubmit={handleSubmit}>
+        <form ref={formRef} onSubmit={handleSubmit}>
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
             <div>
               <label className="text-xs font-medium mb-1 block">Descrição</label>
