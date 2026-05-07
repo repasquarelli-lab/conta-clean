@@ -43,6 +43,7 @@ export default function ResetPassword() {
       toast.error(error.message);
     } else {
       toast.success('Senha atualizada com sucesso!');
+      import('@/lib/auditLog').then(m => m.logAuditEvent('password_changed', { via: 'reset_link' }));
       setTimeout(() => navigate('/'), 1500);
     }
   }
