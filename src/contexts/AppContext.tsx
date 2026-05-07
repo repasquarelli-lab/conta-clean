@@ -8,6 +8,11 @@ import { toast } from 'sonner';
 type Screen = 'landing' | 'auth' | 'app';
 type View = 'dashboard' | 'lancamentos' | 'fixas' | 'cartoes' | 'agenda' | 'resumo' | 'config' | 'admin';
 
+interface ViewingAs {
+  ownerId: string;
+  ownerName: string;
+}
+
 interface AppContextType {
   state: AppState;
   setState: (s: AppState) => void;
@@ -22,6 +27,9 @@ interface AppContextType {
   onAuthSuccess: ReturnType<typeof useAuth>;
   isAuthenticated: boolean;
   logout: () => void;
+  viewingAs: ViewingAs | null;
+  setViewingAs: (v: ViewingAs | null) => void;
+  isReadOnly: boolean;
 }
 
 const AppContext = createContext<AppContextType | null>(null);
