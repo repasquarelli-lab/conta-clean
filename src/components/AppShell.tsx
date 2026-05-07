@@ -296,7 +296,9 @@ export default function AppShell() {
         })}
       </nav>
       {/* Floating AI Copilot */}
-      <AiTipsWidget />
+      <div data-tour="copilot-fab"><AiTipsWidget /></div>
+      {/* First-login guided tour */}
+      <OnboardingTour />
     </div>
   );
 }
