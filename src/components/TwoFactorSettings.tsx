@@ -3,6 +3,7 @@ import { supabase } from '@/integrations/supabase/client';
 import { ShieldCheck, ShieldOff, KeyRound, Loader2, Check, X, Download, RefreshCw, Smartphone } from 'lucide-react';
 import { toast } from 'sonner';
 import { trustExpiresAt, untrustDevice } from '@/lib/trustedDevices';
+import { logAuditEvent } from '@/lib/auditLog';
 
 type Factor = { id: string; status: string; friendly_name?: string | null };
 
