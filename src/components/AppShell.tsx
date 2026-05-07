@@ -251,6 +251,7 @@ export default function AppShell() {
               {currentView === 'dashboard' && <DashboardView />}
               {currentView === 'lancamentos' && <LancamentosView />}
               {currentView === 'fixas' && <FixasView />}
+              {currentView === 'cartoes' && <CartoesView />}
               {currentView === 'agenda' && <AgendaView />}
               {currentView === 'resumo' && <ResumoView />}
               {currentView === 'config' && <ConfigView />}
