@@ -11,6 +11,10 @@ import { useReferral } from '@/hooks/useReferral';
 import { supabase } from '@/integrations/supabase/client';
 import TwoFactorSettings from '@/components/TwoFactorSettings';
 import FamilyShareSettings from '@/components/FamilyShareSettings';
+import SecurityActivity from '@/components/SecurityActivity';
+import ActiveSessions from '@/components/ActiveSessions';
+import DataExportLGPD from '@/components/DataExportLGPD';
+import { logAuditEvent } from '@/lib/auditLog';
 
 export default function ConfigView() {
   const { state, updateState, reloadDemo, onAuthSuccess } = useApp();
