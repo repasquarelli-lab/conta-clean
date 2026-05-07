@@ -463,6 +463,12 @@ export default function ConfigView() {
 
       <FamilyShareSettings />
 
+      <SecurityActivity />
+
+      <ActiveSessions />
+
+      <DataExportLGPD />
+
       {/* Subscription Management */}
       <div className="glass-panel p-4 mb-4">
         <div className="flex items-start gap-2.5 mb-3">
