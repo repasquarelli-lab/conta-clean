@@ -69,26 +69,38 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
     }
   }, [auth.user, auth.loading, loadFromCloud]);
 
+  const isReadOnly = !!viewingAs;
+
   const setState = useCallback((s: AppState) => {
+    if (isReadOnly) {
+      toast.info('Modo somente leitura. Saia para editar.');
+      return;
+    }
     setStateRaw(s);
     saveState(s);
+    ownDataRef.current = s;
     if (saveTimerRef.current) clearTimeout(saveTimerRef.current);
     if (auth.user) {
       saveTimerRef.current = setTimeout(() => saveToCloud(s), 1500);
     }
-  }, [auth.user, saveToCloud]);
+  }, [auth.user, saveToCloud, isReadOnly]);
 
   const updateState = useCallback((updater: (prev: AppState) => AppState) => {
+    if (isReadOnly) {
+      toast.info('Modo somente leitura. Saia para editar.');
+      return;
+    }
     setStateRaw(prev => {
       const next = updater(prev);
       saveState(next);
+      ownDataRef.current = next;
       if (auth.user) {
         if (saveTimerRef.current) clearTimeout(saveTimerRef.current);
         saveTimerRef.current = setTimeout(() => saveToCloud(next), 1500);
       }
       return next;
     });
-  }, [auth.user, saveToCloud]);
+  }, [auth.user, saveToCloud, isReadOnly]);
 
   const reloadDemo = useCallback(() => {
     const demo = makeDemoData();
@@ -114,6 +126,7 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
       onAuthSuccess: auth,
       isAuthenticated: !!auth.user,
       logout,
+      viewingAs, setViewingAs, isReadOnly,
     }}>
       {children}
     </AppContext.Provider>
