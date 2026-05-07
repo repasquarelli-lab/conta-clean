@@ -141,6 +141,7 @@ export default function ConfigView() {
     }
     setDeleting(true);
     try {
+      await logAuditEvent('account_deleted', {});
       const { error } = await supabase.functions.invoke('delete-account');
       if (error) throw error;
       toast.success('Sua conta foi excluída. Até logo!');
