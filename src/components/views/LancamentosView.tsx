@@ -100,6 +100,7 @@ export default function LancamentosView() {
           category,
           recurring,
           paid,
+          cardId,
         }],
       }));
     }
