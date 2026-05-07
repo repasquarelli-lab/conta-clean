@@ -262,3 +262,47 @@ export function budgetProgress(state: AppState, month: string) {
     return { ...g, spent, pct };
   });
 }
+
+// ----------- Credit Card invoice helpers -----------
+export interface CardInvoice {
+  cardId: string;
+  card: CreditCard;
+  cycleStart: string;
+  cycleEnd: string;
+  dueDate: string;
+  total: number;
+  entries: Entry[];
+  isClosed: boolean;
+}
+
+/** Compute invoice cycle for a given card and reference month (YYYY-MM).
+ * Cycle: closing of (refMonth-1) +1 day  ..  closing of refMonth.
+ * Due: dueDay of refMonth.
+ */
+export function getCardInvoice(state: AppState, cardId: string, refMonth: string): CardInvoice | null {
+  const card = (state.creditCards || []).find(c => c.id === cardId);
+  if (!card) return null;
+  const [y, m] = refMonth.split('-').map(Number);
+  const safeDay = (d: number) => Math.min(Math.max(d, 1), 28);
+  const closeRef = new Date(y, m - 1, safeDay(card.closingDay));
+  const closePrev = new Date(y, m - 2, safeDay(card.closingDay));
+  const cycleStart = new Date(closePrev);
+  cycleStart.setDate(cycleStart.getDate() + 1);
+  const cycleEnd = closeRef;
+  const due = new Date(y, m - 1, safeDay(card.dueDay));
+  const iso = (d: Date) => `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}`;
+  const cs = iso(cycleStart);
+  const ce = iso(cycleEnd);
+  const entries = state.entries.filter(e => e.cardId === cardId && e.type === 'expense' && e.date >= cs && e.date <= ce);
+  const total = entries.reduce((a, b) => a + Number(b.value || 0), 0);
+  const today = todayISO();
+  return {
+    cardId, card,
+    cycleStart: cs,
+    cycleEnd: ce,
+    dueDate: iso(due),
+    total,
+    entries,
+    isClosed: today > ce,
+  };
+}
