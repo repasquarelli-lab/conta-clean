@@ -274,16 +274,19 @@ export default function LancamentosView() {
           <MonthNavigator month={currentMonth} onChange={setCurrentMonth} />
         </div>
 
-        <div className="flex gap-2 mb-4">
+        <div className="flex gap-2 mb-4 flex-wrap items-center">
           <button onClick={() => setEntryType('income')} className={`px-3 py-2.5 rounded-xl border text-sm cursor-pointer flex items-center gap-1.5 ${entryType === 'income' ? 'brand-gradient border-transparent text-primary-foreground font-bold' : 'bg-card border-border'}`}>
             <ArrowDownCircle className="size-4" strokeWidth={1.5} /> Receita
           </button>
           <button onClick={() => setEntryType('expense')} className={`px-3 py-2.5 rounded-xl border text-sm cursor-pointer flex items-center gap-1.5 ${entryType === 'expense' ? 'brand-gradient border-transparent text-primary-foreground font-bold' : 'bg-card border-border'}`}>
             <ArrowUpCircle className="size-4" strokeWidth={1.5} /> Despesa
           </button>
+          <div className="ml-auto">
+            <ReceiptScanner categories={expenseCats} onExtracted={applyExtracted} />
+          </div>
         </div>
 
-        <form onSubmit={handleSubmit}>
+        <form ref={formRef} onSubmit={handleSubmit}>
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
             <div>
               <label className="text-xs font-medium mb-1 block">Descrição</label>
