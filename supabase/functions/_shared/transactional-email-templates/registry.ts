@@ -13,10 +13,12 @@ import { template as referralReward } from './referral-reward.tsx'
 import { template as dataDeletionWarning } from './data-deletion-warning.tsx'
 import { template as dataDeleted } from './data-deleted.tsx'
 import { template as familyInvite } from './family-invite.tsx'
+import { template as monthlyReport } from './monthly-report.tsx'
 
 export const TEMPLATES: Record<string, TemplateEntry> = {
   'referral-reward': referralReward,
   'data-deletion-warning': dataDeletionWarning,
   'data-deleted': dataDeleted,
   'family-invite': familyInvite,
+  'monthly-report': monthlyReport,
 }
