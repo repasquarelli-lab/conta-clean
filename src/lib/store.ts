@@ -62,6 +62,8 @@ export interface AppState {
   notificationSettings?: NotificationSettings;
   customCategories?: string[];
   customIncomeCategories?: string[];
+  creditCards?: CreditCard[];
+  onboardingCompleted?: boolean;
 }
 
 const STORAGE_KEY = 'conta_clara_lite_v3';
