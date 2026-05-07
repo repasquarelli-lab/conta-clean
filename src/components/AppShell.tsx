@@ -1,18 +1,20 @@
 import { useState, useRef, useEffect } from 'react';
 import { useApp, View } from '@/contexts/AppContext';
 import { saveState, overdueBills, dueTodayBills, currency, budgetProgress, todayISO } from '@/lib/store';
-import { LayoutDashboard, ArrowLeftRight, Pin, CalendarClock, FileText, Settings, Menu, X, LogOut, Sun, Moon, Download, Upload, ShieldCheck } from 'lucide-react';
+import { LayoutDashboard, ArrowLeftRight, Pin, CalendarClock, FileText, Settings, Menu, X, LogOut, Sun, Moon, Download, Upload, ShieldCheck, CreditCard } from 'lucide-react';
 import { AnimatePresence, motion } from 'framer-motion';
 import { toast } from 'sonner';
 import AppLogo from './AppLogo';
 import AiTipsWidget from './AiTipsWidget';
+import OnboardingTour from './OnboardingTour';
 import { useTheme } from '@/hooks/use-theme';
 import { supabase } from '@/integrations/supabase/client';
 
-const VIEW_ORDER: View[] = ['dashboard', 'lancamentos', 'fixas', 'agenda', 'resumo', 'config', 'admin'];
+const VIEW_ORDER: View[] = ['dashboard', 'lancamentos', 'fixas', 'cartoes', 'agenda', 'resumo', 'config', 'admin'];
 import DashboardView from './views/DashboardView';
 import LancamentosView from './views/LancamentosView';
 import FixasView from './views/FixasView';
+import CartoesView from './views/CartoesView';
 import AgendaView from './views/AgendaView';
 import ResumoView from './views/ResumoView';
 import ConfigView from './views/ConfigView';
@@ -22,6 +24,7 @@ const VIEWS: { id: View; name: string; shortName: string; subtitle: string; icon
   { id: 'dashboard', name: 'Painel do Mês', shortName: 'Painel', subtitle: 'Veja rapidamente quanto entrou, quanto saiu e o que ainda falta pagar.', icon: LayoutDashboard },
   { id: 'lancamentos', name: 'Receitas e Despesas', shortName: 'Lançar', subtitle: 'Cadastre entradas e saídas do mês de forma simples.', icon: ArrowLeftRight },
   { id: 'fixas', name: 'Contas Fixas', shortName: 'Fixas', subtitle: 'Contas que se repetem todo mês para você não esquecer.', icon: Pin },
+  { id: 'cartoes', name: 'Cartões de Crédito', shortName: 'Cartões', subtitle: 'Agrupe lançamentos por cartão e acompanhe a fatura do mês.', icon: CreditCard },
   { id: 'agenda', name: 'Agenda de Vencimentos', shortName: 'Agenda', subtitle: 'Saiba o que vence hoje, nesta semana e o que está atrasado.', icon: CalendarClock },
   { id: 'resumo', name: 'Resumo do Mês', shortName: 'Resumo', subtitle: 'Entenda o seu mês em linguagem simples.', icon: FileText },
   { id: 'config', name: 'Configurações', shortName: 'Config', subtitle: 'Ajustes básicos, backup e personalização.', icon: Settings },
@@ -29,7 +32,7 @@ const VIEWS: { id: View; name: string; shortName: string; subtitle: string; icon
 ];
 
 // Bottom tabs: show 5 main views, config and admin go in hamburger
-const BOTTOM_TABS = VIEWS.filter(v => v.id !== 'config' && v.id !== 'admin');
+const BOTTOM_TABS = VIEWS.filter(v => v.id !== 'config' && v.id !== 'admin' && v.id !== 'cartoes');
 
 export default function AppShell() {
   const { state, currentView, setCurrentView, setScreen, reloadDemo, logout, onAuthSuccess } = useApp();
@@ -193,6 +196,7 @@ export default function AppShell() {
           {visibleViews.map(v => (
             <motion.button
               key={v.id}
+              data-tour={`nav-${v.id}`}
               onClick={() => setCurrentView(v.id)}
               whileHover={{ scale: 1.02, x: 4 }}
               whileTap={{ scale: 0.97 }}
@@ -248,6 +252,7 @@ export default function AppShell() {
               {currentView === 'dashboard' && <DashboardView />}
               {currentView === 'lancamentos' && <LancamentosView />}
               {currentView === 'fixas' && <FixasView />}
+              {currentView === 'cartoes' && <CartoesView />}
               {currentView === 'agenda' && <AgendaView />}
               {currentView === 'resumo' && <ResumoView />}
               {currentView === 'config' && <ConfigView />}
@@ -264,6 +269,7 @@ export default function AppShell() {
           return (
             <motion.button
               key={v.id}
+              data-tour={`nav-${v.id}`}
               onClick={() => setCurrentView(v.id)}
               whileTap={{ scale: 0.85 }}
               transition={{ type: 'spring', stiffness: 400, damping: 25 }}
@@ -290,7 +296,9 @@ export default function AppShell() {
         })}
       </nav>
       {/* Floating AI Copilot */}
-      <AiTipsWidget />
+      <div data-tour="copilot-fab"><AiTipsWidget /></div>
+      {/* First-login guided tour */}
+      <OnboardingTour />
     </div>
   );
 }

@@ -60,7 +60,7 @@ export default function LancamentosView() {
     const category = fd.get('category') as string;
     const recurring = fd.get('recurring') === 'true';
     const paid = fd.get('paid') === 'true';
-
+    const cardId = (fd.get('cardId') as string) || undefined;
     if (installments > 1 && entryType === 'expense') {
       const groupId = uid();
       const parcelValue = Math.round((totalValue / installments) * 100) / 100;
@@ -83,6 +83,7 @@ export default function LancamentosView() {
             installments,
             installmentNumber: i + 1,
             installmentGroup: groupId,
+            cardId,
           });
         }
         return { ...prev, entries: newEntries };
@@ -99,6 +100,7 @@ export default function LancamentosView() {
           category,
           recurring,
           paid,
+          cardId,
         }],
       }));
     }
@@ -304,6 +306,19 @@ export default function LancamentosView() {
                     💡 Cada parcela será distribuída automaticamente nos próximos meses
                   </p>
                 )}
+              </div>
+            )}
+            {entryType === 'expense' && (state.creditCards || []).length > 0 && (
+              <div>
+                <label className="text-xs font-medium mb-1 block flex items-center gap-1.5">
+                  <CreditCard className="size-3.5" strokeWidth={1.5} /> Cartão (opcional)
+                </label>
+                <select name="cardId" defaultValue="" className="w-full px-3 py-2.5 rounded-[14px] border border-border bg-input text-foreground text-sm outline-none">
+                  <option value="">Sem cartão (à vista / boleto)</option>
+                  {(state.creditCards || []).map(c => (
+                    <option key={c.id} value={c.id}>{c.name} {c.last4 ? `••${c.last4}` : ''}</option>
+                  ))}
+                </select>
               </div>
             )}
             <div>

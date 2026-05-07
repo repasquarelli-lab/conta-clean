@@ -38,6 +38,45 @@ export type Database = {
         }
         Relationships: []
       }
+      credit_cards: {
+        Row: {
+          brand: string | null
+          closing_day: number
+          color: string | null
+          created_at: string
+          credit_limit: number
+          due_day: number
+          id: string
+          last4: string | null
+          name: string
+          user_id: string
+        }
+        Insert: {
+          brand?: string | null
+          closing_day?: number
+          color?: string | null
+          created_at?: string
+          credit_limit?: number
+          due_day?: number
+          id?: string
+          last4?: string | null
+          name: string
+          user_id: string
+        }
+        Update: {
+          brand?: string | null
+          closing_day?: number
+          color?: string | null
+          created_at?: string
+          credit_limit?: number
+          due_day?: number
+          id?: string
+          last4?: string | null
+          name?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
       email_send_log: {
         Row: {
           created_at: string
@@ -127,6 +166,7 @@ export type Database = {
       }
       entries: {
         Row: {
+          card_id: string | null
           category: string
           created_at: string
           date: string
@@ -140,6 +180,7 @@ export type Database = {
           value: number
         }
         Insert: {
+          card_id?: string | null
           category?: string
           created_at?: string
           date?: string
@@ -153,6 +194,7 @@ export type Database = {
           value?: number
         }
         Update: {
+          card_id?: string | null
           category?: string
           created_at?: string
           date?: string
@@ -164,6 +206,39 @@ export type Database = {
           type?: string
           user_id?: string
           value?: number
+        }
+        Relationships: []
+      }
+      family_shares: {
+        Row: {
+          accepted_at: string | null
+          created_at: string
+          id: string
+          invite_token: string
+          invitee_email: string
+          invitee_id: string | null
+          owner_id: string
+          status: string
+        }
+        Insert: {
+          accepted_at?: string | null
+          created_at?: string
+          id?: string
+          invite_token?: string
+          invitee_email: string
+          invitee_id?: string | null
+          owner_id: string
+          status?: string
+        }
+        Update: {
+          accepted_at?: string | null
+          created_at?: string
+          id?: string
+          invite_token?: string
+          invitee_email?: string
+          invitee_id?: string | null
+          owner_id?: string
+          status?: string
         }
         Relationships: []
       }
@@ -230,6 +305,7 @@ export type Database = {
           data_deletion_notified: boolean | null
           id: string
           notification_settings: Json | null
+          onboarding_completed: boolean
           subscription_ended_at: string | null
           updated_at: string
           user_name: string
@@ -242,6 +318,7 @@ export type Database = {
           data_deletion_notified?: boolean | null
           id: string
           notification_settings?: Json | null
+          onboarding_completed?: boolean
           subscription_ended_at?: string | null
           updated_at?: string
           user_name?: string
@@ -254,6 +331,7 @@ export type Database = {
           data_deletion_notified?: boolean | null
           id?: string
           notification_settings?: Json | null
+          onboarding_completed?: boolean
           subscription_ended_at?: string | null
           updated_at?: string
           user_name?: string
@@ -353,6 +431,10 @@ export type Database = {
           _role: Database["public"]["Enums"]["app_role"]
           _user_id: string
         }
+        Returns: boolean
+      }
+      is_shared_viewer: {
+        Args: { _owner: string; _viewer: string }
         Returns: boolean
       }
       move_to_dlq: {
