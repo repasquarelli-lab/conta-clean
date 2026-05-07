@@ -83,6 +83,7 @@ export default function LancamentosView() {
             installments,
             installmentNumber: i + 1,
             installmentGroup: groupId,
+            cardId,
           });
         }
         return { ...prev, entries: newEntries };
