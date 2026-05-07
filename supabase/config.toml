@@ -35,3 +35,6 @@ verify_jwt = false
 
 [functions.mfa-backup-codes]
 verify_jwt = false
+
+[functions.family-share]
+verify_jwt = false
