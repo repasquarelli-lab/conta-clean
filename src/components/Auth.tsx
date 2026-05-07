@@ -51,6 +51,8 @@ export default function Auth() {
           toast.error(error.message === 'Invalid login credentials'
             ? 'E-mail ou senha incorretos.'
             : error.message);
+        } else {
+          import('@/lib/auditLog').then(m => m.logAuditEvent('login', { method: 'password' }));
         }
       }
     } finally {
