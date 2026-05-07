@@ -27,6 +27,8 @@ export default function Auth() {
         } else {
           toast.success('E-mail de recuperação enviado! Verifique sua caixa de entrada.');
           setMode('login');
+          // Best-effort audit (no session yet, runs only if logged-in)
+          import('@/lib/auditLog').then(m => m.logAuditEvent('password_reset_requested', { email }));
         }
         return;
       }
@@ -49,6 +51,8 @@ export default function Auth() {
           toast.error(error.message === 'Invalid login credentials'
             ? 'E-mail ou senha incorretos.'
             : error.message);
+        } else {
+          import('@/lib/auditLog').then(m => m.logAuditEvent('login', { method: 'password' }));
         }
       }
     } finally {

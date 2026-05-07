@@ -11,6 +11,10 @@ import { useReferral } from '@/hooks/useReferral';
 import { supabase } from '@/integrations/supabase/client';
 import TwoFactorSettings from '@/components/TwoFactorSettings';
 import FamilyShareSettings from '@/components/FamilyShareSettings';
+import SecurityActivity from '@/components/SecurityActivity';
+import ActiveSessions from '@/components/ActiveSessions';
+import DataExportLGPD from '@/components/DataExportLGPD';
+import { logAuditEvent } from '@/lib/auditLog';
 
 export default function ConfigView() {
   const { state, updateState, reloadDemo, onAuthSuccess } = useApp();
@@ -137,6 +141,7 @@ export default function ConfigView() {
     }
     setDeleting(true);
     try {
+      await logAuditEvent('account_deleted', {});
       const { error } = await supabase.functions.invoke('delete-account');
       if (error) throw error;
       toast.success('Sua conta foi excluída. Até logo!');
@@ -458,6 +463,12 @@ export default function ConfigView() {
       <TwoFactorSettings />
 
       <FamilyShareSettings />
+
+      <SecurityActivity />
+
+      <ActiveSessions />
+
+      <DataExportLGPD />
 
       {/* Subscription Management */}
       <div className="glass-panel p-4 mb-4">

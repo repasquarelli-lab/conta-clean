@@ -3,6 +3,7 @@ import { supabase } from '@/integrations/supabase/client';
 import { ShieldCheck, ShieldOff, KeyRound, Loader2, Check, X, Download, RefreshCw, Smartphone } from 'lucide-react';
 import { toast } from 'sonner';
 import { trustExpiresAt, untrustDevice } from '@/lib/trustedDevices';
+import { logAuditEvent } from '@/lib/auditLog';
 
 type Factor = { id: string; status: string; friendly_name?: string | null };
 
@@ -77,8 +78,12 @@ export default function TwoFactorSettings() {
       });
       if (error) throw error;
       toast.success('2FA ativado!');
+      await logAuditEvent('mfa_enabled', {});
       const codes = await generateBackupCodes();
-      if (codes) setBackupCodes(codes);
+      if (codes) {
+        setBackupCodes(codes);
+        await logAuditEvent('mfa_backup_codes_generated', { count: codes.length });
+      }
       setEnrolling(false);
       setPendingFactorId(null);
       setQr(''); setSecret(''); setCode('');
@@ -108,6 +113,7 @@ export default function TwoFactorSettings() {
       if (error) throw error;
       if (userId) untrustDevice(userId);
       toast.success('2FA desativado.');
+      await logAuditEvent('mfa_disabled', {});
       setBackupCodes(null);
       await refresh();
     } catch (e: any) {
