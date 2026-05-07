@@ -1,7 +1,7 @@
 import { useState, useRef, useEffect } from 'react';
 import { useApp, View } from '@/contexts/AppContext';
 import { saveState, overdueBills, dueTodayBills, currency, budgetProgress, todayISO } from '@/lib/store';
-import { LayoutDashboard, ArrowLeftRight, Pin, CalendarClock, FileText, Settings, Menu, X, LogOut, Sun, Moon, Download, Upload, ShieldCheck, CreditCard } from 'lucide-react';
+import { LayoutDashboard, ArrowLeftRight, Pin, CalendarClock, FileText, Settings, Menu, X, LogOut, Sun, Moon, Download, Upload, ShieldCheck, CreditCard, Target } from 'lucide-react';
 import { AnimatePresence, motion } from 'framer-motion';
 import { toast } from 'sonner';
 import AppLogo from './AppLogo';
@@ -10,11 +10,12 @@ import OnboardingTour from './OnboardingTour';
 import { useTheme } from '@/hooks/use-theme';
 import { supabase } from '@/integrations/supabase/client';
 
-const VIEW_ORDER: View[] = ['dashboard', 'lancamentos', 'fixas', 'cartoes', 'agenda', 'resumo', 'config', 'admin'];
+const VIEW_ORDER: View[] = ['dashboard', 'lancamentos', 'fixas', 'cartoes', 'metas', 'agenda', 'resumo', 'config', 'admin'];
 import DashboardView from './views/DashboardView';
 import LancamentosView from './views/LancamentosView';
 import FixasView from './views/FixasView';
 import CartoesView from './views/CartoesView';
+import MetasView from './views/MetasView';
 import AgendaView from './views/AgendaView';
 import ResumoView from './views/ResumoView';
 import ConfigView from './views/ConfigView';
@@ -25,6 +26,7 @@ const VIEWS: { id: View; name: string; shortName: string; subtitle: string; icon
   { id: 'lancamentos', name: 'Receitas e Despesas', shortName: 'Lançar', subtitle: 'Cadastre entradas e saídas do mês de forma simples.', icon: ArrowLeftRight },
   { id: 'fixas', name: 'Contas Fixas', shortName: 'Fixas', subtitle: 'Contas que se repetem todo mês para você não esquecer.', icon: Pin },
   { id: 'cartoes', name: 'Cartões de Crédito', shortName: 'Cartões', subtitle: 'Agrupe lançamentos por cartão e acompanhe a fatura do mês.', icon: CreditCard },
+  { id: 'metas', name: 'Metas Financeiras', shortName: 'Metas', subtitle: 'Defina objetivos e receba sugestões inteligentes do Copiloto.', icon: Target },
   { id: 'agenda', name: 'Agenda de Vencimentos', shortName: 'Agenda', subtitle: 'Saiba o que vence hoje, nesta semana e o que está atrasado.', icon: CalendarClock },
   { id: 'resumo', name: 'Resumo do Mês', shortName: 'Resumo', subtitle: 'Entenda o seu mês em linguagem simples.', icon: FileText },
   { id: 'config', name: 'Configurações', shortName: 'Config', subtitle: 'Ajustes básicos, backup e personalização.', icon: Settings },
@@ -32,7 +34,7 @@ const VIEWS: { id: View; name: string; shortName: string; subtitle: string; icon
 ];
 
 // Bottom tabs: show 5 main views, config and admin go in hamburger
-const BOTTOM_TABS = VIEWS.filter(v => v.id !== 'config' && v.id !== 'admin' && v.id !== 'cartoes');
+const BOTTOM_TABS = VIEWS.filter(v => v.id !== 'config' && v.id !== 'admin' && v.id !== 'cartoes' && v.id !== 'metas');
 
 export default function AppShell() {
   const { state, currentView, setCurrentView, setScreen, reloadDemo, logout, onAuthSuccess, viewingAs, setViewingAs } = useApp();
@@ -286,6 +288,7 @@ export default function AppShell() {
               {currentView === 'lancamentos' && <LancamentosView />}
               {currentView === 'fixas' && <FixasView />}
               {currentView === 'cartoes' && <CartoesView />}
+              {currentView === 'metas' && <MetasView />}
               {currentView === 'agenda' && <AgendaView />}
               {currentView === 'resumo' && <ResumoView />}
               {currentView === 'config' && <ConfigView />}

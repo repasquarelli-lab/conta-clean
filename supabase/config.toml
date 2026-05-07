@@ -41,3 +41,9 @@ verify_jwt = false
 
 [functions.ocr-receipt]
 verify_jwt = false
+
+[functions.goal-suggest]
+verify_jwt = false
+
+[functions.monthly-report]
+verify_jwt = false
