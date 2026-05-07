@@ -11,6 +11,17 @@ export interface BudgetGoal {
   limit: number;
 }
 
+export interface CreditCard {
+  id: string;
+  name: string;
+  brand?: string;
+  last4?: string;
+  creditLimit: number;
+  closingDay: number;
+  dueDay: number;
+  color?: string;
+}
+
 export interface Entry {
   id: string;
   type: 'income' | 'expense';
@@ -25,6 +36,7 @@ export interface Entry {
   installmentNumber?: number;
   installmentGroup?: string;
   partialOf?: string;
+  cardId?: string;
 }
 
 export interface NotificationSettings {
