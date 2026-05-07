@@ -306,6 +306,19 @@ export default function LancamentosView() {
                 )}
               </div>
             )}
+            {entryType === 'expense' && (state.creditCards || []).length > 0 && (
+              <div>
+                <label className="text-xs font-medium mb-1 block flex items-center gap-1.5">
+                  <CreditCard className="size-3.5" strokeWidth={1.5} /> Cartão (opcional)
+                </label>
+                <select name="cardId" defaultValue="" className="w-full px-3 py-2.5 rounded-[14px] border border-border bg-input text-foreground text-sm outline-none">
+                  <option value="">Sem cartão (à vista / boleto)</option>
+                  {(state.creditCards || []).map(c => (
+                    <option key={c.id} value={c.id}>{c.name} {c.last4 ? `••${c.last4}` : ''}</option>
+                  ))}
+                </select>
+              </div>
+            )}
             <div>
               <label className="text-xs font-medium mb-1 block">Repetir todo mês?</label>
               <select name="recurring" className="w-full px-3 py-2.5 rounded-[14px] border border-border bg-input text-foreground text-sm outline-none">
