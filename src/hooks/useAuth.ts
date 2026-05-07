@@ -38,6 +38,7 @@ export function useAuth() {
   };
 
   const signOut = async () => {
+    try { const { logAuditEvent } = await import('@/lib/auditLog'); await logAuditEvent('logout', {}); } catch {}
     await supabase.auth.signOut();
   };
 
