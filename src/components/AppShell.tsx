@@ -196,6 +196,7 @@ export default function AppShell() {
           {visibleViews.map(v => (
             <motion.button
               key={v.id}
+              data-tour={`nav-${v.id}`}
               onClick={() => setCurrentView(v.id)}
               whileHover={{ scale: 1.02, x: 4 }}
               whileTap={{ scale: 0.97 }}
