@@ -37,6 +37,8 @@ const AppContext = createContext<AppContextType | null>(null);
 export function AppProvider({ children }: { children: React.ReactNode }) {
   const auth = useAuth();
   const { loadFromCloud, saveToCloud } = useCloudSync(auth.user?.id);
+  const [viewingAs, setViewingAsState] = useState<ViewingAs | null>(null);
+  const viewingAsCloud = useCloudSync(viewingAs?.ownerId);
   const [state, setStateRaw] = useState<AppState>(() => {
     const s = loadState();
     return ensureMonthFixedBills(s, todayISO().slice(0, 7));
@@ -45,6 +47,7 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
   const [currentView, setCurrentView] = useState<View>('dashboard');
   const [currentMonth, setCurrentMonth] = useState(todayISO().slice(0, 7));
   const cloudLoadedRef = useRef(false);
+  const ownDataRef = useRef<AppState | null>(null);
   const saveTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
 
   // When auth state changes, load data from cloud or go to landing
@@ -58,6 +61,7 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
             const s = ensureMonthFixedBills(cloudState, todayISO().slice(0, 7));
             setStateRaw(s);
             saveState(s);
+            ownDataRef.current = s;
           }
           setScreen('app');
         });
@@ -66,8 +70,26 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
       }
     } else {
       cloudLoadedRef.current = false;
+      ownDataRef.current = null;
+      setViewingAsState(null);
     }
   }, [auth.user, auth.loading, loadFromCloud]);
+
+  const setViewingAs = useCallback((v: ViewingAs | null) => {
+    if (v) {
+      if (!ownDataRef.current) ownDataRef.current = state;
+      setViewingAsState(v);
+      viewingAsCloud.loadFromCloud().then(s => {
+        if (s) setStateRaw(ensureMonthFixedBills(s, todayISO().slice(0, 7)));
+        else toast.error('Não foi possível carregar os dados compartilhados.');
+      });
+    } else {
+      setViewingAsState(null);
+      if (ownDataRef.current) setStateRaw(ownDataRef.current);
+      else loadFromCloud().then(s => { if (s) setStateRaw(s); });
+    }
+  }, [state, viewingAsCloud, loadFromCloud]);
+
 
   const isReadOnly = !!viewingAs;
 
