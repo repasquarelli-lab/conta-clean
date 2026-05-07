@@ -269,6 +269,7 @@ export default function AppShell() {
           return (
             <motion.button
               key={v.id}
+              data-tour={`nav-${v.id}`}
               onClick={() => setCurrentView(v.id)}
               whileTap={{ scale: 0.85 }}
               transition={{ type: 'spring', stiffness: 400, damping: 25 }}
