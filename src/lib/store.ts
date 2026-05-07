@@ -44,6 +44,7 @@ export interface NotificationSettings {
   dueTodayAlert: boolean;
   overdueAlert: boolean;
   dueSoonAlert: boolean;
+  monthlyReport?: boolean;
 }
 
 export const defaultNotificationSettings: NotificationSettings = {
@@ -51,6 +52,7 @@ export const defaultNotificationSettings: NotificationSettings = {
   dueTodayAlert: true,
   overdueAlert: true,
   dueSoonAlert: true,
+  monthlyReport: true,
 };
 
 export interface AppState {
