@@ -455,6 +455,16 @@ export default function ConfigView() {
                   <div className={`absolute top-1 w-4 h-4 rounded-full bg-primary-foreground transition-transform ${notifSettings.dueSoonAlert ? 'left-5' : 'left-1'}`} />
                 </div>
               </label>
+
+              <label className={`flex items-center justify-between p-3 rounded-xl bg-accent border border-border cursor-pointer transition-opacity ${!notifSettings.enabled ? 'opacity-50 pointer-events-none' : ''}`} onClick={() => notifSettings.enabled && toggle('monthlyReport')}>
+                <div className="flex items-center gap-2.5">
+                  <span className="text-base">📊</span>
+                  <span className="text-sm">Relatório mensal por e-mail (dia 1º)</span>
+                </div>
+                <div className={`w-10 h-6 rounded-full transition-colors relative ${notifSettings.monthlyReport !== false ? 'bg-primary' : 'bg-muted'}`}>
+                  <div className={`absolute top-1 w-4 h-4 rounded-full bg-primary-foreground transition-transform ${notifSettings.monthlyReport !== false ? 'left-5' : 'left-1'}`} />
+                </div>
+              </label>
             </div>
           );
         })()}

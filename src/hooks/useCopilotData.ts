@@ -1,8 +1,10 @@
 import { useApp } from '@/contexts/AppContext';
 import { monthMetrics, currency, budgetProgress, topCategory, paidCount, getMonthEntries } from '@/lib/store';
+import { useGoals } from '@/hooks/useGoals';
 
 export function useCopilotData() {
-  const { state, currentMonth } = useApp();
+  const { state, currentMonth, onAuthSuccess } = useApp();
+  const { goals: financialGoals } = useGoals(onAuthSuccess.user?.id);
 
   const buildFinancialData = () => {
     const m = monthMetrics(state, currentMonth);
@@ -45,6 +47,14 @@ ${Object.entries(categoryBreakdown).map(([cat, val]) => `- ${cat}: ${currency(va
 
 Metas de orçamento:
 ${goals.map(g => `- ${g.category}: ${currency(g.spent)}/${currency(g.limit)} (${g.pct}%)`).join('\n') || 'Nenhuma meta definida'}
+
+Metas financeiras (objetivos de longo prazo):
+${financialGoals.length > 0
+  ? financialGoals.map(g => {
+      const pct = g.target_value > 0 ? Math.round((Number(g.current_value) / Number(g.target_value)) * 100) : 0;
+      return `- ${g.name}: ${currency(Number(g.current_value))}/${currency(Number(g.target_value))} (${pct}%)${g.deadline ? ` até ${g.deadline}` : ''}`;
+    }).join('\n')
+  : 'Nenhuma meta cadastrada'}
 
 --- Mês anterior (${prevMonth}) ---
 Receitas: ${currency(pm.incomes)}
