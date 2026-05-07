@@ -60,7 +60,7 @@ export default function LancamentosView() {
     const category = fd.get('category') as string;
     const recurring = fd.get('recurring') === 'true';
     const paid = fd.get('paid') === 'true';
-
+    const cardId = (fd.get('cardId') as string) || undefined;
     if (installments > 1 && entryType === 'expense') {
       const groupId = uid();
       const parcelValue = Math.round((totalValue / installments) * 100) / 100;
