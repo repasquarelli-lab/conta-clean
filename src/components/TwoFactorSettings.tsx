@@ -113,6 +113,7 @@ export default function TwoFactorSettings() {
       if (error) throw error;
       if (userId) untrustDevice(userId);
       toast.success('2FA desativado.');
+      await logAuditEvent('mfa_disabled', {});
       setBackupCodes(null);
       await refresh();
     } catch (e: any) {
