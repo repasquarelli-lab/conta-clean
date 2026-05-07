@@ -53,6 +53,24 @@ export default function AppShell() {
       .then(({ data }) => setIsAdmin(!!data));
   }, [userId]);
 
+  // Auto-accept family share invite from URL (?familyInvite=token)
+  useEffect(() => {
+    if (!userId) return;
+    const url = new URL(window.location.href);
+    const token = url.searchParams.get('familyInvite');
+    if (!token) return;
+    url.searchParams.delete('familyInvite');
+    window.history.replaceState({}, '', url.toString());
+    supabase.functions.invoke('family-share', { body: { action: 'accept', token } })
+      .then(({ data, error }) => {
+        if (error || data?.error) {
+          toast.error(data?.error || 'Não foi possível aceitar o convite.');
+        } else {
+          toast.success('Convite aceito! Veja em Configurações → Compartilhamento Familiar.');
+        }
+      });
+  }, [userId]);
+
   const visibleViews = VIEWS.filter(v => v.id !== 'admin' || isAdmin);
 
   useEffect(() => {
