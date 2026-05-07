@@ -6,7 +6,7 @@ import { useNotifications } from '@/hooks/useNotifications';
 import { toast } from 'sonner';
 
 type Screen = 'landing' | 'auth' | 'app';
-type View = 'dashboard' | 'lancamentos' | 'fixas' | 'cartoes' | 'agenda' | 'resumo' | 'config' | 'admin';
+type View = 'dashboard' | 'lancamentos' | 'fixas' | 'cartoes' | 'metas' | 'agenda' | 'resumo' | 'config' | 'admin';
 
 interface ViewingAs {
   ownerId: string;

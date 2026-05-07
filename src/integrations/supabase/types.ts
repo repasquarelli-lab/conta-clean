@@ -302,6 +302,42 @@ export type Database = {
         }
         Relationships: []
       }
+      goals: {
+        Row: {
+          color: string | null
+          created_at: string
+          current_value: number
+          deadline: string | null
+          id: string
+          name: string
+          target_value: number
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          color?: string | null
+          created_at?: string
+          current_value?: number
+          deadline?: string | null
+          id?: string
+          name: string
+          target_value?: number
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          color?: string | null
+          created_at?: string
+          current_value?: number
+          deadline?: string | null
+          id?: string
+          name?: string
+          target_value?: number
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
       mfa_backup_codes: {
         Row: {
           code_hash: string
