@@ -78,8 +78,12 @@ export default function TwoFactorSettings() {
       });
       if (error) throw error;
       toast.success('2FA ativado!');
+      await logAuditEvent('mfa_enabled', {});
       const codes = await generateBackupCodes();
-      if (codes) setBackupCodes(codes);
+      if (codes) {
+        setBackupCodes(codes);
+        await logAuditEvent('mfa_backup_codes_generated', { count: codes.length });
+      }
       setEnrolling(false);
       setPendingFactorId(null);
       setQr(''); setSecret(''); setCode('');
