@@ -20,6 +20,23 @@ export default function LancamentosView() {
   const [installments, setInstallments] = useState(1);
   const [partialEntry, setPartialEntry] = useState<Entry | null>(null);
   const [expandedPartials, setExpandedPartials] = useState<Set<string>>(new Set());
+  const formRef = useRef<HTMLFormElement>(null);
+
+  function applyExtracted(r: { description: string | null; value: number | null; date: string | null; category: string | null }) {
+    setEntryType('expense');
+    setTimeout(() => {
+      const f = formRef.current;
+      if (!f) return;
+      if (r.description) (f.elements.namedItem('desc') as HTMLInputElement).value = r.description;
+      if (r.value != null) (f.elements.namedItem('value') as HTMLInputElement).value = String(r.value);
+      if (r.date) (f.elements.namedItem('date') as HTMLInputElement).value = r.date;
+      const sel = f.elements.namedItem('category') as HTMLSelectElement | null;
+      if (sel && r.category) {
+        const opt = Array.from(sel.options).find(o => o.value.toLowerCase() === r.category!.toLowerCase());
+        if (opt) sel.value = opt.value;
+      }
+    }, 50);
+  }
 
   const entries = getMonthEntries(state, currentMonth).sort((a, b) => a.date.localeCompare(b.date));
   const expenseCats = getAllCategories(state);
