@@ -69,6 +69,13 @@ export default function OnboardingTour() {
       run={run}
       continuous
       onEvent={handleEvent}
+      locale={{
+        back: 'Voltar',
+        close: 'Fechar',
+        last: 'Concluir',
+        next: 'Próximo',
+        skip: 'Pular tour',
+      }}
       options={{
         primaryColor: 'hsl(263 70% 50%)',
         zIndex: 10000,
@@ -76,13 +83,6 @@ export default function OnboardingTour() {
         textColor: 'hsl(var(--foreground))',
         overlayColor: 'hsla(0, 0%, 0%, 0.55)',
         arrowColor: 'hsl(var(--card))',
-        locale: {
-          back: 'Voltar',
-          close: 'Fechar',
-          last: 'Concluir',
-          next: 'Próximo',
-          skip: 'Pular tour',
-        },
       }}
     />
   );
