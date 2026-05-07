@@ -35,7 +35,7 @@ const VIEWS: { id: View; name: string; shortName: string; subtitle: string; icon
 const BOTTOM_TABS = VIEWS.filter(v => v.id !== 'config' && v.id !== 'admin' && v.id !== 'cartoes');
 
 export default function AppShell() {
-  const { state, currentView, setCurrentView, setScreen, reloadDemo, logout, onAuthSuccess } = useApp();
+  const { state, currentView, setCurrentView, setScreen, reloadDemo, logout, onAuthSuccess, viewingAs, setViewingAs } = useApp();
   const userEmail = onAuthSuccess.user?.email || '';
   const userId = onAuthSuccess.user?.id || '';
   const { theme, toggleTheme } = useTheme();
@@ -51,6 +51,24 @@ export default function AppShell() {
     if (!userId) return;
     supabase.from('user_roles').select('role').eq('user_id', userId).eq('role', 'admin').maybeSingle()
       .then(({ data }) => setIsAdmin(!!data));
+  }, [userId]);
+
+  // Auto-accept family share invite from URL (?familyInvite=token)
+  useEffect(() => {
+    if (!userId) return;
+    const url = new URL(window.location.href);
+    const token = url.searchParams.get('familyInvite');
+    if (!token) return;
+    url.searchParams.delete('familyInvite');
+    window.history.replaceState({}, '', url.toString());
+    supabase.functions.invoke('family-share', { body: { action: 'accept', token } })
+      .then(({ data, error }) => {
+        if (error || data?.error) {
+          toast.error(data?.error || 'Não foi possível aceitar o convite.');
+        } else {
+          toast.success('Convite aceito! Veja em Configurações → Compartilhamento Familiar.');
+        }
+      });
   }, [userId]);
 
   const visibleViews = VIEWS.filter(v => v.id !== 'admin' || isAdmin);
@@ -227,6 +245,21 @@ export default function AppShell() {
 
       {/* Main Content */}
       <main className="flex-1 p-4 lg:p-6 pb-24 lg:pb-6 overflow-x-hidden">
+        {/* Read-only banner when viewing someone else's data */}
+        {viewingAs && (
+          <div className="mb-3 rounded-2xl px-4 py-3 bg-amber-500/15 border border-amber-500/40 flex items-center justify-between gap-3 flex-wrap">
+            <div className="text-sm">
+              <span className="font-bold">👁️ Visualizando como {viewingAs.ownerName}</span>
+              <span className="text-muted-foreground ml-2">Modo somente leitura — você não pode editar.</span>
+            </div>
+            <button
+              onClick={() => setViewingAs(null)}
+              className="glass-panel rounded-xl px-3 py-1.5 text-xs font-bold cursor-pointer"
+            >
+              Sair do modo leitura
+            </button>
+          </div>
+        )}
         {/* Desktop header bar */}
         <div className="glass-panel rounded-3xl p-4 lg:p-5 flex flex-col sm:flex-row justify-between gap-3 items-start sm:items-center mb-4">
           <div>

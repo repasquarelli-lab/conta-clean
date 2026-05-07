@@ -8,6 +8,11 @@ import { toast } from 'sonner';
 type Screen = 'landing' | 'auth' | 'app';
 type View = 'dashboard' | 'lancamentos' | 'fixas' | 'cartoes' | 'agenda' | 'resumo' | 'config' | 'admin';
 
+interface ViewingAs {
+  ownerId: string;
+  ownerName: string;
+}
+
 interface AppContextType {
   state: AppState;
   setState: (s: AppState) => void;
@@ -22,6 +27,9 @@ interface AppContextType {
   onAuthSuccess: ReturnType<typeof useAuth>;
   isAuthenticated: boolean;
   logout: () => void;
+  viewingAs: ViewingAs | null;
+  setViewingAs: (v: ViewingAs | null) => void;
+  isReadOnly: boolean;
 }
 
 const AppContext = createContext<AppContextType | null>(null);
@@ -29,6 +37,8 @@ const AppContext = createContext<AppContextType | null>(null);
 export function AppProvider({ children }: { children: React.ReactNode }) {
   const auth = useAuth();
   const { loadFromCloud, saveToCloud } = useCloudSync(auth.user?.id);
+  const [viewingAs, setViewingAsState] = useState<ViewingAs | null>(null);
+  const viewingAsCloud = useCloudSync(viewingAs?.ownerId);
   const [state, setStateRaw] = useState<AppState>(() => {
     const s = loadState();
     return ensureMonthFixedBills(s, todayISO().slice(0, 7));
@@ -37,6 +47,7 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
   const [currentView, setCurrentView] = useState<View>('dashboard');
   const [currentMonth, setCurrentMonth] = useState(todayISO().slice(0, 7));
   const cloudLoadedRef = useRef(false);
+  const ownDataRef = useRef<AppState | null>(null);
   const saveTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
 
   // When auth state changes, load data from cloud or go to landing
@@ -50,6 +61,7 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
             const s = ensureMonthFixedBills(cloudState, todayISO().slice(0, 7));
             setStateRaw(s);
             saveState(s);
+            ownDataRef.current = s;
           }
           setScreen('app');
         });
@@ -58,29 +70,59 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
       }
     } else {
       cloudLoadedRef.current = false;
+      ownDataRef.current = null;
+      setViewingAsState(null);
     }
   }, [auth.user, auth.loading, loadFromCloud]);
 
+  const setViewingAs = useCallback((v: ViewingAs | null) => {
+    if (v) {
+      if (!ownDataRef.current) ownDataRef.current = state;
+      setViewingAsState(v);
+      viewingAsCloud.loadFromCloud().then(s => {
+        if (s) setStateRaw(ensureMonthFixedBills(s, todayISO().slice(0, 7)));
+        else toast.error('Não foi possível carregar os dados compartilhados.');
+      });
+    } else {
+      setViewingAsState(null);
+      if (ownDataRef.current) setStateRaw(ownDataRef.current);
+      else loadFromCloud().then(s => { if (s) setStateRaw(s); });
+    }
+  }, [state, viewingAsCloud, loadFromCloud]);
+
+
+  const isReadOnly = !!viewingAs;
+
   const setState = useCallback((s: AppState) => {
+    if (isReadOnly) {
+      toast.info('Modo somente leitura. Saia para editar.');
+      return;
+    }
     setStateRaw(s);
     saveState(s);
+    ownDataRef.current = s;
     if (saveTimerRef.current) clearTimeout(saveTimerRef.current);
     if (auth.user) {
       saveTimerRef.current = setTimeout(() => saveToCloud(s), 1500);
     }
-  }, [auth.user, saveToCloud]);
+  }, [auth.user, saveToCloud, isReadOnly]);
 
   const updateState = useCallback((updater: (prev: AppState) => AppState) => {
+    if (isReadOnly) {
+      toast.info('Modo somente leitura. Saia para editar.');
+      return;
+    }
     setStateRaw(prev => {
       const next = updater(prev);
       saveState(next);
+      ownDataRef.current = next;
       if (auth.user) {
         if (saveTimerRef.current) clearTimeout(saveTimerRef.current);
         saveTimerRef.current = setTimeout(() => saveToCloud(next), 1500);
       }
       return next;
     });
-  }, [auth.user, saveToCloud]);
+  }, [auth.user, saveToCloud, isReadOnly]);
 
   const reloadDemo = useCallback(() => {
     const demo = makeDemoData();
@@ -106,6 +148,7 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
       onAuthSuccess: auth,
       isAuthenticated: !!auth.user,
       logout,
+      viewingAs, setViewingAs, isReadOnly,
     }}>
       {children}
     </AppContext.Provider>

@@ -10,6 +10,7 @@ import { toast } from 'sonner';
 import { useReferral } from '@/hooks/useReferral';
 import { supabase } from '@/integrations/supabase/client';
 import TwoFactorSettings from '@/components/TwoFactorSettings';
+import FamilyShareSettings from '@/components/FamilyShareSettings';
 
 export default function ConfigView() {
   const { state, updateState, reloadDemo, onAuthSuccess } = useApp();
@@ -455,6 +456,8 @@ export default function ConfigView() {
       </div>
 
       <TwoFactorSettings />
+
+      <FamilyShareSettings />
 
       {/* Subscription Management */}
       <div className="glass-panel p-4 mb-4">
