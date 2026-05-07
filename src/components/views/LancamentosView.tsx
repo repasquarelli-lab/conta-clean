@@ -1,8 +1,9 @@
-import React, { useState } from 'react';
+import React, { useRef, useState } from 'react';
 import { useApp } from '@/contexts/AppContext';
 import { getMonthEntries, currency, formatDate, todayISO, uid, getAllCategories, getAllIncomeCategories, Entry } from '@/lib/store';
 import MonthNavigator from '../MonthNavigator';
 import PartialPaymentDialog from '../PartialPaymentDialog';
+import ReceiptScanner from '../ReceiptScanner';
 import { PlusCircle, List, LayoutGrid, Search, Check, Undo2, Trash2, ArrowDownCircle, ArrowUpCircle, Save, Pencil, X, CreditCard, TrendingUp, TrendingDown, SplitSquareHorizontal, ChevronDown, ChevronUp } from 'lucide-react';
 import { getCategoryIcon } from '@/lib/categoryIcons';
 import { motion, AnimatePresence } from 'framer-motion';
