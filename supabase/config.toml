@@ -38,3 +38,6 @@ verify_jwt = false
 
 [functions.family-share]
 verify_jwt = false
+
+[functions.ocr-receipt]
+verify_jwt = false
