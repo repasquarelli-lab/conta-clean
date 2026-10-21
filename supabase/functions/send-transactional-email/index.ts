@@ -1,3 +1,4 @@
+import { getAuthUser, isServiceRole, maskEmail, safeOrigin } from "../_shared/auth.ts";
 import * as React from 'npm:react@18.3.1'
 import { renderAsync } from 'npm:@react-email/components@0.0.22'
 import { createClient } from 'npm:@supabase/supabase-js@2'
@@ -38,6 +39,14 @@ Deno.serve(async (req) => {
   // Handle CORS preflight
   if (req.method === 'OPTIONS') {
     return new Response(null, { headers: corsHeaders })
+  }
+
+  // Only backend functions (service role) may send emails
+  if (!isServiceRole(req)) {
+    return new Response(JSON.stringify({ error: 'Forbidden' }), {
+      status: 403,
+      headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+    })
   }
 
   const supabaseUrl = Deno.env.get('SUPABASE_URL')
@@ -135,7 +144,7 @@ Deno.serve(async (req) => {
   if (suppressionError) {
     console.error('Suppression check failed — refusing to send', {
       error: suppressionError,
-      effectiveRecipient,
+      recipient: maskEmail(effectiveRecipient),
     })
     return new Response(
       JSON.stringify({ error: 'Failed to verify suppression status' }),
@@ -155,7 +164,7 @@ Deno.serve(async (req) => {
       status: 'suppressed',
     })
 
-    console.log('Email suppressed', { effectiveRecipient, templateName })
+    console.log('Email suppressed', { recipient: maskEmail(effectiveRecipient), templateName })
     return new Response(
       JSON.stringify({ success: false, reason: 'email_suppressed' }),
       {
@@ -179,7 +188,7 @@ Deno.serve(async (req) => {
   if (tokenLookupError) {
     console.error('Token lookup failed', {
       error: tokenLookupError,
-      email: normalizedEmail,
+      email: maskEmail(normalizedEmail),
     })
     await supabase.from('email_send_log').insert({
       message_id: messageId,
@@ -347,7 +356,7 @@ Deno.serve(async (req) => {
     })
   }
 
-  console.log('Transactional email enqueued', { templateName, effectiveRecipient })
+  console.log('Transactional email enqueued', { templateName, recipient: maskEmail(effectiveRecipient) })
 
   return new Response(
     JSON.stringify({ success: true, queued: true }),

@@ -1,3 +1,4 @@
+import { getAuthUser, isServiceRole, maskEmail, safeOrigin } from "../_shared/auth.ts";
 import { serve } from "https://deno.land/std@0.190.0/http/server.ts";
 import Stripe from "https://esm.sh/stripe@18.5.0";
 import { createClient } from "npm:@supabase/supabase-js@2.57.2";
@@ -15,7 +16,7 @@ const PRICES: Record<string, string> = {
 const REFERRAL_COUPON_ID = "uJMk0Uma";
 
 const logStep = (step: string, details?: any) => {
-  const detailsStr = details ? ` - ${JSON.stringify(details)}` : '';
+  const detailsStr = details ? ` - ${JSON.stringify(details).replace(/[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\.[A-Za-z]{2,}/g, (m) => maskEmail(m))}` : '';
   console.log(`[CREATE-CHECKOUT] ${step}${detailsStr}`);
 };
 
@@ -36,7 +37,7 @@ serve(async (req) => {
     const { data } = await supabaseClient.auth.getUser(token);
     const user = data.user;
     if (!user?.email) throw new Error("User not authenticated or email not available");
-    logStep("User authenticated", { userId: user.id, email: user.email });
+    logStep("User authenticated", { userId: user.id });
 
     const body = await req.json().catch(() => ({}));
     const plan = body.plan || "monthly";
@@ -70,8 +71,8 @@ serve(async (req) => {
       customer_email: customerId ? undefined : user.email,
       line_items: [{ price: priceId, quantity: 1 }],
       mode: "subscription",
-      success_url: `${req.headers.get("origin")}/?subscription=success`,
-      cancel_url: `${req.headers.get("origin")}/?subscription=canceled`,
+      success_url: `${safeOrigin(req)}/?subscription=success`,
+      cancel_url: `${safeOrigin(req)}/?subscription=canceled`,
     };
 
     // Apply referral coupon to the referred user if eligible
@@ -127,7 +128,7 @@ serve(async (req) => {
                     },
                   },
                 });
-                logStep("Referral reward email sent to referrer", { referrerEmail });
+                logStep("Referral reward email sent to referrer");
               } catch (emailErr) {
                 logStep("Error sending referral reward email (non-blocking)", { error: emailErr.message });
               }

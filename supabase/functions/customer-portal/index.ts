@@ -1,3 +1,4 @@
+import { getAuthUser, isServiceRole, maskEmail, safeOrigin } from "../_shared/auth.ts";
 import { serve } from "https://deno.land/std@0.190.0/http/server.ts";
 import Stripe from "https://esm.sh/stripe@18.5.0";
 import { createClient } from "npm:@supabase/supabase-js@2.57.2";
@@ -41,7 +42,7 @@ serve(async (req) => {
       });
     }
 
-    const origin = req.headers.get("origin") || "http://localhost:3000";
+    const origin = safeOrigin(req);
     const portalSession = await stripe.billingPortal.sessions.create({
       customer: customers.data[0].id,
       return_url: `${origin}/`,

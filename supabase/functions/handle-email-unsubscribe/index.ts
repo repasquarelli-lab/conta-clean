@@ -124,7 +124,7 @@ Deno.serve(async (req) => {
     return jsonResponse({ error: 'Failed to process unsubscribe' }, 500)
   }
 
-  console.log('Email unsubscribed', { email: tokenRecord.email })
+  console.log('Email unsubscribed', { tokenId: tokenRecord.id ?? 'n/a' })
 
   return jsonResponse({ success: true })
 })

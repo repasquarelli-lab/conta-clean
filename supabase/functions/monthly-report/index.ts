@@ -1,3 +1,4 @@
+import { getAuthUser, isServiceRole, maskEmail, safeOrigin } from "../_shared/auth.ts";
 import { createClient } from "npm:@supabase/supabase-js@2";
 
 const corsHeaders = {
@@ -48,6 +49,7 @@ async function aiSummary(metrics: any, monthLabel: string): Promise<string> {
 
 Deno.serve(async (req) => {
   if (req.method === "OPTIONS") return new Response("ok", { headers: corsHeaders });
+  if (!isServiceRole(req)) return new Response(JSON.stringify({ error: "Forbidden" }), { status: 403, headers: { ...corsHeaders, "Content-Type": "application/json" } });
 
   const supabase = createClient(SUPABASE_URL, SERVICE_KEY);
   const { iso, label, start, end } = previousMonth();
