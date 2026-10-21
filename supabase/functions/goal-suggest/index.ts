@@ -1,7 +1,9 @@
+import { getAuthUser } from "../_shared/auth.ts";
 import { corsHeaders } from "https://esm.sh/@supabase/supabase-js@2.95.0/cors";
 
 Deno.serve(async (req) => {
   if (req.method === "OPTIONS") return new Response("ok", { headers: corsHeaders });
+  if (!(await getAuthUser(req))) return new Response(JSON.stringify({ error: "Unauthorized" }), { status: 401, headers: { ...corsHeaders, "Content-Type": "application/json" } });
 
   try {
     const { goalName, targetValue, currentValue, deadline, monthlySurplus } = await req.json();
