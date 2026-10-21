@@ -46,4 +46,7 @@ verify_jwt = false
 verify_jwt = false
 
 [functions.monthly-report]
-verify_jwt = false
+verify_jwt = true
+
+[functions.cleanup-expired-data]
+verify_jwt = true
