@@ -64,7 +64,7 @@ serve(async (req) => {
                 },
               },
             });
-            logStep("Sent data deletion warning email", { userId: profile.id, email });
+            logStep("Sent data deletion warning email", { userId: profile.id });
           }
 
           // Mark as notified
