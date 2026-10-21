@@ -82,6 +82,16 @@ serve(async (req) => {
         });
       }
 
+      // Only new accounts (within trial window) that were never referred can claim a code
+      const ageDays = (Date.now() - new Date(user.created_at).getTime()) / 86400000;
+      const { data: already } = await supabaseClient
+        .from("referrals").select("id").eq("referred_id", user.id).limit(1);
+      if (ageDays > 3 || (already && already.length > 0)) {
+        return new Response(JSON.stringify({ tracked: false, reason: "Not eligible" }), {
+          headers: { ...corsHeaders, "Content-Type": "application/json" },
+        });
+      }
+
       // Update the referral with the referred user
       await supabaseClient
         .from("referrals")

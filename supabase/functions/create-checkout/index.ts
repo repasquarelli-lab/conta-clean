@@ -1,3 +1,4 @@
+import { getAuthUser, isServiceRole, maskEmail, safeOrigin } from "../_shared/auth.ts";
 import { serve } from "https://deno.land/std@0.190.0/http/server.ts";
 import Stripe from "https://esm.sh/stripe@18.5.0";
 import { createClient } from "npm:@supabase/supabase-js@2.57.2";
@@ -15,7 +16,7 @@ const PRICES: Record<string, string> = {
 const REFERRAL_COUPON_ID = "uJMk0Uma";
 
 const logStep = (step: string, details?: any) => {
-  const detailsStr = details ? ` - ${JSON.stringify(details)}` : '';
+  const detailsStr = details ? ` - ${JSON.stringify(details).replace(/[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\.[A-Za-z]{2,}/g, (m) => maskEmail(m))}` : '';
   console.log(`[CREATE-CHECKOUT] ${step}${detailsStr}`);
 };
 
@@ -36,7 +37,7 @@ serve(async (req) => {
     const { data } = await supabaseClient.auth.getUser(token);
     const user = data.user;
     if (!user?.email) throw new Error("User not authenticated or email not available");
-    logStep("User authenticated", { userId: user.id, email: user.email });
+    logStep("User authenticated", { userId: user.id });
 
     const body = await req.json().catch(() => ({}));
     const plan = body.plan || "monthly";
@@ -70,8 +71,8 @@ serve(async (req) => {
       customer_email: customerId ? undefined : user.email,
       line_items: [{ price: priceId, quantity: 1 }],
       mode: "subscription",
-      success_url: `${req.headers.get("origin")}/?subscription=success`,
-      cancel_url: `${req.headers.get("origin")}/?subscription=canceled`,
+      success_url: `${safeOrigin(req)}/?subscription=success`,
+      cancel_url: `${safeOrigin(req)}/?subscription=canceled`,
     };
 
     // Apply referral coupon to the referred user if eligible
@@ -79,69 +80,7 @@ serve(async (req) => {
       sessionParams.discounts = [{ coupon: REFERRAL_COUPON_ID }];
       logStep("Applying referral coupon to referred user", { couponId: REFERRAL_COUPON_ID });
 
-      // Mark referral reward as applied
-      await supabaseClient
-        .from("referrals")
-        .update({ reward_applied: true })
-        .eq("id", referral![0].id);
-      logStep("Referral reward marked as applied");
-
-      // Reward the referrer: apply coupon to their active subscription
-      try {
-        const referrerId = referral![0].referrer_id;
-        const { data: referrerUser } = await supabaseClient.auth.admin.getUserById(referrerId);
-        const referrerEmail = referrerUser?.user?.email;
-
-        if (referrerEmail) {
-          const referrerCustomers = await stripe.customers.list({ email: referrerEmail, limit: 1 });
-          if (referrerCustomers.data.length > 0) {
-            const referrerCustomerId = referrerCustomers.data[0].id;
-            const referrerSubs = await stripe.subscriptions.list({
-              customer: referrerCustomerId,
-              status: "active",
-              limit: 1,
-            });
-
-            if (referrerSubs.data.length > 0) {
-              // Apply the coupon to the referrer's active subscription
-              await stripe.subscriptions.update(referrerSubs.data[0].id, {
-                coupon: REFERRAL_COUPON_ID,
-              });
-              logStep("Referrer rewarded with free month", { referrerId, subscriptionId: referrerSubs.data[0].id });
-
-              // Send reward notification email to referrer
-              try {
-                const referrerProfile = await supabaseClient
-                  .from("profiles")
-                  .select("user_name")
-                  .eq("id", referrerId)
-                  .maybeSingle();
-
-                await supabaseClient.functions.invoke("send-transactional-email", {
-                  body: {
-                    templateName: "referral-reward",
-                    recipientEmail: referrerEmail,
-                    idempotencyKey: `referral-reward-${referral![0].id}`,
-                    templateData: {
-                      referrerName: referrerProfile?.data?.user_name || undefined,
-                    },
-                  },
-                });
-                logStep("Referral reward email sent to referrer", { referrerEmail });
-              } catch (emailErr) {
-                logStep("Error sending referral reward email (non-blocking)", { error: emailErr.message });
-              }
-            } else {
-              logStep("Referrer has no active subscription to reward", { referrerId });
-            }
-          } else {
-            logStep("Referrer has no Stripe customer", { referrerId });
-          }
-        }
-      } catch (referrerErr) {
-        // Don't block checkout if referrer reward fails
-        logStep("Error rewarding referrer (non-blocking)", { error: referrerErr.message });
-      }
+      // Referrer reward is granted only after this user's subscription is active (see check-subscription).
     }
 
     const session = await stripe.checkout.sessions.create(sessionParams);
