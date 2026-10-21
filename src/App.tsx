@@ -10,6 +10,7 @@ import ResumoDemo from "./pages/ResumoDemo";
 import Termos from "./pages/Termos";
 import Privacidade from "./pages/Privacidade";
 import CookieConsent from "./components/CookieConsent";
+import BemVindo from "./pages/BemVindo";
 import NotFound from "./pages/NotFound";
 
 const queryClient = new QueryClient();
@@ -25,6 +26,7 @@ const App = () => (
           <Route path="/reset-password" element={<ResetPassword />} />
           <Route path="/unsubscribe" element={<Unsubscribe />} />
           <Route path="/resumo-demo" element={<ResumoDemo />} />
+          <Route path="/bem-vindo" element={<BemVindo />} />
           <Route path="/termos" element={<Termos />} />
           <Route path="/privacidade" element={<Privacidade />} />
           {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
