@@ -437,6 +437,24 @@ export type Database = {
         }
         Relationships: []
       }
+      subscription_access: {
+        Row: {
+          paid_until: string | null
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          paid_until?: string | null
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          paid_until?: string | null
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
       suppressed_emails: {
         Row: {
           created_at: string
@@ -493,6 +511,7 @@ export type Database = {
         Args: { payload: Json; queue_name: string }
         Returns: number
       }
+      has_app_access: { Args: { _user_id: string }; Returns: boolean }
       has_role: {
         Args: {
           _role: Database["public"]["Enums"]["app_role"]

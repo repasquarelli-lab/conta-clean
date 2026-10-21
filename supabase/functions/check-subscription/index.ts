@@ -142,6 +142,15 @@ serve(async (req) => {
 
     const hasAccess = hasActiveSub || trialActive;
 
+    // Server-side paywall: record paid period (+2 days grace) for RLS checks
+    await supabaseClient.from("subscription_access").upsert({
+      user_id: user.id,
+      paid_until: hasActiveSub && subscriptionEnd
+        ? new Date(new Date(subscriptionEnd).getTime() + 2 * 86400000).toISOString()
+        : null,
+      updated_at: new Date().toISOString(),
+    });
+
     // Track subscription_ended_at for data retention policy
     if (hasAccess) {
       // User has access — clear any retention tracking
