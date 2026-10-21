@@ -44,11 +44,11 @@ serve(async (req) => {
     
     const allMessages = [
       { role: "system", content: systemPrompt },
-      ...(messages || []).map((m: any) => ({
-        role: m.role,
+      ...(Array.isArray(messages) ? messages : []).slice(-30).map((m: any) => ({
+        role: m?.role === "assistant" ? "assistant" : "user",
         content: m.role === "user" && m === (messages || [])[0] 
-          ? m.content + userContext 
-          : m.content,
+          ? String(m.content ?? "").slice(0, 4000) + userContext 
+          : String(m?.content ?? "").slice(0, 4000),
       })),
     ];
 
