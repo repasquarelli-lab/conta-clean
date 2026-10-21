@@ -71,6 +71,7 @@ export function useDataExport(userId: string | undefined) {
       if (!data) throw new Error('Sem dados');
 
       // Build a printable HTML document
+      const esc = (v: unknown) => String(v ?? '').replace(/[&<>"']/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]!));
       const formatCurrency = (v: number) => `R$ ${v.toFixed(2).replace('.', ',')}`;
       const today = new Date().toLocaleDateString('pt-BR');
 
@@ -112,10 +113,10 @@ export function useDataExport(userId: string | undefined) {
         data.entries.forEach((e: any) => {
           html += `<tr>
             <td>${e.type === 'income' ? '📈 Receita' : '📉 Despesa'}</td>
-            <td>${e.description}</td>
+            <td>${esc(e.description)}</td>
             <td>${formatCurrency(Number(e.value))}</td>
             <td>${new Date(e.date).toLocaleDateString('pt-BR')}</td>
-            <td>${e.category}</td>
+            <td>${esc(e.category)}</td>
             <td>${e.paid ? '✅' : '❌'}</td>
           </tr>`;
         });
@@ -127,7 +128,7 @@ export function useDataExport(userId: string | undefined) {
         html += `<h2>Contas Fixas (${data.fixedBills.length})</h2><table>
           <tr><th>Nome</th><th>Valor</th><th>Dia</th><th>Categoria</th></tr>`;
         data.fixedBills.forEach((f: any) => {
-          html += `<tr><td>${f.name}</td><td>${formatCurrency(Number(f.value))}</td><td>${f.day}</td><td>${f.category}</td></tr>`;
+          html += `<tr><td>${esc(f.name)}</td><td>${formatCurrency(Number(f.value))}</td><td>${esc(f.day)}</td><td>${esc(f.category)}</td></tr>`;
         });
         html += `</table>`;
       }
@@ -137,7 +138,7 @@ export function useDataExport(userId: string | undefined) {
         html += `<h2>Metas de Orçamento (${data.budgetGoals.length})</h2><table>
           <tr><th>Categoria</th><th>Limite</th></tr>`;
         data.budgetGoals.forEach((g: any) => {
-          html += `<tr><td>${g.category}</td><td>${formatCurrency(Number(g.limit))}</td></tr>`;
+          html += `<tr><td>${esc(g.category)}</td><td>${formatCurrency(Number(g.limit))}</td></tr>`;
         });
         html += `</table>`;
       }
