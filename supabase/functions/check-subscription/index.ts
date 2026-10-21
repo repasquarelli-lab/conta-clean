@@ -103,7 +103,7 @@ serve(async (req) => {
         // Welcome email once per subscription (idempotent by subscription id)
         try {
           const { data: acc } = await supabaseClient.from("subscription_access").select("welcomed_subscription_id").eq("user_id", user.id).maybeSingle();
-          if (acc?.welcomed_subscription_id !== subscription.id) {
+          if (acc?.welcomed_subscription_id !== subscription.id && Date.now() - subscription.created * 1000 < 2 * 86400000) {
           await supabaseClient.from("subscription_access").upsert({ user_id: user.id, welcomed_subscription_id: subscription.id });
           const annual = planInterval === "year";
           const { data: prof } = await supabaseClient.from("profiles").select("user_name").eq("id", user.id).maybeSingle();
