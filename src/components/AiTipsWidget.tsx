@@ -3,6 +3,12 @@ import { motion, AnimatePresence } from 'framer-motion';
 import { Sparkles, Send, TrendingUp, Target, MessageCircle, RefreshCw, AlertCircle, Bot, User, X, ChevronDown } from 'lucide-react';
 import ReactMarkdown from 'react-markdown';
 import { useCopilotData } from '@/hooks/useCopilotData';
+import { supabase } from '@/integrations/supabase/client';
+
+const authHeader = async () => {
+  const { data } = await supabase.auth.getSession();
+  return `Bearer ${data.session?.access_token ?? ''}`;
+};
 
 type Tab = 'chat' | 'score' | 'trends' | 'tips';
 type Msg = { role: 'user' | 'assistant'; content: string };
@@ -54,7 +60,8 @@ export default function AiTipsWidget() {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
-          Authorization: `Bearer ${import.meta.env.VITE_SUPABASE_PUBLISHABLE_KEY}`,
+          Authorization: await authHeader(),
+          apikey: import.meta.env.VITE_SUPABASE_PUBLISHABLE_KEY,
         },
         body: JSON.stringify({
           messages: msgs,
@@ -131,7 +138,8 @@ export default function AiTipsWidget() {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
-          Authorization: `Bearer ${import.meta.env.VITE_SUPABASE_PUBLISHABLE_KEY}`,
+          Authorization: await authHeader(),
+          apikey: import.meta.env.VITE_SUPABASE_PUBLISHABLE_KEY,
         },
         body: JSON.stringify({ financialData: buildFinancialData(), type: 'score', messages: [] }),
       });
@@ -151,7 +159,8 @@ export default function AiTipsWidget() {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
-          Authorization: `Bearer ${import.meta.env.VITE_SUPABASE_PUBLISHABLE_KEY}`,
+          Authorization: await authHeader(),
+          apikey: import.meta.env.VITE_SUPABASE_PUBLISHABLE_KEY,
         },
         body: JSON.stringify({ financialData: buildFinancialData(), type: 'tips', messages: [] }),
       });
