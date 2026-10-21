@@ -50,3 +50,6 @@ verify_jwt = true
 
 [functions.cleanup-expired-data]
 verify_jwt = true
+
+[functions.trial-reminder]
+verify_jwt = true
