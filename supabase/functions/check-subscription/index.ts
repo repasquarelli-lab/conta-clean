@@ -102,6 +102,9 @@ serve(async (req) => {
 
         // Welcome email once per subscription (idempotent by subscription id)
         try {
+          const { data: acc } = await supabaseClient.from("subscription_access").select("welcomed_subscription_id").eq("user_id", user.id).maybeSingle();
+          if (acc?.welcomed_subscription_id !== subscription.id) {
+          await supabaseClient.from("subscription_access").upsert({ user_id: user.id, welcomed_subscription_id: subscription.id });
           const annual = planInterval === "year";
           const { data: prof } = await supabaseClient.from("profiles").select("user_name").eq("id", user.id).maybeSingle();
           await supabaseClient.functions.invoke("send-transactional-email", {
@@ -118,6 +121,7 @@ serve(async (req) => {
               },
             },
           });
+          }
         } catch (e) {
           logStep("Welcome email error (non-blocking)", { error: (e as Error).message });
         }

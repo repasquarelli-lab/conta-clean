@@ -442,16 +442,19 @@ export type Database = {
           paid_until: string | null
           updated_at: string
           user_id: string
+          welcomed_subscription_id: string | null
         }
         Insert: {
           paid_until?: string | null
           updated_at?: string
           user_id: string
+          welcomed_subscription_id?: string | null
         }
         Update: {
           paid_until?: string | null
           updated_at?: string
           user_id?: string
+          welcomed_subscription_id?: string | null
         }
         Relationships: []
       }
