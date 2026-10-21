@@ -250,7 +250,7 @@ Deno.serve(async (req) => {
     if (reReadError || !storedToken) {
       console.error('Failed to read back unsubscribe token after upsert', {
         error: reReadError,
-        email: normalizedEmail,
+        email: maskEmail(normalizedEmail),
       })
       await supabase.from('email_send_log').insert({
         message_id: messageId,
