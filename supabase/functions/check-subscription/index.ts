@@ -99,6 +99,32 @@ serve(async (req) => {
         subscriptionEnd = new Date(subscription.current_period_end * 1000).toISOString();
         planInterval = subscription.items?.data?.[0]?.price?.recurring?.interval ?? null;
         subTrialing = subscription.status === "trialing";
+
+        // Welcome email once per subscription (idempotent by subscription id)
+        try {
+          const { data: acc } = await supabaseClient.from("subscription_access").select("welcomed_subscription_id").eq("user_id", user.id).maybeSingle();
+          if (acc?.welcomed_subscription_id !== subscription.id && Date.now() - subscription.created * 1000 < 2 * 86400000) {
+          await supabaseClient.from("subscription_access").upsert({ user_id: user.id, welcomed_subscription_id: subscription.id });
+          const annual = planInterval === "year";
+          const { data: prof } = await supabaseClient.from("profiles").select("user_name").eq("id", user.id).maybeSingle();
+          await supabaseClient.functions.invoke("send-transactional-email", {
+            body: {
+              templateName: "subscription-welcome",
+              recipientEmail: user.email,
+              idempotencyKey: `subscription-welcome-${subscription.id}`,
+              templateData: {
+                userName: prof?.user_name || undefined,
+                planLabel: annual ? "Anual" : "Mensal",
+                amount: annual ? "R$ 159,90/ano" : "R$ 14,90/mês",
+                renewalDate: new Date(subscription.current_period_end * 1000).toLocaleDateString("pt-BR", { timeZone: "America/Sao_Paulo" }),
+                trialing: subTrialing,
+              },
+            },
+          });
+          }
+        } catch (e) {
+          logStep("Welcome email error (non-blocking)", { error: (e as Error).message });
+        }
         logStep("Active subscription found", { subscriptionId: subscription.id });
 
         // Reward referrer only once the referred user has actually paid

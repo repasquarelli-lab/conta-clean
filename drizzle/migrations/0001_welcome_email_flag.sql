@@ -1,0 +1,1 @@
+ALTER TABLE public.subscription_access ADD COLUMN welcomed_subscription_id text;

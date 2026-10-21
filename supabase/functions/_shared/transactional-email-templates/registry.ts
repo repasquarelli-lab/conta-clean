@@ -15,6 +15,7 @@ import { template as dataDeleted } from './data-deleted.tsx'
 import { template as familyInvite } from './family-invite.tsx'
 import { template as monthlyReport } from './monthly-report.tsx'
 import { template as trialEnding } from './trial-ending.tsx'
+import { template as subscriptionWelcome } from './subscription-welcome.tsx'
 
 export const TEMPLATES: Record<string, TemplateEntry> = {
   'referral-reward': referralReward,
@@ -23,4 +24,5 @@ export const TEMPLATES: Record<string, TemplateEntry> = {
   'family-invite': familyInvite,
   'monthly-report': monthlyReport,
   'trial-ending': trialEnding,
+  'subscription-welcome': subscriptionWelcome,
 }
