@@ -71,7 +71,7 @@ serve(async (req) => {
       customer_email: customerId ? undefined : user.email,
       line_items: [{ price: priceId, quantity: 1 }],
       mode: "subscription",
-      success_url: `${safeOrigin(req)}/?subscription=success`,
+      success_url: `${safeOrigin(req)}/bem-vindo`,
       cancel_url: `${safeOrigin(req)}/?subscription=canceled`,
     };
 

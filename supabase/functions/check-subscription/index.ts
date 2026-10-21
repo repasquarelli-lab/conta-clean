@@ -82,6 +82,8 @@ serve(async (req) => {
 
     let hasActiveSub = false;
     let subscriptionEnd = null;
+    let planInterval: string | null = null;
+    let subTrialing = false;
 
     if (customers.data.length > 0) {
       const customerId = customers.data[0].id;
@@ -95,6 +97,8 @@ serve(async (req) => {
       if (hasActiveSub) {
         const subscription = subscriptions.data[0];
         subscriptionEnd = new Date(subscription.current_period_end * 1000).toISOString();
+        planInterval = subscription.items?.data?.[0]?.price?.recurring?.interval ?? null;
+        subTrialing = subscription.status === "trialing";
         logStep("Active subscription found", { subscriptionId: subscription.id });
 
         // Reward referrer only once the referred user has actually paid
@@ -193,6 +197,8 @@ serve(async (req) => {
     return new Response(JSON.stringify({
       subscribed: hasActiveSub,
       subscription_end: subscriptionEnd,
+      plan_interval: planInterval,
+      subscription_trialing: subTrialing,
       trial_active: trialActive,
       trial_days_left: trialDaysLeft,
       data_retention_days_left: dataRetentionDaysLeft,
