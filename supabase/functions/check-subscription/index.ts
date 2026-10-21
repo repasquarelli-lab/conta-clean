@@ -98,6 +98,43 @@ serve(async (req) => {
         const subscription = subscriptions.data[0];
         subscriptionEnd = new Date(subscription.current_period_end * 1000).toISOString();
         logStep("Active subscription found", { subscriptionId: subscription.id });
+
+        // Reward referrer only once the referred user has actually paid
+        try {
+          const { data: claimed } = await supabaseClient
+            .from("referrals")
+            .update({ reward_applied: true })
+            .eq("referred_id", user.id)
+            .eq("status", "converted")
+            .eq("reward_applied", false)
+            .select("id, referrer_id");
+          const ref = claimed?.[0];
+          if (ref) {
+            const { data: refUser } = await supabaseClient.auth.admin.getUserById(ref.referrer_id);
+            const refEmail = refUser?.user?.email;
+            if (refEmail) {
+              const refCustomers = await stripe.customers.list({ email: refEmail, limit: 1 });
+              if (refCustomers.data.length > 0) {
+                const refSubs = await stripe.subscriptions.list({ customer: refCustomers.data[0].id, status: "active", limit: 1 });
+                if (refSubs.data.length > 0) {
+                  await stripe.subscriptions.update(refSubs.data[0].id, { coupon: "uJMk0Uma" });
+                  const { data: prof } = await supabaseClient.from("profiles").select("user_name").eq("id", ref.referrer_id).maybeSingle();
+                  await supabaseClient.functions.invoke("send-transactional-email", {
+                    body: {
+                      templateName: "referral-reward",
+                      recipientEmail: refEmail,
+                      idempotencyKey: `referral-reward-${ref.id}`,
+                      templateData: { referrerName: prof?.user_name || undefined },
+                    },
+                  });
+                  logStep("Referrer rewarded", { referrerId: ref.referrer_id });
+                }
+              }
+            }
+          }
+        } catch (e) {
+          logStep("Referral reward error (non-blocking)", { error: (e as Error).message });
+        }
       } else {
         logStep("No active subscription found");
       }

@@ -80,69 +80,7 @@ serve(async (req) => {
       sessionParams.discounts = [{ coupon: REFERRAL_COUPON_ID }];
       logStep("Applying referral coupon to referred user", { couponId: REFERRAL_COUPON_ID });
 
-      // Mark referral reward as applied
-      await supabaseClient
-        .from("referrals")
-        .update({ reward_applied: true })
-        .eq("id", referral![0].id);
-      logStep("Referral reward marked as applied");
-
-      // Reward the referrer: apply coupon to their active subscription
-      try {
-        const referrerId = referral![0].referrer_id;
-        const { data: referrerUser } = await supabaseClient.auth.admin.getUserById(referrerId);
-        const referrerEmail = referrerUser?.user?.email;
-
-        if (referrerEmail) {
-          const referrerCustomers = await stripe.customers.list({ email: referrerEmail, limit: 1 });
-          if (referrerCustomers.data.length > 0) {
-            const referrerCustomerId = referrerCustomers.data[0].id;
-            const referrerSubs = await stripe.subscriptions.list({
-              customer: referrerCustomerId,
-              status: "active",
-              limit: 1,
-            });
-
-            if (referrerSubs.data.length > 0) {
-              // Apply the coupon to the referrer's active subscription
-              await stripe.subscriptions.update(referrerSubs.data[0].id, {
-                coupon: REFERRAL_COUPON_ID,
-              });
-              logStep("Referrer rewarded with free month", { referrerId, subscriptionId: referrerSubs.data[0].id });
-
-              // Send reward notification email to referrer
-              try {
-                const referrerProfile = await supabaseClient
-                  .from("profiles")
-                  .select("user_name")
-                  .eq("id", referrerId)
-                  .maybeSingle();
-
-                await supabaseClient.functions.invoke("send-transactional-email", {
-                  body: {
-                    templateName: "referral-reward",
-                    recipientEmail: referrerEmail,
-                    idempotencyKey: `referral-reward-${referral![0].id}`,
-                    templateData: {
-                      referrerName: referrerProfile?.data?.user_name || undefined,
-                    },
-                  },
-                });
-                logStep("Referral reward email sent to referrer");
-              } catch (emailErr) {
-                logStep("Error sending referral reward email (non-blocking)", { error: emailErr.message });
-              }
-            } else {
-              logStep("Referrer has no active subscription to reward", { referrerId });
-            }
-          } else {
-            logStep("Referrer has no Stripe customer", { referrerId });
-          }
-        }
-      } catch (referrerErr) {
-        // Don't block checkout if referrer reward fails
-        logStep("Error rewarding referrer (non-blocking)", { error: referrerErr.message });
-      }
+      // Referrer reward is granted only after this user's subscription is active (see check-subscription).
     }
 
     const session = await stripe.checkout.sessions.create(sessionParams);
