@@ -75,6 +75,17 @@ serve(async (req) => {
       cancel_url: `${safeOrigin(req)}/?subscription=canceled`,
     };
 
+    // Keep the remaining in-app trial days: card is collected now, first charge happens when the trial ends
+    const trialMsLeft = new Date(user.created_at).getTime() + 3 * 86400000 - Date.now();
+    if (trialMsLeft > 0) {
+      sessionParams.payment_method_collection = "always";
+      sessionParams.subscription_data = {
+        trial_period_days: Math.max(1, Math.ceil(trialMsLeft / 86400000)),
+        trial_settings: { end_behavior: { missing_payment_method: "cancel" } },
+      };
+      logStep("Trial carried into subscription", { days: sessionParams.subscription_data.trial_period_days });
+    }
+
     // Apply referral coupon to the referred user if eligible
     if (hasReferralDiscount) {
       sessionParams.discounts = [{ coupon: REFERRAL_COUPON_ID }];

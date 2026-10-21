@@ -87,11 +87,9 @@ serve(async (req) => {
       const customerId = customers.data[0].id;
       logStep("Found Stripe customer", { customerId });
 
-      const subscriptions = await stripe.subscriptions.list({
-        customer: customerId,
-        status: "active",
-        limit: 1,
-      });
+      const all = await stripe.subscriptions.list({ customer: customerId, status: "all", limit: 10 });
+      // "trialing" = card on file, Stripe will charge automatically when the 3-day trial ends
+      const subscriptions = { data: all.data.filter((s) => s.status === "active" || s.status === "trialing") };
       hasActiveSub = subscriptions.data.length > 0;
 
       if (hasActiveSub) {
