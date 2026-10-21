@@ -7,6 +7,7 @@ import { toast } from 'sonner';
 import AppLogo from './AppLogo';
 import AiTipsWidget from './AiTipsWidget';
 import OnboardingTour from './OnboardingTour';
+import TrialBanner from './TrialBanner';
 import { useTheme } from '@/hooks/use-theme';
 import { supabase } from '@/integrations/supabase/client';
 
@@ -247,6 +248,7 @@ export default function AppShell() {
 
       {/* Main Content */}
       <main className="flex-1 p-4 lg:p-6 pb-24 lg:pb-6 overflow-x-hidden">
+        {!viewingAs && <TrialBanner user={onAuthSuccess.user ?? null} />}
         {/* Read-only banner when viewing someone else's data */}
         {viewingAs && (
           <div className="mb-3 rounded-2xl px-4 py-3 bg-amber-500/15 border border-amber-500/40 flex items-center justify-between gap-3 flex-wrap">
