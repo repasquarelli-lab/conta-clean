@@ -6,9 +6,9 @@ import type { User } from '@supabase/supabase-js';
 
 /** Shown during the free trial: lets the user activate the paid plan now (charged only when the trial ends). */
 export default function TrialBanner({ user }: { user: User | null }) {
-  const { subscribed, trialActive, trialDaysLeft, isAdmin, loading, openCheckout } = useSubscription(user) as any;
+  const { subscribed, trialActive, trialDaysLeft, loading, openCheckout } = useSubscription(user);
   const [busy, setBusy] = useState(false);
-  if (loading || subscribed || isAdmin || !trialActive) return null;
+  if (loading || subscribed || !trialActive) return null;
 
   const start = async (plan: 'monthly' | 'annual') => {
     setBusy(true);
