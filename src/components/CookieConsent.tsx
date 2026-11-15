@@ -1,11 +1,11 @@
-import { useEffect, useState } from 'react';
+import { forwardRef, useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
 import { Cookie, X } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 
 const STORAGE_KEY = 'cc_cookie_consent_v1';
 
-export default function CookieConsent() {
+const CookieConsent = forwardRef<HTMLDivElement>(function CookieConsent(_props, ref) {
   const [visible, setVisible] = useState(false);
 
   useEffect(() => {
@@ -25,6 +25,7 @@ export default function CookieConsent() {
   }
 
   return (
+    <div ref={ref} className="contents">
     <AnimatePresence>
       {visible && (
         <motion.div
@@ -69,5 +70,8 @@ export default function CookieConsent() {
         </motion.div>
       )}
     </AnimatePresence>
+    </div>
   );
-}
+});
+
+export default CookieConsent;

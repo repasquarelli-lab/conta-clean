@@ -53,3 +53,6 @@ verify_jwt = true
 
 [functions.trial-reminder]
 verify_jwt = true
+
+[functions.overdue-reminder]
+verify_jwt = true

@@ -112,6 +112,13 @@ export default function AppShell() {
         duration: 6000,
       });
     }
+    const halfway = budgets.filter(b => b.pct >= 50 && b.pct < 80);
+    if (halfway.length > 0) {
+      toast.info(`💡 ${halfway.length} categoria${halfway.length > 1 ? 's' : ''} já passou da metade do orçamento`, {
+        description: halfway.map(b => `${b.category}: ${b.pct}% usado`).join(' · '),
+        duration: 5000,
+      });
+    }
   }, []); // eslint-disable-line react-hooks/exhaustive-deps
 
   function exportBackup() {

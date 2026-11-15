@@ -1,3 +1,4 @@
+import { forwardRef } from 'react';
 import { motion } from 'framer-motion';
 import appIcon from '@/assets/app-icon.png';
 
@@ -14,11 +15,11 @@ const sizes = {
   xl: { icon: 'w-20 h-20', ring: 'w-24 h-24', text: 'text-2xl', sub: 'text-base' },
 };
 
-export default function AppLogo({ size = 'md', showText = true, subtitle }: AppLogoProps) {
+const AppLogo = forwardRef<HTMLDivElement, AppLogoProps>(function AppLogo({ size = 'md', showText = true, subtitle }, ref) {
   const s = sizes[size];
 
   return (
-    <div className="flex items-center gap-3">
+    <div ref={ref} className="flex items-center gap-3">
       <motion.div
         className={`relative ${s.ring} shrink-0 flex items-center justify-center`}
         whileHover={{ scale: 1.08, rotate: 3 }}
@@ -46,4 +47,6 @@ export default function AppLogo({ size = 'md', showText = true, subtitle }: AppL
       )}
     </div>
   );
-}
+});
+
+export default AppLogo;
