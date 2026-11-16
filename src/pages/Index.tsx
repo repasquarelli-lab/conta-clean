@@ -10,10 +10,11 @@ import { useReferral } from '@/hooks/useReferral';
 import { useDataExport } from '@/hooks/useDataExport';
 import { supabase } from '@/integrations/supabase/client';
 import { isDeviceTrusted } from '@/lib/trustedDevices';
+import CheckoutRecoveryOffer from '@/components/CheckoutRecoveryOffer';
 
 function ScreenRouter() {
   const { screen, onAuthSuccess, logout } = useApp();
-  const { hasAccess, loading: subLoading, openCheckout, dataRetentionDaysLeft } = useSubscription(onAuthSuccess.user);
+  const { hasAccess, loading: subLoading, openCheckout, dataRetentionDaysLeft, recoveryOffer, dismissRecoveryOffer, checkoutLoading, trialActive } = useSubscription(onAuthSuccess.user);
   const { referralCode } = useReferral(onAuthSuccess.user);
   const { exportCSV, exportPDF, exporting } = useDataExport(onAuthSuccess.user?.id);
 
@@ -52,10 +53,13 @@ function ScreenRouter() {
     );
   }
 
-  if (!hasAccess) {
-    return (
+  return (
+    <>
+      <CheckoutRecoveryOffer open={recoveryOffer} busy={checkoutLoading} trialActive={trialActive} onDismiss={dismissRecoveryOffer} onCheckout={openCheckout} />
+      {!hasAccess ? (
       <SubscriptionPaywall
         onCheckout={openCheckout}
+        loading={checkoutLoading}
         onBack={logout}
         referralCode={referralCode || undefined}
         dataRetentionDaysLeft={dataRetentionDaysLeft}
@@ -63,10 +67,9 @@ function ScreenRouter() {
         onExportPDF={exportPDF}
         exporting={exporting}
       />
-    );
-  }
-
-  return <AppShell />;
+      ) : <AppShell />}
+    </>
+  );
 }
 
 const Index = () => (
