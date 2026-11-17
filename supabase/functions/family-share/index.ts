@@ -41,8 +41,19 @@ serve(async (req) => {
         .eq("invitee_email", email)
         .maybeSingle();
 
+      const { count: activeCount } = await supabase
+        .from("family_shares")
+        .select("id", { count: "exact", head: true })
+        .eq("owner_id", user.id)
+        .neq("status", "revoked");
+      const { data: canUse } = await supabase.rpc("has_app_access", { _user_id: user.id });
+      if (!canUse) throw new Error("Assinatura necessária para convidar");
+
       let share = existing;
+      let shouldEmail = false;
       if (!share) {
+        if ((activeCount ?? 0) >= 5) throw new Error("Limite de 5 convites atingido");
+        shouldEmail = true;
         const { data: inserted, error: insErr } = await supabase
           .from("family_shares")
           .insert({ owner_id: user.id, invitee_email: email, status: "pending" })
@@ -51,6 +62,8 @@ serve(async (req) => {
         if (insErr) throw insErr;
         share = inserted;
       } else if (share.status === "revoked") {
+        if ((activeCount ?? 0) >= 5) throw new Error("Limite de 5 convites atingido");
+        shouldEmail = true;
         const { data: updated } = await supabase
           .from("family_shares")
           .update({ status: "pending", invitee_id: null, accepted_at: null })
@@ -70,7 +83,7 @@ serve(async (req) => {
 
       // Send invite e-mail (best effort)
       const acceptUrl = `${Deno.env.get("SUPABASE_URL")?.replace("ioatqhiqhzumuxivjcon.supabase.co", "appcontaclaralite.lovable.app") || "https://appcontaclaralite.lovable.app"}/?familyInvite=${share!.invite_token}`;
-      try {
+      if (shouldEmail) try {
         await fetch(`${Deno.env.get("SUPABASE_URL")}/functions/v1/send-transactional-email`, {
           method: "POST",
           headers: {

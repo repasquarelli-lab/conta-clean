@@ -15,6 +15,13 @@
       "when": 1792621645225,
       "tag": "0001_welcome_email_flag",
       "breakpoints": true
+    },
+    {
+      "idx": 2,
+      "version": "7",
+      "when": 1794874772548,
+      "tag": "0002_restrict_has_app_access",
+      "breakpoints": true
     }
   ]
 }
