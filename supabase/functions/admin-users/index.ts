@@ -1,4 +1,5 @@
 import { createClient } from "https://esm.sh/@supabase/supabase-js@2";
+import Stripe from "https://esm.sh/stripe@18.5.0";
 
 const corsHeaders = {
   "Access-Control-Allow-Origin": "*",
@@ -73,6 +74,51 @@ Deno.serve(async (req) => {
       }));
 
       return new Response(JSON.stringify({ users: enrichedUsers }), {
+        headers: { ...corsHeaders, "Content-Type": "application/json" },
+      });
+    }
+
+    if (action === "billing") {
+      const stripeKey = Deno.env.get("STRIPE_SECRET_KEY");
+      if (!stripeKey) throw new Error("STRIPE_SECRET_KEY missing");
+      const stripe = new Stripe(stripeKey, { apiVersion: "2025-08-27.basil" });
+      const subs: any[] = [];
+      for await (const sub of stripe.subscriptions.list({ status: "all", limit: 100, expand: ["data.customer"] })) {
+        subs.push(sub);
+        if (subs.length >= 500) break;
+      }
+      const charges = await stripe.charges.list({ limit: 100, expand: ["data.customer"] });
+      const emailOf = (c: any) => (c && typeof c === "object" && !c.deleted ? c.email : null);
+      const subscriptions = subs.map((s) => {
+        const item = s.items?.data?.[0];
+        const price = item?.price;
+        return {
+          id: s.id,
+          email: emailOf(s.customer),
+          status: s.status,
+          interval: price?.recurring?.interval ?? null,
+          amount: (price?.unit_amount ?? 0) / 100,
+          currency: price?.currency ?? "brl",
+          created: s.created,
+          trial_end: s.trial_end,
+          current_period_end: item?.current_period_end ?? null,
+          cancel_at_period_end: s.cancel_at_period_end,
+          canceled_at: s.canceled_at,
+        };
+      });
+      const chargeList = charges.data.map((c: any) => ({
+        id: c.id,
+        email: emailOf(c.customer) || c.billing_details?.email || c.receipt_email || null,
+        amount: c.amount / 100,
+        refunded: c.amount_refunded / 100,
+        currency: c.currency,
+        status: c.status,
+        paid: c.paid,
+        failure_message: c.failure_message,
+        created: c.created,
+        receipt_url: c.receipt_url,
+      }));
+      return new Response(JSON.stringify({ subscriptions, charges: chargeList }), {
         headers: { ...corsHeaders, "Content-Type": "application/json" },
       });
     }

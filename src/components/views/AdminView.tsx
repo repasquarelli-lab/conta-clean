@@ -2,6 +2,7 @@ import { useState, useEffect } from 'react';
 import { supabase } from '@/integrations/supabase/client';
 import { Shield, Trash2, UserPlus, RefreshCw, Crown } from 'lucide-react';
 import { toast } from 'sonner';
+import AdminBilling from '@/components/admin/AdminBilling';
 
 interface AdminUser {
   id: string;
@@ -92,6 +93,8 @@ export default function AdminView() {
   }
 
   return (
+    <div className="space-y-8">
+    <AdminBilling />
     <div className="space-y-4">
       <div className="flex items-center justify-between">
         <div className="flex items-center gap-2">
@@ -218,6 +221,7 @@ export default function AdminView() {
           </div>
         ))}
       </div>
+    </div>
     </div>
   );
 }
